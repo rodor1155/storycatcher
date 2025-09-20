@@ -1,1 +1,661 @@
+/* The Hidden World of London - Custom Styles */
 
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom animations */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+@keyframes shimmer {
+    0% { opacity: 0.3; }
+    50% { opacity: 1; }
+    100% { opacity: 0.3; }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Floating stones background animation */
+.floating-stones {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(135, 206, 235, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(143, 188, 143, 0.1) 0%, transparent 50%);
+    animation: float 6s ease-in-out infinite;
+}
+
+/* Navigation styles */
+.nav-crystal-btn {
+    position: relative;
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.nav-crystal-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
+}
+
+/* Editable content indicators (admin only) */
+body.admin-logged-in .editable-content {
+    position: relative;
+    cursor: pointer;
+}
+
+body.admin-logged-in .editable-content:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 8px;
+}
+
+body.admin-logged-in .editable-content::before {
+    content: '✏️';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    font-size: 0.8rem;
+}
+
+body.admin-logged-in .editable-content:hover::before {
+    opacity: 1;
+}
+
+/* Button animations */
+.cta-button {
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.cta-button:hover::before {
+    left: 100%;
+}
+
+/* Card styles */
+.magic-card {
+    background: rgba(99, 102, 241, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(147, 197, 253, 0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.2);
+}
+
+.magic-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #1e3a5f, #d4af37, #2d5016);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.magic-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(212, 175, 55, 0.5);
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
+}
+
+.magic-card:hover::before {
+    opacity: 1;
+}
+
+/* Clan-specific colors */
+.clan-sea {
+    border-color: rgba(30, 58, 95, 0.5);
+}
+
+.clan-sea:hover {
+    border-color: rgba(135, 206, 235, 0.7);
+    box-shadow: 0 10px 30px rgba(135, 206, 235, 0.3);
+}
+
+.clan-earth {
+    border-color: rgba(45, 80, 22, 0.5);
+}
+
+.clan-earth:hover {
+    border-color: rgba(143, 188, 143, 0.7);
+    box-shadow: 0 10px 30px rgba(143, 188, 143, 0.3);
+}
+
+.clan-sky {
+    border-color: rgba(74, 74, 74, 0.5);
+}
+
+.clan-sky:hover {
+    border-color: rgba(211, 211, 211, 0.7);
+    box-shadow: 0 10px 30px rgba(211, 211, 211, 0.3);
+}
+
+/* Episode cards */
+.episode-card {
+    background: linear-gradient(145deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.15));
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(147, 197, 253, 0.4);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
+}
+
+.episode-card::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #1e3a5f, #d4af37, #2d5016, #4a4a4a);
+    border-radius: 12px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.episode-card:hover::before {
+    opacity: 1;
+}
+
+.episode-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(212, 175, 55, 0.25);
+}
+
+/* Location cards */
+.location-card {
+    background: rgba(56, 189, 248, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(147, 197, 253, 0.4);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(56, 189, 248, 0.2);
+}
+
+.location-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(135, 206, 235, 0.6);
+    box-shadow: 0 12px 35px rgba(135, 206, 235, 0.2);
+}
+
+/* Text effects */
+.magical-text {
+    background: linear-gradient(45deg, #d4af37, #87ceeb, #8fbc8f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .floating-stones {
+        animation-duration: 8s;
+    }
+    
+    .magic-card, .episode-card, .location-card {
+        margin-bottom: 1rem;
+    }
+    
+    /* Mobile navigation adjustments */
+    .nav-link::after {
+        display: none;
+    }
+    
+    /* Smaller text on mobile */
+    .hero-title {
+        font-size: 2rem !important;
+        line-height: 1.2;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem !important;
+    }
+    
+    /* Stack buttons vertically on small screens */
+    .cta-buttons {
+        flex-direction: column;
+    }
+    
+    .cta-buttons .cta-button {
+        width: 100%;
+        margin-bottom: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Very small screens */
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .hero-title {
+        font-size: 1.75rem !important;
+    }
+    
+    .section-title {
+        font-size: 1.5rem !important;
+    }
+    
+    .magic-card, .episode-card, .location-card {
+        padding: 1rem;
+    }
+    
+    /* Admin panel mobile adjustments */
+    .admin-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        position: fixed;
+        z-index: 40;
+        height: 100vh;
+    }
+    
+    .admin-sidebar.open {
+        transform: translateX(0);
+    }
+    
+    .admin-content {
+        margin-left: 0;
+        padding: 1rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .nav, .floating-stones, .cta-button {
+        display: none;
+    }
+    
+    body {
+        color: black;
+        background: white;
+    }
+    
+    .magic-card, .episode-card, .location-card {
+        border: 1px solid #ccc;
+        break-inside: avoid;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #d4af37;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Form styles for admin */
+.form-input {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+    padding: 0.75rem;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.form-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* WYSIWYG Editor Styles */
+.editor-toolbar {
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    padding: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.editor-btn {
+    background: transparent;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: #d4af37;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.editor-btn:hover {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: #d4af37;
+}
+
+.editor-btn.active {
+    background: #d4af37;
+    color: #1e293b;
+}
+
+.editor-content {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 1rem;
+    color: white;
+    min-height: 200px;
+    outline: none;
+}
+
+.editor-content:focus {
+    border-color: #d4af37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+/* Child-friendly enhancements */
+.child-friendly {
+    --rainbow: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #54a0ff);
+}
+
+.rainbow-border {
+    background: var(--rainbow);
+    padding: 3px;
+    border-radius: 12px;
+}
+
+.rainbow-border > * {
+    background: rgba(30, 41, 59, 0.9);
+    border-radius: 9px;
+}
+
+.sparkle-effect {
+    position: relative;
+    overflow: hidden;
+}
+
+.sparkle-effect::before {
+    content: '✨';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 1.5rem;
+    animation: sparkle 3s ease-in-out infinite;
+    z-index: 1;
+}
+
+@keyframes sparkle {
+    0%, 100% { 
+        opacity: 0;
+        transform: scale(0.5) rotate(0deg);
+    }
+    50% { 
+        opacity: 1;
+        transform: scale(1.2) rotate(180deg);
+    }
+}
+
+.bouncy-button {
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.bouncy-button:hover {
+    transform: scale(1.1) rotate(-2deg);
+}
+
+.magical-text {
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: rainbow-shift 3s ease-in-out infinite;
+    background-size: 300% 300%;
+}
+
+@keyframes rainbow-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.fun-shadow {
+    filter: drop-shadow(0 5px 15px rgba(255, 107, 107, 0.3)) 
+            drop-shadow(0 5px 15px rgba(78, 205, 196, 0.3));
+}
+
+/* Enhanced editor styles */
+.editor-toolbar-mini {
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    padding: 0.25rem;
+    display: flex;
+    gap: 0.25rem;
+    margin-bottom: 0;
+}
+
+.editor-toolbar-mini button {
+    background: transparent;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: #d4af37;
+    padding: 0.25rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.75rem;
+    min-width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.editor-toolbar-mini button:hover {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: #d4af37;
+}
+
+.editor-content-mini {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 0.75rem;
+    color: white;
+    min-height: 80px;
+    outline: none;
+    font-size: 0.875rem;
+}
+
+.editor-content-mini:focus {
+    border-color: #d4af37;
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
+}
+
+/* Enhanced color picker */
+input[type="color"] {
+    -webkit-appearance: none;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+    border-radius: 6px;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: 2px solid #475569;
+    border-radius: 6px;
+}
+
+/* Animation utilities */
+.fade-in {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+
+.bounce-in {
+    animation: bounceIn 0.8s ease-out;
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3) rotate(-10deg);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.1) rotate(5deg);
+    }
+    70% {
+        transform: scale(0.9) rotate(-2deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+/* Fun loading animation */
+.loading-magical::after {
+    content: '✨ 🔮 ⭐ 🌟 ✨';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: magical-loading 2s linear infinite;
+    font-size: 1.2rem;
+}
+
+@keyframes magical-loading {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+
+/* Logo transparency fix */
+.logo-transparent {
+    background: transparent !important;
+    mix-blend-mode: normal;
+}
+
+.logo-transparent img {
+    background: transparent !important;
+}
+
+/* Utilities */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Map styles */
+.map-container {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+/* Success/Error messages */
+.message {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    animation: fadeInUp 0.3s ease-out;
+}
+
+.message-success {
+    background: rgba(34, 197, 94, 0.2);
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    color: #22c55e;
+}
+
+.message-error {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #ef4444;
+}
+
+.message-info {
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    color: #3b82f6;
+}
