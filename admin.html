@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - The Hidden World of London</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Fredoka+One&family=Bangers&family=Creepster&family=Righteous&family=Kalam:wght@300;400;700&family=Nunito:wght@300;400;600;700&family=Quicksand:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'cinzel': ['Cinzel', 'serif'],
+                        'inter': ['Inter', 'sans-serif']
+                    },
+                    colors: {
+                        'sea-dark': '#1e3a5f',
+                        'sea-light': '#87ceeb',
+                        'earth-dark': '#2d5016',
+                        'earth-light': '#8fbc8f',
+                        'sky-dark': '#4a4a4a',
+                        'sky-light': '#d3d3d3',
+                        'london-gold': '#d4af37',
+                        'stone-grey': '#708090'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-900 text-white font-inter">
+    <!-- Login Screen -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-sea-dark to-slate-800">
+        <div class="w-full max-w-md">
+            <!-- Logo/Title -->
+            <div class="text-center mb-8">
+                <div class="mb-4">
+                    <img src="https://page.gensparksite.com/v1/base64_upload/3fe4b4bc7b065ea3fa045ae2f403396e" 
+                         alt="Logo" class="logo-transparent w-16 h-16 mx-auto mb-4 animate-pulse">
+                </div>
+                <h1 class="text-2xl font-cinzel font-semibold mb-2">Admin Panel</h1>
+                <p class="text-slate-400">The Hidden World of London</p>
+            </div>
+
+            <!-- Login Form -->
+            <div class="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-london-gold/20">
+                <form id="login-form" class="space-y-6">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-slate-300 mb-2">
+                            <i class="fas fa-user mr-2"></i>Username
+                        </label>
+                        <input type="text" id="username" name="username" required
+                               class="form-input w-full" placeholder="Enter your username">
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-slate-300 mb-2">
+                            <i class="fas fa-lock mr-2"></i>Password
+                        </label>
+                        <input type="password" id="password" name="password" required
+                               class="form-input w-full" placeholder="Enter your password">
+                    </div>
+
+                    <button type="submit" 
+                            class="w-full bg-london-gold hover:bg-yellow-500 text-slate-900 font-semibold py-3 px-4 rounded-lg transition-all transform hover:scale-105">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center">
+                    <a href="index.html" class="text-slate-400 hover:text-london-gold transition-colors text-sm">
+                        <i class="fas fa-arrow-left mr-1"></i>Back to Website
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="hidden">
+        <!-- Navigation Bar -->
+        <nav class="bg-slate-800 border-b border-london-gold/20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <img src="https://page.gensparksite.com/v1/base64_upload/3fe4b4bc7b065ea3fa045ae2f403396e" 
+                             alt="Logo" class="logo-transparent w-6 h-6 mr-3">
+                        <span class="font-cinzel font-semibold text-lg">Hidden World Admin</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-slate-400 text-sm">
+                            Welcome, <span id="admin-username" class="text-london-gold"></span>
+                        </span>
+                        <button onclick="logout()" class="text-slate-400 hover:text-london-gold transition-colors">
+                            <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="flex">
+            <!-- Sidebar -->
+            <div class="w-64 bg-slate-800 min-h-screen p-4">
+                <nav class="space-y-2">
+                    <button onclick="showSection('dashboard')" class="admin-nav-btn w-full text-left p-3 rounded-lg bg-london-gold/20 text-london-gold">
+                        <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
+                    </button>
+                    <button onclick="showSection('pages')" class="admin-nav-btn w-full text-left p-3 rounded-lg hover:bg-slate-700 transition-colors">
+                        <i class="fas fa-file-alt mr-3"></i>Pages & Episodes
+                    </button>
+                    <button onclick="showSection('clans')" class="admin-nav-btn w-full text-left p-3 rounded-lg hover:bg-slate-700 transition-colors">
+                        <i class="fas fa-gem mr-3"></i>Clan Management
+                    </button>
+                    <button onclick="showSection('locations')" class="admin-nav-btn w-full text-left p-3 rounded-lg hover:bg-slate-700 transition-colors">
+                        <i class="fas fa-map-marker-alt mr-3"></i>Locations
+                    </button>
+                    <button onclick="showSection('settings')" class="admin-nav-btn w-full text-left p-3 rounded-lg hover:bg-slate-700 transition-colors">
+                        <i class="fas fa-cog mr-3"></i>Settings
+                    </button>
+                </nav>
+
+                <div class="mt-8 pt-8 border-t border-slate-700">
+                    <a href="index.html" target="_blank" class="flex items-center text-slate-400 hover:text-london-gold transition-colors">
+                        <i class="fas fa-external-link-alt mr-2"></i>
+                        <span class="text-sm">View Website</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="flex-1 p-8">
+                <!-- Dashboard Section -->
+                <div id="dashboard-section" class="admin-section">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-cinzel font-semibold mb-2">Dashboard</h2>
+                        <p class="text-slate-400">Welcome to the Hidden World content management system</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-slate-800 rounded-lg p-6 border border-london-gold/20">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-slate-400 text-sm">Total Episodes</p>
+                                    <p class="text-2xl font-semibold text-london-gold" id="total-episodes">0</p>
+                                </div>
+                                <i class="fas fa-scroll text-london-gold text-2xl"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800 rounded-lg p-6 border border-sea-light/20">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-slate-400 text-sm">Active Clans</p>
+                                    <p class="text-2xl font-semibold text-sea-light" id="total-clans">0</p>
+                                </div>
+                                <i class="fas fa-gem text-sea-light text-2xl"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800 rounded-lg p-6 border border-earth-light/20">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-slate-400 text-sm">Locations</p>
+                                    <p class="text-2xl font-semibold text-earth-light" id="total-locations">0</p>
+                                </div>
+                                <i class="fas fa-map-marker-alt text-earth-light text-2xl"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800 rounded-lg p-6 border border-sky-light/20">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-slate-400 text-sm">Draft Pages</p>
+                                    <p class="text-2xl font-semibold text-sky-light" id="draft-pages">0</p>
+                                </div>
+                                <i class="fas fa-edit text-sky-light text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="bg-slate-800 rounded-lg p-6 border border-london-gold/20">
+                        <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <button onclick="createNewPage('episode')" 
+                                    class="bg-london-gold hover:bg-yellow-500 text-slate-900 font-semibold py-3 px-4 rounded-lg transition-all">
+                                <i class="fas fa-plus mr-2"></i>New Episode
+                            </button>
+                            <button onclick="createNewPage('general')" 
+                                    class="bg-sea-dark hover:bg-sea-light hover:text-slate-900 text-white font-semibold py-3 px-4 rounded-lg border border-sea-light transition-all">
+                                <i class="fas fa-file-alt mr-2"></i>New Page
+                            </button>
+                            <button onclick="showSection('clans')" 
+                                    class="bg-earth-dark hover:bg-earth-light hover:text-slate-900 text-white font-semibold py-3 px-4 rounded-lg border border-earth-light transition-all">
+                                <i class="fas fa-gem mr-2"></i>Manage Clans
+                            </button>
+                            <button onclick="showSection('locations')" 
+                                    class="bg-sky-dark hover:bg-sky-light hover:text-slate-900 text-white font-semibold py-3 px-4 rounded-lg border border-sky-light transition-all">
+                                <i class="fas fa-map mr-2"></i>Add Location
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pages Section -->
+                <div id="pages-section" class="admin-section hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-cinzel font-semibold mb-2">Pages & Episodes</h2>
+                            <p class="text-slate-400">Manage your website content</p>
+                        </div>
+                        <div class="space-x-3">
+                            <button onclick="createNewPage('episode')" 
+                                    class="bg-london-gold hover:bg-yellow-500 text-slate-900 font-semibold py-2 px-4 rounded-lg transition-all">
+                                <i class="fas fa-plus mr-2"></i>New Episode
+                            </button>
+                            <button onclick="createNewPage('general')" 
+                                    class="bg-sea-dark hover:bg-sea-light hover:text-slate-900 text-white font-semibold py-2 px-4 rounded-lg border border-sea-light transition-all">
+                                <i class="fas fa-file-alt mr-2"></i>New Page
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Page Filters -->
+                    <div class="mb-6">
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="filterPages('all')" class="filter-btn bg-london-gold text-slate-900 px-4 py-2 rounded-lg font-medium">
+                                All Pages
+                            </button>
+                            <button onclick="filterPages('episode')" class="filter-btn bg-slate-700 text-white px-4 py-2 rounded-lg font-medium">
+                                Episodes
+                            </button>
+                            <button onclick="filterPages('published')" class="filter-btn bg-slate-700 text-white px-4 py-2 rounded-lg font-medium">
+                                Published
+                            </button>
+                            <button onclick="filterPages('draft')" class="filter-btn bg-slate-700 text-white px-4 py-2 rounded-lg font-medium">
+                                Drafts
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pages List -->
+                    <div id="pages-list" class="space-y-4">
+                        <!-- Pages will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Clans Section -->
+                <div id="clans-section" class="admin-section hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-cinzel font-semibold mb-2">Clan Management</h2>
+                            <p class="text-slate-400">Manage the magical clans and their stone powers</p>
+                        </div>
+                        <button onclick="createNewClan()" 
+                                class="bg-london-gold hover:bg-yellow-500 text-slate-900 font-semibold py-2 px-4 rounded-lg transition-all">
+                            <i class="fas fa-plus mr-2"></i>New Clan
+                        </button>
+                    </div>
+
+                    <div id="clans-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Clans will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Locations Section -->
+                <div id="locations-section" class="admin-section hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-cinzel font-semibold mb-2">Location Management</h2>
+                            <p class="text-slate-400">Manage magical locations across London</p>
+                        </div>
+                        <button onclick="createNewLocation()" 
+                                class="bg-london-gold hover:bg-yellow-500 text-slate-900 font-semibold py-2 px-4 rounded-lg transition-all">
+                            <i class="fas fa-plus mr-2"></i>New Location
+                        </button>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="bg-slate-800 rounded-lg p-4 border border-london-gold/20">
+                            <h3 class="text-lg font-semibold mb-3">
+                                <i class="fas fa-map mr-2"></i>Interactive Map
+                            </h3>
+                            <div id="locations-map" style="height: 400px; border-radius: 8px;"></div>
+                        </div>
+                    </div>
+
+                    <div id="locations-list" class="space-y-4">
+                        <!-- Locations will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <div id="settings-section" class="admin-section hidden">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-cinzel font-semibold mb-2">Settings</h2>
+                        <p class="text-slate-400">Customize your Hidden World website</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- Website Settings -->
+                        <div class="bg-slate-800 rounded-lg p-6 border border-london-gold/20">
+                            <h3 class="text-lg font-semibold mb-4 text-london-gold">Website Settings</h3>
+                            <form id="website-settings-form" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-2">Site Title</label>
+                                    <input type="text" id="site-title" value="The Hidden World of London"
+                                           class="form-input w-full">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-2">Site Description</label>
+                                    <textarea id="site-description" rows="3" 
+                                              class="form-input w-full">Discover the magical side of London through stories, clans, and hidden locations.</textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-2">Primary Color</label>
+                                    <input type="color" id="primary-color" value="#d4af37" 
+                                           class="form-input w-full h-12">
+                                </div>
+                                <button type="submit" 
+                                        class="bg-london-gold hover:bg-yellow-500 text-slate-900 font-semibold py-2 px-4 rounded-lg transition-all">
+                                    <i class="fas fa-save mr-2"></i>Save Settings
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- User Management -->
+                        <div class="bg-slate-800 rounded-lg p-6 border border-london-gold/20">
+                            <h3 class="text-lg font-semibold mb-4 text-london-gold">User Management</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-2">Current User</label>
+                                    <p class="text-white" id="current-user-info">admin (Administrator)</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-2">Change Password</label>
+                                    <input type="password" id="new-password" placeholder="New password"
+                                           class="form-input w-full mb-2">
+                                    <button onclick="changePassword()" 
+                                            class="bg-sea-dark hover:bg-sea-light hover:text-slate-900 text-white font-semibold py-2 px-4 rounded-lg border border-sea-light transition-all">
+                                        <i class="fas fa-key mr-2"></i>Change Password
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Management -->
+                    <div class="mt-8 bg-slate-800 rounded-lg p-6 border border-red-500/20">
+                        <h3 class="text-lg font-semibold mb-4 text-red-400">Data Management</h3>
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <button onclick="exportData()" 
+                                    class="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg transition-all">
+                                <i class="fas fa-download mr-2"></i>Export Data
+                            </button>
+                            <button onclick="importData()" 
+                                    class="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg transition-all">
+                                <i class="fas fa-upload mr-2"></i>Import Data
+                            </button>
+                            <button onclick="clearAllData()" 
+                                    class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-all">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>Clear All Data
+                            </button>
+                        </div>
+                        <p class="text-slate-400 text-sm mt-4">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Use these tools carefully. Always export your data before making major changes.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Editor Modal -->
+    <div id="page-editor-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-lg w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-london-gold/20 flex justify-between items-center">
+                <h3 class="text-xl font-cinzel font-semibold text-london-gold" id="editor-title">
+                    New Page
+                </h3>
+                <button onclick="closeEditor()" class="text-slate-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="flex-1 overflow-hidden flex">
+                <!-- Editor Form -->
+                <div class="w-1/3 p-6 border-r border-slate-700 overflow-y-auto">
+                    <form id="page-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Title</label>
+                            <input type="text" id="page-title" required 
+                                   class="form-input w-full" placeholder="Page title">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Slug</label>
+                            <input type="text" id="page-slug" 
+                                   class="form-input w-full" placeholder="url-friendly-name">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Type</label>
+                            <select id="page-type" class="form-input w-full">
+                                <option value="episode">Episode</option>
+                                <option value="general">General Page</option>
+                                <option value="clan">Clan Page</option>
+                                <option value="location">Location Page</option>
+                                <option value="story">Story Fragment</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Status</label>
+                            <select id="page-status" class="form-input w-full">
+                                <option value="draft">Draft</option>
+                                <option value="published">Published</option>
+                                <option value="archived">Archived</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Featured Image</label>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Upload Image</label>
+                                    <input type="file" id="page-image-upload" accept="image/*" 
+                                           class="form-input w-full" onchange="handleImageUpload('page-image', this)">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Or Enter URL</label>
+                                    <input type="url" id="page-image" 
+                                           class="form-input w-full" placeholder="https://...">
+                                </div>
+                                <div id="page-image-preview" class="hidden">
+                                    <img id="page-image-preview-img" class="logo-transparent w-full h-32 object-cover rounded-lg border border-slate-600" alt="Preview">
+                                    <button type="button" onclick="clearImage('page-image')" 
+                                            class="mt-2 text-red-400 hover:text-red-300 text-sm">
+                                        <i class="fas fa-trash mr-1"></i>Remove Image
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Story/Episode Logo</label>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Upload Logo</label>
+                                    <input type="file" id="page-logo-upload" accept="image/*" 
+                                           class="form-input w-full" onchange="handleImageUpload('page-logo', this)">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Or Enter URL</label>
+                                    <input type="url" id="page-logo" 
+                                           class="form-input w-full" placeholder="https://...">
+                                </div>
+                                <div id="page-logo-preview" class="hidden">
+                                    <img id="page-logo-preview-img" class="logo-transparent w-20 h-20 object-contain border border-slate-600 rounded-lg" alt="Preview">
+                                    <button type="button" onclick="clearImage('page-logo')" 
+                                            class="mt-2 text-red-400 hover:text-red-300 text-sm">
+                                        <i class="fas fa-trash mr-1"></i>Remove Logo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Meta Description</label>
+                            <textarea id="page-meta" rows="3" 
+                                      class="form-input w-full" placeholder="Brief description for SEO"></textarea>
+                        </div>
+
+                        <div class="flex items-center">
+                            <input type="checkbox" id="page-featured" class="mr-2">
+                            <label class="text-sm text-slate-300">Feature on homepage</label>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-700">
+                            <button type="submit" 
+                                    class="w-full bg-london-gold hover:bg-yellow-500 text-slate-900 font-semibold py-2 px-4 rounded-lg transition-all">
+                                <i class="fas fa-save mr-2"></i>Save Page
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- WYSIWYG Editor -->
+                <div class="flex-1 p-6 overflow-y-auto">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Content</label>
+                        <!-- Enhanced WYSIWYG Editor with color and font controls -->
+                        <div id="wysiwyg-container">
+                            <div class="editor-toolbar">
+                                <!-- Toolbar buttons will be added via JS -->
+                            </div>
+                            <div id="editor-content" contenteditable="true" class="editor-content">
+                                <p>Start writing your content here...</p>
+                            </div>
+                        </div>
+                        <textarea id="page-content" class="hidden"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clan Editor Modal -->
+    <div id="clan-editor-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="p-6 border-b border-london-gold/20 flex justify-between items-center">
+                <h3 class="text-xl font-cinzel font-semibold text-london-gold" id="clan-editor-title">New Clan</h3>
+                <button onclick="closeClanEditor()" class="text-slate-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6">
+                <form id="clan-form" class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Clan Name</label>
+                            <input type="text" id="clan-name" required class="form-input w-full" placeholder="e.g., Fire Clan">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Primary Color</label>
+                            <div class="flex gap-2">
+                                <input type="color" id="clan-color-primary" class="w-12 h-10 rounded border border-slate-600">
+                                <input type="text" id="clan-color-primary-hex" class="form-input flex-1" placeholder="#ff5733">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Secondary Color</label>
+                            <div class="flex gap-2">
+                                <input type="color" id="clan-color-secondary" class="w-12 h-10 rounded border border-slate-600">
+                                <input type="text" id="clan-color-secondary-hex" class="form-input flex-1" placeholder="#ff8c69">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Clan Emblem</label>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Upload Emblem</label>
+                                    <input type="file" id="clan-emblem-upload" accept="image/*" 
+                                           class="form-input w-full" onchange="handleImageUpload('clan-emblem', this)">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Or Enter URL</label>
+                                    <input type="url" id="clan-emblem" class="form-input w-full" placeholder="https://...">
+                                </div>
+                                <div id="clan-emblem-preview" class="hidden">
+                                    <img id="clan-emblem-preview-img" class="logo-transparent w-20 h-20 object-cover rounded-full border border-slate-600" alt="Preview">
+                                    <button type="button" onclick="clearImage('clan-emblem')" 
+                                            class="mt-2 text-red-400 hover:text-red-300 text-sm">
+                                        <i class="fas fa-trash mr-1"></i>Remove Image
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Clan Logo</label>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Upload Logo</label>
+                                    <input type="file" id="clan-logo-upload" accept="image/*" 
+                                           class="form-input w-full" onchange="handleImageUpload('clan-logo', this)">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Or Enter URL</label>
+                                    <input type="url" id="clan-logo" class="form-input w-full" placeholder="https://...">
+                                </div>
+                                <div id="clan-logo-preview" class="hidden">
+                                    <img id="clan-logo-preview-img" class="logo-transparent w-20 h-20 object-contain border border-slate-600 rounded-lg" alt="Preview">
+                                    <button type="button" onclick="clearImage('clan-logo')" 
+                                            class="mt-2 text-red-400 hover:text-red-300 text-sm">
+                                        <i class="fas fa-trash mr-1"></i>Remove Logo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Status</label>
+                            <select id="clan-status" class="form-input w-full">
+                                <option value="active">Active</option>
+                                <option value="hidden">Hidden</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Stone Origin Story</label>
+                            <div class="editor-toolbar-mini">
+                                <button type="button" onclick="formatClanText('stone-description', 'bold')"><i class="fas fa-bold"></i></button>
+                                <button type="button" onclick="formatClanText('stone-description', 'italic')"><i class="fas fa-italic"></i></button>
+                                <button type="button" onclick="formatClanText('stone-description', 'insertHTML', '<em>magical text</em>')"><i class="fas fa-magic"></i></button>
+                            </div>
+                            <div id="clan-stone-description" contenteditable="true" class="editor-content-mini">
+                                <p>Enter the mystical origin story of this clan's stone...</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">What It Offers</label>
+                            <div class="editor-toolbar-mini">
+                                <button type="button" onclick="formatClanText('offering', 'bold')"><i class="fas fa-bold"></i></button>
+                                <button type="button" onclick="formatClanText('offering', 'italic')"><i class="fas fa-italic"></i></button>
+                            </div>
+                            <div id="clan-offering" contenteditable="true" class="editor-content-mini">
+                                <p>Describe the powers and gifts this clan stone provides...</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Resonance Note</label>
+                            <div class="editor-toolbar-mini">
+                                <button type="button" onclick="formatClanText('resonance-note', 'bold')"><i class="fas fa-bold"></i></button>
+                                <button type="button" onclick="formatClanText('resonance-note', 'italic')"><i class="fas fa-italic"></i></button>
+                            </div>
+                            <div id="clan-resonance-note" contenteditable="true" class="editor-content-mini">
+                                <p>How does one awaken or connect with this stone?</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:col-span-2 pt-4 border-t border-slate-700">
+                        <button type="submit" class="w-full bg-london-gold hover:bg-yellow-500 text-slate-900 font-semibold py-3 px-4 rounded-lg transition-all">
+                            <i class="fas fa-save mr-2"></i>Save Clan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Location Editor Modal -->
+    <div id="location-editor-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="p-6 border-b border-london-gold/20 flex justify-between items-center">
+                <h3 class="text-xl font-cinzel font-semibold text-london-gold" id="location-editor-title">New Location</h3>
+                <button onclick="closeLocationEditor()" class="text-slate-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6">
+                <form id="location-form" class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Location Name</label>
+                            <input type="text" id="location-name" required class="form-input w-full" placeholder="e.g., Tower Bridge">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-2">Latitude</label>
+                                <input type="number" id="location-latitude" step="0.0001" class="form-input w-full" placeholder="51.5074">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-2">Longitude</label>
+                                <input type="number" id="location-longitude" step="0.0001" class="form-input w-full" placeholder="-0.1278">
+                            </div>
+                        </div>
+                        <div>
+                            <button type="button" onclick="getCurrentLocation()" class="bg-sea-dark text-white py-2 px-4 rounded-lg text-sm hover:bg-sea-light hover:text-slate-900 transition-all">
+                                <i class="fas fa-crosshairs mr-2"></i>Use My Location
+                            </button>
+                            <button type="button" onclick="searchLocation()" class="bg-earth-dark text-white py-2 px-4 rounded-lg text-sm hover:bg-earth-light hover:text-slate-900 transition-all ml-2">
+                                <i class="fas fa-search mr-2"></i>Search Address
+                            </button>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Location Image</label>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Upload Image</label>
+                                    <input type="file" id="location-image-upload" accept="image/*" 
+                                           class="form-input w-full" onchange="handleImageUpload('location-image', this)">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Or Enter URL</label>
+                                    <input type="url" id="location-image" class="form-input w-full" placeholder="https://...">
+                                </div>
+                                <div id="location-image-preview" class="hidden">
+                                    <img id="location-image-preview-img" class="w-full h-32 object-cover rounded-lg border border-slate-600" alt="Preview">
+                                    <button type="button" onclick="clearImage('location-image')" 
+                                            class="mt-2 text-red-400 hover:text-red-300 text-sm">
+                                        <i class="fas fa-trash mr-1"></i>Remove Image
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Status</label>
+                            <select id="location-status" class="form-input w-full">
+                                <option value="active">Active</option>
+                                <option value="hidden">Hidden</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Magical Description</label>
+                            <div class="editor-toolbar-mini">
+                                <button type="button" onclick="formatLocationText('magical-description', 'bold')"><i class="fas fa-bold"></i></button>
+                                <button type="button" onclick="formatLocationText('magical-description', 'italic')"><i class="fas fa-italic"></i></button>
+                                <button type="button" onclick="formatLocationText('magical-description', 'insertHTML', '<span class=\"magical-text\">✨ magical ✨</span>')"><i class="fas fa-sparkles"></i></button>
+                            </div>
+                            <div id="location-magical-description" contenteditable="true" class="editor-content-mini">
+                                <p>What magical energy exists at this location?</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">What to Look For</label>
+                            <div class="editor-toolbar-mini">
+                                <button type="button" onclick="formatLocationText('what-to-look-for', 'bold')"><i class="fas fa-bold"></i></button>
+                                <button type="button" onclick="formatLocationText('what-to-look-for', 'italic')"><i class="fas fa-italic"></i></button>
+                            </div>
+                            <div id="location-what-to-look-for" contenteditable="true" class="editor-content-mini">
+                                <p>What should visitors look for in the real world?</p>
+                            </div>
+                        </div>
+                        <div id="location-mini-map" style="height: 200px; border-radius: 8px; border: 1px solid #475569;"></div>
+                    </div>
+                    <div class="md:col-span-2 pt-4 border-t border-slate-700">
+                        <button type="submit" class="w-full bg-london-gold hover:bg-yellow-500 text-slate-900 font-semibold py-3 px-4 rounded-lg transition-all">
+                            <i class="fas fa-save mr-2"></i>Save Location
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/admin.js"></script>
+</body>
+</html>
