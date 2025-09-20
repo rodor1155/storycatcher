@@ -79,28 +79,139 @@ function setupNavigation() {
     });
 }
 
-// Load all data from API
+// Load all data (static data since GitHub Pages doesn't support database)
 async function loadAllData() {
     try {
-        // Load episodes (published pages of type 'episode')
-        const episodesResponse = await fetch('tables/pages?limit=100');
-        const episodesData = await episodesResponse.json();
-        allEpisodes = episodesData.data.filter(page => 
-            page.page_type === 'episode' && page.status === 'published'
-        ).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        // Static episodes data
+        allEpisodes = [
+            {
+                id: 'ep1',
+                title: 'The Awakening of the Thames Stones',
+                meta_description: 'Discover how the ancient clan stones first awakened along the Thames, calling to children who could hear their magical whispers.',
+                content: '<p>Long ago, when London was just a collection of villages along the Thames, five mysterious stones appeared overnight. Each stone hummed with a different magical frequency...</p><p>The River Clan stone emerged first, glowing blue-green like the deepest part of the Thames. Children walking along the river banks began to hear whispers in languages they had never learned...</p>',
+                created_at: Date.now() - 86400000, // 1 day ago
+                image_url: null,
+                page_type: 'episode',
+                status: 'published'
+            },
+            {
+                id: 'ep2',
+                title: 'The Secret of Fleet River',
+                meta_description: 'Follow Maya as she discovers the hidden Fleet River and learns why some waters remember everything.',
+                content: '<p>Maya pressed her ear to the pavement near Blackfriars Bridge. Other children thought she was playing, but Maya could hear something magical...</p><p>Beneath the busy London streets, the Fleet River still flows, carrying messages between the clan stones. Maya was the first to hear its call in over fifty years...</p>',
+                created_at: Date.now() - 172800000, // 2 days ago
+                image_url: null,
+                page_type: 'episode',
+                status: 'published'
+            },
+            {
+                id: 'ep3',
+                title: 'The Crystal Garden of Covent Garden',
+                meta_description: 'Explore the hidden crystal garden where the Earth Clan stone teaches children to speak with growing things.',
+                content: '<p>Behind the market stalls of Covent Garden, there is a garden that only appears to children who truly believe in magic...</p><p>Tommy discovered it when he was looking for his lost marble. But what he found instead was a garden where flowers sang and trees offered advice in rustling whispers...</p>',
+                created_at: Date.now() - 259200000, // 3 days ago
+                image_url: null,
+                page_type: 'episode',
+                status: 'published'
+            }
+        ];
 
-        // Load clans
-        const clansResponse = await fetch('tables/clans?limit=100');
-        const clansData = await clansResponse.json();
-        allClans = clansData.data.filter(clan => clan.status === 'active');
+        // Static clans data
+        allClans = [
+            {
+                id: 'clan1',
+                name: 'River Clan',
+                stone_description: 'The River Clan stone emerged from the Thames itself, carrying the wisdom of waters that have flowed for thousands of years. It glows with the blue-green light of deep water and hums with the rhythm of tides.',
+                offering: 'The power to understand any language, to flow around obstacles like water, and to hear the stories that rivers tell. Members can communicate with all water creatures and feel the emotions of anyone who has touched the same water.',
+                resonance_note: 'Place your hand on any flowing water and whisper "I hear your stories." The stone will respond when you truly mean it.',
+                color_primary: '#0EA5E9',
+                color_secondary: '#06B6D4',
+                emblem_url: null,
+                status: 'active'
+            },
+            {
+                id: 'clan2',
+                name: 'Earth Clan',
+                stone_description: 'Born from the deep clay beneath London, this stone contains the memories of every tree that ever grew in the city. It glows with warm brown and green light, and smells like fresh soil after rain.',
+                offering: 'The ability to make plants grow, to speak with animals, and to sense the health of the earth. Members can find lost things by asking the ground to remember, and they always know which direction leads home.',
+                resonance_note: 'Plant something with your own hands and whisper "I help you grow." Care for it daily, and the stone will notice your dedication.',
+                color_primary: '#16A34A',
+                color_secondary: '#84CC16',
+                emblem_url: null,
+                status: 'active'
+            },
+            {
+                id: 'clan3',
+                name: 'Sky Clan',
+                stone_description: 'This stone fell from the London sky on a night when all the stars seemed especially bright. It floats slightly above the ground and changes color like the sky throughout the day and night.',
+                offering: 'The gift of flying in dreams that feel completely real, the ability to predict weather by feeling it in your bones, and the power to send messages on the wind. Members can breathe comfortably at any height.',
+                resonance_note: 'On a windy day, spread your arms wide and say "I am ready to soar." If the wind lifts your hair and fills your heart with lightness, the stone has heard you.',
+                color_primary: '#3B82F6',
+                color_secondary: '#8B5CF6',
+                emblem_url: null,
+                status: 'active'
+            },
+            {
+                id: 'clan4',
+                name: 'Fire Clan',
+                stone_description: 'Forged in the great fire of London and cooled in Thames water, this stone burns without consuming and lights without blinding. It pulses with warmth and casts dancing shadows that tell stories.',
+                offering: 'The power to bring warmth to cold hearts, to light any darkness (including the darkness of sadness), and to forge unbreakable friendships. Members can create beautiful things from raw materials and their presence makes others feel brave.',
+                resonance_note: 'Light a candle and speak your deepest wish to the flame. If the fire dances in response and fills you with courage, you have the Fire Clan\'s attention.',
+                color_primary: '#EF4444',
+                color_secondary: '#F59E0B',
+                emblem_url: null,
+                status: 'active'
+            },
+            {
+                id: 'clan5',
+                name: 'Shadow Clan',
+                stone_description: 'The most mysterious stone, it appears as black as midnight but reflects all colors when moonlight touches it. It emerged during London\'s darkest hour and teaches that shadows are not evil, but necessary for light to have meaning.',
+                offering: 'The ability to move unseen when needed, to understand hidden emotions, and to help others face their fears. Members can step into shadows to travel quickly across the city and they see clearly in complete darkness.',
+                resonance_note: 'Stand alone in a shadow and say "I am not afraid of the dark within me or around me." If you feel peaceful rather than frightened, the Shadow Clan recognizes your wisdom.',
+                color_primary: '#6366F1',
+                color_secondary: '#8B5CF6',
+                emblem_url: null,
+                status: 'active'
+            }
+        ];
 
-        // Load locations
-        const locationsResponse = await fetch('tables/locations?limit=100');
-        const locationsData = await locationsResponse.json();
-        allLocations = locationsData.data.filter(location => location.status === 'active');
+        // Static locations data (matching the map locations)
+        allLocations = [
+            {
+                id: 'loc1',
+                name: "Cleopatra's Needle",
+                latitude: 51.5081,
+                longitude: -0.1195,
+                magical_description: "Here, where Cleopatra's Needle pierces the London sky, the ancient Egyptian magic still hums in the stone. The Thames whispers secrets of empires past, and children who touch the bronze sphinxes at sunset can hear hieroglyphs telling their stories.",
+                what_to_look_for: "Look for the bronze sphinxes at the base - they have tiny scratches that form letters in ancient languages. Notice how the light changes around the obelisk at different times of day, and listen for the sound of ancient chanting on windy afternoons.",
+                image_url: null,
+                status: 'active'
+            },
+            {
+                id: 'loc2',
+                name: "Fleet River",
+                latitude: 51.5134,
+                longitude: -0.1044,
+                magical_description: "The Fleet River still flows beneath your feet, carrying messages between the clan stones. Listen carefully to the stones—they remember when this was a rushing waterway that powered London's first mills and carried away the city's secrets.",
+                what_to_look_for: "Find the Fleet River marker near the bridge, and notice the subtle sound of water that shouldn't be there. Place your ear to the ground near the marker - children with clan stone connections can hear the river's whispered messages.",
+                image_url: null,
+                status: 'active'
+            },
+            {
+                id: 'loc3',
+                name: "Blackfriars Bridge",
+                latitude: 51.511,
+                longitude: -0.103,
+                magical_description: "Where the ancient bridge crosses the Fleet of memory, two worlds meet. The stones here have witnessed a thousand years of London's secrets, from Roman roads to medieval monasteries to the magical awakening of the clan stones.",
+                what_to_look_for: "Stand on the bridge and feel for the vibration beneath—the old river's pulse still beats strong. Look for the small carved symbols on the bridge stones that only appear when the light is just right, usually just after rain.",
+                image_url: null,
+                status: 'active'
+            }
+        ];
 
+        console.log('Static data loaded successfully');
     } catch (error) {
-        console.error('Error loading data:', error);
+        console.error('Error loading static data:', error);
         throw error;
     }
 }
@@ -508,26 +619,67 @@ function showMessage(text, type = 'info') {
 // Public Map Functions
 function initializePublicMap() {
     const mapElement = document.getElementById('public-locations-map');
-    if (!mapElement || !window.L) return;
+    if (!mapElement) {
+        console.log('Map element not found');
+        return;
+    }
     
-    // Initialize Leaflet map
-    publicMap = L.map(mapElement).setView([51.5074, -0.1278], 12);
+    // Check if Leaflet is loaded
+    if (typeof L === 'undefined') {
+        console.log('Leaflet not loaded, trying again...');
+        setTimeout(initializePublicMap, 1000);
+        return;
+    }
     
-    // Add magical tile layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(publicMap);
-    
-    updatePublicMapMarkers();
+    try {
+        // Initialize Leaflet map
+        publicMap = L.map(mapElement).setView([51.5074, -0.1278], 12);
+        
+        // Add magical tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(publicMap);
+        
+        // Add static sample locations since we don't have database
+        addStaticLocations();
+        
+        console.log('Map initialized successfully');
+    } catch (error) {
+        console.error('Error initializing map:', error);
+        // Fallback: hide map and show message
+        mapElement.innerHTML = '<div class="text-center p-8"><p class="text-slate-400">🗺️ Interactive map will be available soon!</p></div>';
+    }
 }
 
-function updatePublicMapMarkers() {
+// Static locations for the map (since no database)
+function addStaticLocations() {
     if (!publicMap) return;
     
-    // Clear existing markers
-    publicMapMarkers.forEach(marker => publicMap.removeLayer(marker));
-    publicMapMarkers = [];
+    // Static location data
+    const staticLocations = [
+        {
+            name: "Cleopatra's Needle",
+            latitude: 51.5081,
+            longitude: -0.1195,
+            magical_description: "Here, where Cleopatra's Needle pierces the London sky, the ancient Egyptian magic still hums in the stone. The Thames whispers secrets of empires past.",
+            what_to_look_for: "Look for the bronze sphinxes at the base, and notice how the light changes around the obelisk at different times of day."
+        },
+        {
+            name: "Fleet River",
+            latitude: 51.5134,
+            longitude: -0.1044,
+            magical_description: "The Fleet River still flows beneath your feet, carrying messages from the hidden world. Listen carefully to the stones—they remember when this was a rushing waterway.",
+            what_to_look_for: "Find the Fleet River marker near the bridge, and notice the subtle sound of water that shouldn't be there."
+        },
+        {
+            name: "Blackfriars Bridge",
+            latitude: 51.511,
+            longitude: -0.103,
+            magical_description: "Where the ancient bridge crosses the Fleet of memory, two worlds meet. The stones here have witnessed a thousand years of London's secrets.",
+            what_to_look_for: "Stand on the bridge and feel for the vibration beneath—the old river's pulse still beats strong."
+        }
+    ];
     
     // Create custom sparkly icon
     const sparkleIcon = L.divIcon({
@@ -543,66 +695,55 @@ function updatePublicMapMarkers() {
                 color: white;
                 font-size: 20px;
                 box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-                animation: bounce 2s infinite;
                 border: 3px solid white;
             ">✨</div>
-            <style>
-                @keyframes bounce {
-                    0%, 100% { transform: translateY(0); }
-                    50% { transform: translateY(-5px); }
-                }
-            </style>
         `,
         className: 'sparkle-marker',
         iconSize: [40, 40],
         iconAnchor: [20, 40]
     });
     
-    // Add sparkly markers for each active location
-    allLocations.filter(location => location.status === 'active').forEach((location, index) => {
-        if (location.latitude && location.longitude) {
-            const marker = L.marker([parseFloat(location.latitude), parseFloat(location.longitude)], {
-                icon: sparkleIcon,
-                title: location.name
-            }).addTo(publicMap);
-            
-            const popupContent = `
-                <div style="font-family: 'Fredoka One', cursive; color: #1e293b; max-width: 300px;">
-                    <h3 style="margin: 0 0 10px 0; color: #d4af37; font-size: 18px;">
-                        ✨ ${location.name} ✨
-                    </h3>
-                    ${location.image_url ? `
-                        <img src="${location.image_url}" alt="${location.name}" 
-                             style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;">
-                    ` : ''}
-                    <div style="margin-bottom: 10px; font-family: 'Nunito', sans-serif;">
-                        <h4 style="color: #4ecdc4; margin: 0 0 5px 0; font-size: 14px;">🔮 The Magic Here:</h4>
-                        <p style="margin: 0; font-size: 13px; line-height: 1.4;">
-                            ${stripHtml(location.magical_description || 'A place where magic dwells...')}
-                        </p>
-                    </div>
-                    <div style="font-family: 'Nunito', sans-serif;">
-                        <h4 style="color: #96ceb4; margin: 0 0 5px 0; font-size: 14px;">👀 Look For:</h4>
-                        <p style="margin: 0; font-size: 13px; line-height: 1.4;">
-                            ${stripHtml(location.what_to_look_for || 'Magical signs and wonders...')}
-                        </p>
-                    </div>
+    // Add markers for each location
+    staticLocations.forEach((location, index) => {
+        const marker = L.marker([location.latitude, location.longitude], {
+            icon: sparkleIcon,
+            title: location.name
+        }).addTo(publicMap);
+        
+        const popupContent = `
+            <div style="font-family: 'Fredoka One', cursive; color: #1e293b; max-width: 300px;">
+                <h3 style="margin: 0 0 10px 0; color: #d4af37; font-size: 18px;">
+                    ✨ ${location.name} ✨
+                </h3>
+                <div style="margin-bottom: 10px; font-family: 'Nunito', sans-serif;">
+                    <h4 style="color: #4ecdc4; margin: 0 0 5px 0; font-size: 14px;">🔮 The Magic Here:</h4>
+                    <p style="margin: 0; font-size: 13px; line-height: 1.4;">
+                        ${location.magical_description}
+                    </p>
                 </div>
-            `;
-            
-            marker.bindPopup(popupContent);
-            
-            marker.on('click', () => {
-                // Add magical sound effect (if browser supports it)
-                playMagicalSound('sparkle');
-            });
-            
-            publicMapMarkers.push(marker);
-        }
+                <div style="font-family: 'Nunito', sans-serif;">
+                    <h4 style="color: #96ceb4; margin: 0 0 5px 0; font-size: 14px;">👀 Look For:</h4>
+                    <p style="margin: 0; font-size: 13px; line-height: 1.4;">
+                        ${location.what_to_look_for}
+                    </p>
+                </div>
+            </div>
+        `;
+        
+        marker.bindPopup(popupContent);
+        
+        marker.on('click', () => {
+            // Add magical sound effect (if browser supports it)
+            playMagicalSound('sparkle');
+        });
+        
+        publicMapMarkers.push(marker);
     });
-    
-    // Add magical floating elements
-    addMagicalEffects();
+}
+
+function updatePublicMapMarkers() {
+    // This function is kept for compatibility but uses static data now
+    addStaticLocations();
 }
 
 function addMagicalEffects() {
