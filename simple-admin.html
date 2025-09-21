@@ -394,6 +394,9 @@
                         <button onclick="showTab('locations')" id="tab-locations" class="tab-btn py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium">
                             <i class="fas fa-map-marker-alt mr-2"></i>Locations
                         </button>
+                        <button onclick="showTab('mainpage')" id="tab-mainpage" class="tab-btn py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium">
+                            <i class="fas fa-home mr-2"></i>Main Page
+                        </button>
                     </nav>
                 </div>
             </div>
@@ -554,6 +557,130 @@
                             <!-- Locations will be loaded here -->
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Main Page Tab -->
+            <div id="mainpage-tab" class="tab-content hidden">
+                <div class="admin-card">
+                    <h2 class="text-xl font-bold mb-6 text-gray-800">
+                        <i class="fas fa-home text-blue-600 mr-2"></i>Edit Main Page Content
+                    </h2>
+                    
+                    <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <h3 class="font-semibold text-blue-800 mb-2">🏠 Homepage Content Editor</h3>
+                        <p class="text-blue-700 text-sm mb-2">
+                            Edit the text content that appears on your main website homepage. Changes are saved automatically and will appear immediately on the live site.
+                        </p>
+                        <ul class="text-blue-600 text-sm list-disc ml-4">
+                            <li>Use the rich text editor to format content with fonts, colors, and images</li>
+                            <li>Changes save to your browser's local storage</li>
+                            <li>All existing functionality (episodes, clans, locations) remains intact</li>
+                        </ul>
+                    </div>
+
+                    <form id="mainpage-form" onsubmit="saveMainPageContent(event)">
+                        <!-- Hero Section -->
+                        <div class="mb-8 border border-gray-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-4 text-gray-700 border-b pb-2">
+                                <i class="fas fa-star text-yellow-500 mr-2"></i>Hero Section
+                            </h3>
+                            
+                            <label for="hero-title">Main Title:</label>
+                            <div class="wysiwyg-container">
+                                <textarea id="hero-title" placeholder="Enter the main homepage title..."></textarea>
+                            </div>
+                            
+                            <label for="hero-subtitle">Subtitle:</label>
+                            <div class="wysiwyg-container">
+                                <textarea id="hero-subtitle" placeholder="Enter the homepage subtitle/description..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Episodes Section -->
+                        <div class="mb-8 border border-gray-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-4 text-gray-700 border-b pb-2">
+                                <i class="fas fa-book text-green-600 mr-2"></i>Episodes Section
+                            </h3>
+                            
+                            <label for="episodes-title">Episodes Section Title:</label>
+                            <div class="wysiwyg-container">
+                                <textarea id="episodes-title" placeholder="Episodes section heading..."></textarea>
+                            </div>
+                            
+                            <label for="episodes-description">Episodes Description:</label>
+                            <div class="wysiwyg-container">
+                                <textarea id="episodes-description" placeholder="Description for the episodes section..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Stones Section -->
+                        <div class="mb-8 border border-gray-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-4 text-gray-700 border-b pb-2">
+                                <i class="fas fa-gem text-purple-600 mr-2"></i>Clan Stones Section
+                            </h3>
+                            
+                            <label for="stones-title">Stones Section Title:</label>
+                            <div class="wysiwyg-container">
+                                <textarea id="stones-title" placeholder="Clan stones section heading..."></textarea>
+                            </div>
+                            
+                            <label for="stones-description">Stones Description:</label>
+                            <div class="wysiwyg-container">
+                                <textarea id="stones-description" placeholder="Description for the clan stones section..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- London Section -->
+                        <div class="mb-8 border border-gray-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-4 text-gray-700 border-b pb-2">
+                                <i class="fas fa-map text-blue-600 mr-2"></i>London Section
+                            </h3>
+                            
+                            <label for="london-title">London Section Title:</label>
+                            <div class="wysiwyg-container">
+                                <textarea id="london-title" placeholder="London locations section heading..."></textarea>
+                            </div>
+                            
+                            <label for="london-description">London Description:</label>
+                            <div class="wysiwyg-container">
+                                <textarea id="london-description" placeholder="Description for the London locations section..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- About Section -->
+                        <div class="mb-8 border border-gray-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-4 text-gray-700 border-b pb-2">
+                                <i class="fas fa-heart text-red-500 mr-2"></i>About Section
+                            </h3>
+                            
+                            <label for="about-content">About Content:</label>
+                            <div class="wysiwyg-container">
+                                <textarea id="about-content" placeholder="Full about section content - describe your project, mission, safety information, etc."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="mb-8 border border-gray-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-4 text-gray-700 border-b pb-2">
+                                <i class="fas fa-info-circle text-gray-600 mr-2"></i>Footer
+                            </h3>
+                            
+                            <label for="footer-tagline">Footer Tagline:</label>
+                            <div class="wysiwyg-container">
+                                <textarea id="footer-tagline" placeholder="Brief tagline that appears in the footer..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn-primary mr-4">
+                                <i class="fas fa-save mr-2"></i>Save All Changes
+                            </button>
+                            <button type="button" onclick="resetMainPageContent()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg">
+                                <i class="fas fa-undo mr-2"></i>Reset to Defaults
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

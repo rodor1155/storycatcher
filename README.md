@@ -1,206 +1,192 @@
-# 🏰 The Hidden World of London
+# The Hidden World of London
 
-A magical storytelling platform designed for children (ages 8-12) that transforms London into an enchanted realm filled with clan stones, mysterious locations, and episodic adventures.
+A magical storytelling platform for children aged 8-12, featuring interactive episodes, clan stones, London locations, and comprehensive admin management.
 
-## ✨ Current Features (Fully Implemented)
+## 🌟 Currently Completed Features
 
-### 📱 Core Website Functionality
-- **Responsive Design**: Child-friendly interface with magical animations and rainbow borders
-- **Interactive Navigation**: Crystal navigation buttons with hover effects and emoji integration
-- **Mobile Optimization**: Fully responsive design that works beautifully on all devices
+### ✅ **Admin Panel with WYSIWYG Editing**
+- **Location**: `simple-admin.html` (password: `hiddenworld2024`)
+- **Complete content management** with rich text editing for all content types
+- **30+ font families** including child-friendly, elegant, modern, and creative options
+- **Comprehensive image editing** with replace, delete, copy, and resize functionality
+- **Episode reordering** via drag-and-drop interface
+- **Main page text editing** through dedicated admin interface
 
-### 📚 Content Management (Static Data Approach)
-- **Episode System**: 3 sample magical episodes featuring London locations
-- **Clan Stones**: 5 distinct magical clans (River, Earth, Sky, Fire, Shadow) with unique powers
-- **Location Discovery**: 3 featured London locations with magical descriptions
-- **Rich Content**: Each clan has origin stories, powers, and connection rituals
+### ✅ **Episode Management System**
+- Create, edit, and delete episodes with rich content
+- Cover image upload with drag-and-drop support
+- WYSIWYG editor with image insertion and formatting
+- Episode ordering (new episodes added at end as Episodes 4, 5, 6...)
+- Real-time preview and editing capabilities
 
-### 🗺️ Interactive Map
-- **Leaflet Integration**: Interactive map showing magical locations around London
-- **Custom Markers**: Sparkly magical markers with detailed popup descriptions
-- **Static Location Data**: Cleopatra's Needle, Fleet River, and Blackfriars Bridge
-- **Child-Friendly Design**: Colorful popups with emojis and magical descriptions
+### ✅ **Clan Stones System**
+- Complete clan stone management with magical descriptions
+- Color customization for each clan (primary/secondary colors)
+- Rich text descriptions for origin stories, powers, and connection methods
+- Visual clan cards with gradient backgrounds
 
-### 🎨 Visual Design
-- **Child-Friendly Aesthetics**: Bright colors, playful fonts (Fredoka One, Nunito)
-- **Y-Shaped Logo**: Custom transparent logo integrated throughout the site
-- **Magical Animations**: Sparkle effects, rainbow borders, and hover animations
-- **Dark Theme**: Magical dark theme with gold accents and colorful highlights
+### ✅ **Interactive London Locations**
+- Location management with coordinates and magical descriptions
+- Interactive Leaflet map with sparkly markers
+- Location details with "what to look for" guidance
+- Mobile-responsive location cards
 
-## 🚀 Live Website
+### ✅ **Main Page Content Editing**
+- **NEW**: Full main page text editing through admin interface
+- Edit hero section title and subtitle
+- Customize section headings (Episodes, Stones, London)
+- Update about section content
+- Modify footer tagline
+- All changes save to localStorage and appear immediately
 
-**Production URL**: [https://storycatcher.github.io/hiddenworld/](https://storycatcher.github.io/hiddenworld/)
-- Hosted on GitHub Pages
-- SSL secured with custom domain: storycatcher.uk (configured)
-- Fully static implementation compatible with GitHub Pages hosting
+### ✅ **Child-Friendly Design**
+- Rainbow borders and magical animations
+- Emoji integration throughout interface
+- Responsive design for all screen sizes
+- Y-shaped logo integration with transparency
+- Sparkle effects and magical visual elements
 
-## 📁 Project Structure
+## 🚀 Current Functional Entry Points
 
-### 🎯 Active Files (Production)
-```
-index.html              # Main homepage with all functionality
-css/style.css          # Complete styling with child-friendly design
-js/main.js             # Main functionality with static data
-MANUAL-EDITING-GUIDE.md # Comprehensive content editing guide
-README.md              # This documentation
-```
+### **Public Website** (`index.html`)
+- **Home page** with hero section and navigation
+- **Episodes section** with dynamic loading (`#episodes`)
+- **Clan Stones section** with interactive cards (`#stones`)  
+- **London Locations** with interactive map (`#london`)
+- **About section** with project information (`#about`)
+- **Connect section** with social links (`#connect`)
 
-### 📋 Legacy Files (Not Used in Production)
-```
-admin.html             # Database-driven admin panel (GitHub Pages incompatible)
-js/admin.js           # Admin functionality (requires server-side database)
-```
+### **Admin Interface** (`simple-admin.html`)
+- **Episodes tab** - Create, edit, reorder episodes
+- **Clan Stones tab** - Manage magical clan stones
+- **Locations tab** - Add/edit London magical locations
+- **Main Page tab** - **NEW**: Edit all homepage text content
+- **Authentication** - Password protected (hiddenworld2024)
 
-## 📖 Content Management Approach
+## 💾 Data Storage Architecture
 
-**Current Method: Manual HTML Editing** ✅
+### **localStorage Keys Used**
+- `hiddenworld_episodes` - Episode content and metadata
+- `hiddenworld_clans` - Clan stone information
+- `hiddenworld_locations` - London location data
+- `hiddenworld_mainpage_content` - **NEW**: Homepage text content
+- `hiddenworld_admin_auth` - Admin authentication state
 
-After discovering GitHub Pages limitations with database-driven admin systems, we've implemented a static data approach:
+### **Data Persistence**
+- All content saves to browser localStorage
+- Automatic fallback to default content if no custom content exists
+- Real-time updates between admin panel and main site
+- Export/import functionality for content backup
 
-### ✅ How It Works
-- **Episodes, clans, and locations** are stored as JavaScript arrays in `js/main.js`
-- **Content editing** is done directly in the source code
-- **No database required** - everything works on GitHub Pages
-- **Version controlled** - all changes tracked in Git
-- **Fast and reliable** - no server-side dependencies
+## 🛠️ Technical Implementation
 
-### 📚 Content Editing Guide
-See **[MANUAL-EDITING-GUIDE.md](./MANUAL-EDITING-GUIDE.md)** for complete instructions on:
-- Adding new episodes with magical storylines
-- Creating new clan stones with unique powers
-- Adding London locations with magical descriptions
-- Managing images and media content
-- Testing and publishing changes
+### **Frontend Libraries Used**
+- **Tailwind CSS** - Utility-first styling framework
+- **Quill.js** - Rich text WYSIWYG editor with image support
+- **Leaflet** - Interactive mapping with OpenStreetMap
+- **SortableJS** - Drag-and-drop episode reordering
+- **Font Awesome** - Icon library for UI elements
+- **Google Fonts** - Typography (30+ font families loaded)
 
-## 🎯 Data Models
+### **WYSIWYG Editor Features**
+- Font selection from 30+ font families
+- Text color and background color options
+- Image insertion with resize handles
+- Bold, italic, underline formatting
+- Lists, alignment, and blockquotes
+- Link insertion and management
 
-### Episode Structure
-```javascript
-{
-    id: 'unique_id',
-    title: 'Episode Title',
-    meta_description: 'Brief description for cards',
-    content: 'Full HTML content of the story',
-    created_at: timestamp,
-    image_url: 'optional_image_url',
-    page_type: 'episode',
-    status: 'published'
-}
-```
+### **Image Management**
+- Base64 encoding for localStorage compatibility
+- Drag-and-drop upload zones
+- Image resize handles with live size display
+- Replace, delete, and copy image functionality
+- Automatic image optimization for web display
 
-### Clan Structure
-```javascript
-{
-    id: 'clan_id',
-    name: 'Clan Name',
-    stone_description: 'Origin story of the clan stone',
-    offering: 'Powers and abilities granted',
-    resonance_note: 'How children can connect',
-    color_primary: '#hex_color',
-    color_secondary: '#hex_color',
-    emblem_url: 'optional_emblem_url',
-    status: 'active'
-}
-```
+## 🎯 Recommended Next Steps
 
-### Location Structure
-```javascript
-{
-    id: 'location_id',
-    name: 'Location Name',
-    latitude: number,
-    longitude: number,
-    magical_description: 'What makes this place special',
-    what_to_look_for: 'Specific things to notice',
-    image_url: 'optional_image_url',
-    status: 'active'
-}
-```
+1. **Content Enhancement**
+   - Add more default episodes and clan stones
+   - Expand London locations with real coordinates
+   - Create more interactive magical elements
 
-## 🛠️ Technology Stack
+2. **Feature Additions**
+   - User comments/feedback system
+   - Social sharing capabilities
+   - Search functionality across all content
+   - Print-friendly episode pages
 
-- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **Styling**: Tailwind CSS (CDN), Custom CSS animations
-- **Mapping**: Leaflet.js with OpenStreetMap tiles
-- **Fonts**: Google Fonts (Fredoka One, Nunito, Cinzel, Kalam)
-- **Icons**: Font Awesome 6
-- **Hosting**: GitHub Pages (static hosting)
-- **Version Control**: Git/GitHub
+3. **Technical Improvements**
+   - Implement proper database backend for scalability
+   - Add content versioning and revision history
+   - Create automated content backups
+   - Add multi-language support
 
-## 🎯 Target Audience
+4. **Design Enhancements**
+   - Add more magical animations and effects
+   - Create custom audio for interactions
+   - Implement dark/light theme toggle
+   - Add accessibility features for screen readers
 
-**Primary**: Children aged 8-12 who love stories and adventure
-**Secondary**: Parents and educators looking for creative London-based content
-**Design Philosophy**: Magical, safe, educational, and inspiring wonder about London
+## 🌐 Public URLs & Deployment
 
-## 🔮 Current Sample Content
+### **Live Website**
+- **Production URL**: `storycatcher.uk` (configured for custom domain)
+- **GitHub Pages**: Available via Publish tab
+- **Admin Access**: `storycatcher.uk/simple-admin.html`
 
-### Episodes Available
-1. **The Awakening of the Thames Stones** - Origin story of the clan stones
-2. **The Secret of Fleet River** - Maya discovers the hidden underground river
-3. **The Crystal Garden of Covent Garden** - Tommy finds a magical secret garden
+### **Domain Configuration**
+- Custom domain: `storycatcher.uk` and `www.storycatcher.uk`
+- DNS configuration completed for Fasthosts hosting
+- HTTPS enabled for secure access
+- Mobile-optimized for all devices
 
-### Clan Stones Active
-1. **River Clan** - Water powers and language abilities
-2. **Earth Clan** - Plant growth and animal communication
-3. **Sky Clan** - Flying dreams and weather prediction
-4. **Fire Clan** - Warmth creation and courage inspiration
-5. **Shadow Clan** - Stealth abilities and fear conquering
+## 🎨 Design Philosophy
 
-### Featured Locations
-1. **Cleopatra's Needle** - Ancient Egyptian magic by the Thames
-2. **Fleet River** - Hidden underground waterway with messaging powers
-3. **Blackfriars Bridge** - Where two worlds meet over ancient waters
+### **Child-Centered Approach**
+- **Age-appropriate content** for 8-12 year olds
+- **Safety-focused messaging** for parents
+- **Imagination-driven** storytelling elements
+- **Interactive without overwhelming** complexity
 
-## 🚀 Recommended Next Steps
+### **Magical Theme Integration**
+- London's real history woven with fantasy elements
+- Clan stones as focal points for belonging and identity
+- Hidden locations that encourage real-world exploration
+- Stories that celebrate curiosity and wonder
 
-### 1. Content Expansion
-- Add 5-10 more episodes featuring different London boroughs
-- Create seasonal content (Christmas, Halloween, summer adventures)
-- Develop character series following specific children through multiple episodes
+## 🔧 Admin Usage Guide
 
-### 2. Interactive Features
-- Add search functionality for episodes and locations
-- Implement favorite/bookmark system using localStorage
-- Create printable "treasure hunt" guides for real London exploration
+### **Episode Management**
+1. Login to admin panel with password `hiddenworld2024`
+2. Go to Episodes tab
+3. Use rich text editor to create magical stories
+4. Upload cover images via drag-and-drop
+5. Reorder episodes by dragging the handle icons
+6. Edit existing episodes by clicking the edit button
 
-### 3. Educational Integration
-- Add historical facts section for each location
-- Create learning activities related to episodes
-- Develop teacher resources and lesson plans
+### **Main Page Editing** (NEW)
+1. Login to admin panel
+2. Click "Main Page" tab
+3. Edit any homepage section using rich text editors
+4. Save changes to see them live immediately
+5. Reset to defaults if needed
 
-### 4. Community Features
-- Photo submission system for children's London discoveries
-- Interactive comments using external services (Disqus, etc.)
-- Social sharing capabilities for favorite episodes
+### **Content Best Practices**
+- Use child-friendly language and concepts
+- Include magical elements while keeping content grounded
+- Add emojis and visual elements to engage young readers
+- Maintain consistent tone across all content types
 
-## 🔧 Development Setup
+## 📱 Mobile Responsiveness
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/storycatcher/hiddenworld.git
-   cd hiddenworld
-   ```
-
-2. **Open locally**
-   - Open `index.html` in any web browser
-   - No build process or dependencies required
-   - All functionality works offline
-
-3. **Make content changes**
-   - Follow the [Manual Editing Guide](./MANUAL-EDITING-GUIDE.md)
-   - Test locally before pushing to GitHub
-   - Changes automatically deploy via GitHub Pages
-
-## 📞 Support & Contributions
-
-- **Content Ideas**: See the Manual Editing Guide for inspiration
-- **Bug Reports**: Test thoroughly before reporting issues
-- **Feature Requests**: Consider GitHub Pages limitations
-- **Contributions**: All content additions welcome via pull requests
+- **Fully responsive design** works on all device sizes
+- **Touch-friendly interface** for tablets and phones  
+- **Optimized image loading** for mobile connections
+- **Simplified navigation** for smaller screens
 
 ---
 
-*Making London magical, one story at a time* ✨🏰📚
+**Made with ✨ magic and wonder for the children of London and beyond.**
 
-**Built with love for the young explorers of London**
+*Last Updated: 2024 - All functionality implemented and tested*
