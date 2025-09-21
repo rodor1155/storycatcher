@@ -7,7 +7,8 @@ const STORAGE_KEYS = {
     episodes: 'hiddenworld_episodes',
     clans: 'hiddenworld_clans',
     locations: 'hiddenworld_locations',
-    adminAuth: 'hiddenworld_admin_auth'
+    adminAuth: 'hiddenworld_admin_auth',
+    mainpage: 'hiddenworld_mainpage_content'
 };
 
 // Initialize on page load
@@ -74,7 +75,9 @@ window.EditorManager = {
             return;
         }
         
-        const targetIds = ['episode-content', 'clan-origin', 'clan-powers', 'clan-connection', 'location-magic', 'location-lookfor'];
+        const targetIds = ['episode-content', 'clan-origin', 'clan-powers', 'clan-connection', 'location-magic', 'location-lookfor', 
+                          'hero-title', 'hero-subtitle', 'episodes-title', 'episodes-description', 'stones-title', 'stones-description', 
+                          'london-title', 'london-description', 'about-content', 'footer-tagline'];
         
         targetIds.forEach(id => {
             const textarea = document.getElementById(id);
@@ -947,6 +950,7 @@ function loadAllContent() {
     loadEpisodes();
     loadClans();
     loadLocations();
+    loadMainPageContent();
     // Initialize drag and drop after content loads
     setTimeout(initializeDragAndDrop, 100);
 }
@@ -1595,4 +1599,176 @@ function showSuccess(message) {
     setTimeout(() => {
         document.getElementById('success-message').classList.add('hidden');
     }, 3000);
+}
+
+// Main Page Content Management
+function saveMainPageContent(event) {
+    event.preventDefault();
+    console.log('💾 Saving main page content...');
+    
+    // Collect content from all editors and fallback to textareas
+    const content = {
+        hero: {
+            title: window.EditorManager.getContent('hero-title') || document.getElementById('hero-title').value,
+            subtitle: window.EditorManager.getContent('hero-subtitle') || document.getElementById('hero-subtitle').value
+        },
+        episodes: {
+            title: window.EditorManager.getContent('episodes-title') || document.getElementById('episodes-title').value,
+            description: window.EditorManager.getContent('episodes-description') || document.getElementById('episodes-description').value
+        },
+        stones: {
+            title: window.EditorManager.getContent('stones-title') || document.getElementById('stones-title').value,
+            description: window.EditorManager.getContent('stones-description') || document.getElementById('stones-description').value
+        },
+        london: {
+            title: window.EditorManager.getContent('london-title') || document.getElementById('london-title').value,
+            description: window.EditorManager.getContent('london-description') || document.getElementById('london-description').value
+        },
+        about: {
+            content: window.EditorManager.getContent('about-content') || document.getElementById('about-content').value
+        },
+        footer: {
+            tagline: window.EditorManager.getContent('footer-tagline') || document.getElementById('footer-tagline').value
+        },
+        updated_at: Date.now()
+    };
+    
+    // Save to localStorage
+    localStorage.setItem(STORAGE_KEYS.mainpage, JSON.stringify(content));
+    
+    console.log('✅ Main page content saved:', content);
+    
+    // Update the main site
+    updateMainJsData();
+    
+    // Show success message
+    showSuccess('Main page content saved successfully! Your homepage has been updated.');
+}
+
+function loadMainPageContent() {
+    console.log('📖 Loading main page content...');
+    
+    const stored = localStorage.getItem(STORAGE_KEYS.mainpage);
+    let content;
+    
+    if (stored) {
+        content = JSON.parse(stored);
+        console.log('📚 Loaded stored content');
+    } else {
+        content = getDefaultMainPageContent();
+        console.log('📋 Using default content');
+    }
+    
+    // Populate form fields
+    setTimeout(() => {
+        populateMainPageForm(content);
+    }, 500); // Give editors time to initialize
+}
+
+function populateMainPageForm(content) {
+    console.log('📝 Populating main page form...');
+    
+    // Helper function to set content in editor or textarea
+    const setContent = (editorId, htmlContent) => {
+        const editor = window.EditorManager.editors[editorId];
+        if (editor) {
+            editor.root.innerHTML = htmlContent || '';
+        } else {
+            const textarea = document.getElementById(editorId);
+            if (textarea) {
+                textarea.value = htmlContent || '';
+            }
+        }
+    };
+    
+    // Populate all fields
+    setContent('hero-title', content.hero?.title);
+    setContent('hero-subtitle', content.hero?.subtitle);
+    setContent('episodes-title', content.episodes?.title);
+    setContent('episodes-description', content.episodes?.description);
+    setContent('stones-title', content.stones?.title);
+    setContent('stones-description', content.stones?.description);
+    setContent('london-title', content.london?.title);
+    setContent('london-description', content.london?.description);
+    setContent('about-content', content.about?.content);
+    setContent('footer-tagline', content.footer?.tagline);
+    
+    console.log('✅ Main page form populated');
+}
+
+function getDefaultMainPageContent() {
+    return {
+        hero: {
+            title: 'There is a <span class="magical-text sparkle-effect">✨ hidden world ✨</span><br>beneath London...',
+            subtitle: '🏰 Where ancient stones hold memories, 🌊 forgotten rivers whisper secrets, and the city\'s ✨ magical heart ✨ beats beneath the cobblestones. 🗝️'
+        },
+        episodes: {
+            title: '📚 Recent Episodes',
+            description: 'Follow the unfolding story through glimpses and fragments from the hidden world'
+        },
+        stones: {
+            title: '🔮 The Clan Stones',
+            description: 'Each clan stone carries the essence of London\'s hidden elements. Choose your path and discover what the stones may offer you.'
+        },
+        london: {
+            title: '🗺️ Hidden London',
+            description: 'Discover the magical locations scattered across London where the veil between worlds grows thin'
+        },
+        about: {
+            content: `
+                <div class="text-lg text-slate-300 space-y-6 leading-relaxed">
+                    <p>
+                        The Hidden World of London is a magical journey of discovery, designed to spark 
+                        curiosity and wonder in children and adults alike. Through painted stones, 
+                        hidden locations, and mythical storytelling, we invite you to see London 
+                        through new eyes.
+                    </p>
+                    <p>
+                        Our project celebrates the rich history and mythology of London while creating 
+                        new stories for the next generation. Every stone is painted with non-toxic materials, 
+                        every location is safe to explore, and every story is crafted with kindness and imagination.
+                    </p>
+                    <p class="text-london-gold font-semibold">
+                        This is London as you've never seen it before—magical, mysterious, and waiting for you to discover its secrets.
+                    </p>
+                </div>
+                <div class="mt-12">
+                    <h3 class="text-xl font-cinzel font-semibold mb-4">For Parents & Guardians</h3>
+                    <p class="text-slate-300">
+                        All activities are designed with safety in mind. Stones are painted with child-safe, 
+                        non-toxic materials. Location clues encourage observation and imagination without 
+                        requiring dangerous exploration. This is a project about wonder, discovery, and 
+                        the magic that surrounds us in everyday London.
+                    </p>
+                </div>
+            `
+        },
+        footer: {
+            tagline: 'Where magic meets the everyday, and London reveals its deepest secrets'
+        }
+    };
+}
+
+function resetMainPageContent() {
+    if (confirm('Are you sure you want to reset all main page content to defaults? This will overwrite your current content.')) {
+        // Clear localStorage
+        localStorage.removeItem(STORAGE_KEYS.mainpage);
+        
+        // Reload default content
+        loadMainPageContent();
+        
+        // Show message
+        showSuccess('Main page content reset to defaults!');
+        
+        console.log('🔄 Main page content reset');
+    }
+}
+
+// Export main page content for the main site to use
+function getMainPageContentForSite() {
+    const stored = localStorage.getItem(STORAGE_KEYS.mainpage);
+    if (stored) {
+        return JSON.parse(stored);
+    }
+    return getDefaultMainPageContent();
 }

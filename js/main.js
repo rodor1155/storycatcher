@@ -30,6 +30,7 @@ async function refreshContent() {
         renderClans();
         renderLocations();
         updatePublicMapMarkers();
+        loadMainPageContentFromAdmin(); // Refresh main page content too
         console.log('Content refreshed from admin updates');
     } catch (error) {
         console.error('Error refreshing content:', error);
@@ -56,7 +57,8 @@ async function initializeApp() {
         // Set up interactive elements
         setupInteractivity();
         
-        // Load saved content and make elements editable
+        // Load main page content and make elements editable
+        loadMainPageContentFromAdmin();
         loadSavedContent();
         makeContentEditable();
         
@@ -1143,4 +1145,111 @@ function playMagicalSound(type = 'sparkle') {
     } catch (e) {
         // Ignore audio errors
     }
+}
+
+// Load main page content from admin system
+function loadMainPageContentFromAdmin() {
+    console.log('📖 Loading main page content from admin...');
+    
+    // Check if there's content saved by admin
+    const storedContent = localStorage.getItem('hiddenworld_mainpage_content');
+    
+    if (storedContent) {
+        try {
+            const content = JSON.parse(storedContent);
+            updateMainPageContent(content);
+            console.log('✅ Main page content loaded from admin system');
+        } catch (error) {
+            console.error('❌ Error parsing main page content:', error);
+        }
+    } else {
+        console.log('ℹ️ No custom content found, using defaults');
+    }
+}
+
+// Update main page content with admin-saved content
+function updateMainPageContent(content) {
+    // Update hero section
+    if (content.hero?.title) {
+        const titleElement = document.getElementById('main-title');
+        if (titleElement) {
+            titleElement.innerHTML = content.hero.title;
+        }
+    }
+    
+    if (content.hero?.subtitle) {
+        const subtitleElement = document.getElementById('main-subtitle');
+        if (subtitleElement) {
+            subtitleElement.innerHTML = content.hero.subtitle;
+        }
+    }
+    
+    // Update episodes section
+    if (content.episodes?.title) {
+        const episodesTitleElement = document.querySelector('[data-section="episodes"][data-field="title"]');
+        if (episodesTitleElement) {
+            episodesTitleElement.innerHTML = content.episodes.title;
+        }
+    }
+    
+    if (content.episodes?.description) {
+        const episodesDescElement = document.querySelector('[data-section="episodes"][data-field="description"]');
+        if (episodesDescElement) {
+            episodesDescElement.innerHTML = content.episodes.description;
+        }
+    }
+    
+    // Update stones section
+    if (content.stones?.title) {
+        const stonesTitleElement = document.querySelector('[data-section="stones"][data-field="title"]');
+        if (stonesTitleElement) {
+            stonesTitleElement.innerHTML = content.stones.title;
+        }
+    }
+    
+    if (content.stones?.description) {
+        const stonesDescElement = document.querySelector('[data-section="stones"][data-field="description"]');
+        if (stonesDescElement) {
+            stonesDescElement.innerHTML = content.stones.description;
+        }
+    }
+    
+    // Update london section
+    if (content.london?.title) {
+        const londonTitleElement = document.querySelector('[data-section="london"][data-field="title"]');
+        if (londonTitleElement) {
+            londonTitleElement.innerHTML = content.london.title;
+        }
+    }
+    
+    if (content.london?.description) {
+        const londonDescElement = document.querySelector('[data-section="london"][data-field="description"]');
+        if (londonDescElement) {
+            londonDescElement.innerHTML = content.london.description;
+        }
+    }
+    
+    // Update about section (more complex as it contains multiple elements)
+    if (content.about?.content) {
+        const aboutSection = document.querySelector('#about');
+        if (aboutSection) {
+            const contentContainer = aboutSection.querySelector('.max-w-4xl .text-lg');
+            if (contentContainer) {
+                contentContainer.parentElement.innerHTML = content.about.content;
+            }
+        }
+    }
+    
+    // Update footer tagline
+    if (content.footer?.tagline) {
+        const footerTagline = document.querySelector('footer .text-slate-400');
+        if (footerTagline) {
+            footerTagline.textContent = content.footer.tagline;
+        }
+    }
+}
+
+// Refresh main page content when admin makes updates
+function refreshMainPageContent() {
+    loadMainPageContentFromAdmin();
 }
