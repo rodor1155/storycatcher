@@ -101,7 +101,18 @@ window.EditorManager = {
                 theme: 'snow',
                 modules: {
                     toolbar: [
-                        [{ 'font': [] }],
+                        [{ 'font': [
+                            false, // Default font
+                            'arial', 'helvetica', 'times-new-roman', 'courier-new', 'verdana', 'georgia', 'palatino', 'garamond', 'bookman', 'comic-sans-ms', 'trebuchet-ms', 'arial-black', 'impact',
+                            // Child-friendly fonts
+                            'fredoka-one', 'nunito', 'kalam', 'schoolbell', 'caveat', 'dancing-script', 'handlee', 'architects-daughter', 'indie-flower', 'shadows-into-light',
+                            // Elegant fonts  
+                            'playfair-display', 'merriweather', 'lora', 'crimson-text', 'old-standard-tt', 'cinzel', 'cormorant-garamond',
+                            // Modern fonts
+                            'roboto', 'open-sans', 'lato', 'source-sans-pro', 'raleway', 'montserrat', 'poppins', 'inter', 'work-sans',
+                            // Creative fonts
+                            'abril-fatface', 'bangers', 'creepster', 'nosifer', 'monoton', 'orbitron', 'righteous', 'faster-one'
+                        ] }],
                         [{ 'size': ['small', false, 'large', 'huge'] }],  
                         [{ 'header': [1, 2, 3, false] }],
                         ['bold', 'italic', 'underline', 'strike'],
@@ -299,6 +310,48 @@ window.EditorManager = {
         sizeDisplay.textContent = `${Math.round(rect.width)} × ${Math.round(rect.height)}px`;
         handles.appendChild(sizeDisplay);
         
+        // Add image editing toolbar
+        const toolbar = document.createElement('div');
+        toolbar.className = 'image-edit-toolbar';
+        toolbar.style.position = 'absolute';
+        toolbar.style.top = '-40px';
+        toolbar.style.left = '0';
+        toolbar.style.display = 'flex';
+        toolbar.style.gap = '4px';
+        toolbar.style.pointerEvents = 'auto';
+        
+        // Replace image button
+        const replaceBtn = document.createElement('button');
+        replaceBtn.className = 'bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs';
+        replaceBtn.innerHTML = '<i class="fas fa-image mr-1"></i>Replace';
+        replaceBtn.onclick = (e) => {
+            e.stopPropagation();
+            this.replaceImage(img, quill);
+        };
+        toolbar.appendChild(replaceBtn);
+        
+        // Delete image button  
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs';
+        deleteBtn.innerHTML = '<i class="fas fa-trash mr-1"></i>Delete';
+        deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            this.deleteImage(img, quill);
+        };
+        toolbar.appendChild(deleteBtn);
+        
+        // Copy image button
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs';
+        copyBtn.innerHTML = '<i class="fas fa-copy mr-1"></i>Copy';
+        copyBtn.onclick = (e) => {
+            e.stopPropagation();
+            this.copyImage(img, quill);
+        };
+        toolbar.appendChild(copyBtn);
+        
+        handles.appendChild(toolbar);
+        
         quill.root.appendChild(handles);
         
         console.log('🖼️ Image selected with resize handles');
@@ -401,6 +454,140 @@ window.EditorManager = {
         
         document.addEventListener('mousemove', resize);
         document.addEventListener('mouseup', stopResize);
+    },
+    
+    // Replace existing image with new one
+    replaceImage: function(img, quill) {
+        console.log('🔄 Replacing image');
+        
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        
+        input.onchange = function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const oldSrc = img.src;
+                    img.src = e.target.result;
+                    console.log('✅ Image replaced successfully');
+                    
+                    // Show success message
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'fixed top-20 right-4 bg-blue-500 text-white px-4 py-2 rounded shadow-lg z-50';
+                    messageDiv.innerHTML = '<i class="fas fa-image mr-2"></i>Image replaced successfully!';
+                    document.body.appendChild(messageDiv);
+                    setTimeout(() => messageDiv.remove(), 3000);
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        
+        input.click();
+    },
+    
+    // Delete image from editor
+    deleteImage: function(img, quill) {
+        if (confirm('Are you sure you want to delete this image?')) {
+            // Find the image's position in the editor
+            const imgIndex = Array.from(quill.root.children).findIndex(child => 
+                child === img || child.contains(img)
+            );
+            
+            if (imgIndex !== -1) {
+                // Remove from Quill content
+                const delta = quill.getContents();
+                let currentIndex = 0;
+                
+                for (let i = 0; i < delta.ops.length; i++) {
+                    const op = delta.ops[i];
+                    if (op.insert && typeof op.insert === 'object' && op.insert.image) {
+                        if (op.insert.image === img.src) {
+                            quill.deleteText(currentIndex, 1);
+                            break;
+                        }
+                    }
+                    if (typeof op.insert === 'string') {
+                        currentIndex += op.insert.length;
+                    } else {
+                        currentIndex += 1;
+                    }
+                }
+            }
+            
+            // Clear selection
+            this.clearImageSelection();
+            
+            console.log('🗑️ Image deleted');
+            
+            // Show success message
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'fixed top-20 right-4 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50';
+            messageDiv.innerHTML = '<i class="fas fa-trash mr-2"></i>Image deleted successfully!';
+            document.body.appendChild(messageDiv);
+            setTimeout(() => messageDiv.remove(), 3000);
+        }
+    },
+    
+    // Copy image to clipboard (as base64)
+    copyImage: function(img, quill) {
+        // For modern browsers, copy the image data
+        if (navigator.clipboard && window.ClipboardItem) {
+            // Convert image to blob and copy
+            fetch(img.src)
+                .then(response => response.blob())
+                .then(blob => {
+                    const item = new ClipboardItem({ [blob.type]: blob });
+                    navigator.clipboard.write([item]);
+                    
+                    // Show success message
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'fixed top-20 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50';
+                    messageDiv.innerHTML = '<i class="fas fa-copy mr-2"></i>Image copied to clipboard!';
+                    document.body.appendChild(messageDiv);
+                    setTimeout(() => messageDiv.remove(), 3000);
+                })
+                .catch(err => {
+                    console.log('Copy failed, showing alternative');
+                    this.showImageInfo(img);
+                });
+        } else {
+            // Fallback: show image info
+            this.showImageInfo(img);
+        }
+    },
+    
+    // Show image information (fallback for copy)
+    showImageInfo: function(img) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+        modal.innerHTML = `
+            <div class="bg-white rounded-lg max-w-lg w-full p-6">
+                <h3 class="text-lg font-bold mb-4">Image Information</h3>
+                <div class="space-y-2">
+                    <p><strong>Size:</strong> ${img.offsetWidth} × ${img.offsetHeight}px</p>
+                    <p><strong>Type:</strong> ${img.src.includes('data:') ? 'Uploaded Image' : 'External Image'}</p>
+                </div>
+                <div class="mt-4 text-xs">
+                    <label class="block mb-2"><strong>Image Data:</strong></label>
+                    <textarea readonly class="w-full h-32 border rounded p-2 text-xs" onclick="this.select()">${img.src}</textarea>
+                    <p class="text-gray-500 mt-1">Click the text area above to select all, then Ctrl+C to copy</p>
+                </div>
+                <button onclick="this.closest('.fixed').remove()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
+                    Close
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Close on background click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
     }
 };
 
