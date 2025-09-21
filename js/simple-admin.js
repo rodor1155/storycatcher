@@ -682,6 +682,11 @@ function showTab(tabName) {
     setTimeout(() => {
         initializeWYSIWYG();
         initializeDragAndDrop();
+        
+        // If switching to main page tab, load the content
+        if (tabName === 'mainpage') {
+            loadMainPageContent();
+        }
     }, 100);
 }
 
@@ -950,7 +955,7 @@ function loadAllContent() {
     loadEpisodes();
     loadClans();
     loadLocations();
-    loadMainPageContent();
+    // Don't load main page content here initially - it will load when tab is shown
     // Initialize drag and drop after content loads
     setTimeout(initializeDragAndDrop, 100);
 }
@@ -1656,29 +1661,51 @@ function loadMainPageContent() {
         console.log('📚 Loaded stored content');
     } else {
         content = getDefaultMainPageContent();
-        console.log('📋 Using default content');
+        console.log('📋 Using default content (existing homepage content)');
     }
     
-    // Populate form fields
-    setTimeout(() => {
-        populateMainPageForm(content);
-    }, 500); // Give editors time to initialize
+    // Check if main page tab is currently visible before populating
+    const mainPageTab = document.getElementById('mainpage-tab');
+    if (mainPageTab && !mainPageTab.classList.contains('hidden')) {
+        // Populate form fields with multiple attempts to ensure editors are ready
+        setTimeout(() => {
+            populateMainPageForm(content);
+        }, 300);
+        
+        // Backup attempt in case first one fails
+        setTimeout(() => {
+            populateMainPageForm(content);
+        }, 1000);
+    } else {
+        console.log('ℹ️ Main page tab not visible, content will load when tab is shown');
+    }
 }
 
 function populateMainPageForm(content) {
     console.log('📝 Populating main page form...');
     
-    // Helper function to set content in editor or textarea
+    // Helper function to set content in editor or textarea with retry logic
     const setContent = (editorId, htmlContent) => {
-        const editor = window.EditorManager.editors[editorId];
-        if (editor) {
-            editor.root.innerHTML = htmlContent || '';
-        } else {
-            const textarea = document.getElementById(editorId);
-            if (textarea) {
-                textarea.value = htmlContent || '';
+        const trySet = (attempts = 0) => {
+            const editor = window.EditorManager.editors[editorId];
+            if (editor && editor.root) {
+                editor.root.innerHTML = htmlContent || '';
+                console.log(`✅ Set content for ${editorId} via editor`);
+            } else {
+                const textarea = document.getElementById(editorId);
+                if (textarea) {
+                    textarea.value = htmlContent || '';
+                    console.log(`✅ Set content for ${editorId} via textarea`);
+                } else if (attempts < 5) {
+                    // Retry up to 5 times with increasing delay
+                    setTimeout(() => trySet(attempts + 1), 200 * (attempts + 1));
+                    console.log(`⏳ Retrying ${editorId} (attempt ${attempts + 1})`);
+                } else {
+                    console.warn(`❌ Could not set content for ${editorId}`);
+                }
             }
-        }
+        };
+        trySet();
     };
     
     // Populate all fields
@@ -1693,7 +1720,7 @@ function populateMainPageForm(content) {
     setContent('about-content', content.about?.content);
     setContent('footer-tagline', content.footer?.tagline);
     
-    console.log('✅ Main page form populated');
+    console.log('✅ Main page form population initiated');
 }
 
 function getDefaultMainPageContent() {
@@ -1715,8 +1742,7 @@ function getDefaultMainPageContent() {
             description: 'Discover the magical locations scattered across London where the veil between worlds grows thin'
         },
         about: {
-            content: `
-                <div class="text-lg text-slate-300 space-y-6 leading-relaxed">
+            content: `<div class="text-lg text-slate-300 space-y-6 leading-relaxed">
                     <p>
                         The Hidden World of London is a magical journey of discovery, designed to spark 
                         curiosity and wonder in children and adults alike. Through painted stones, 
@@ -1740,8 +1766,7 @@ function getDefaultMainPageContent() {
                         requiring dangerous exploration. This is a project about wonder, discovery, and 
                         the magic that surrounds us in everyday London.
                     </p>
-                </div>
-            `
+                </div>`
         },
         footer: {
             tagline: 'Where magic meets the everyday, and London reveals its deepest secrets'
@@ -1772,3 +1797,21 @@ function getMainPageContentForSite() {
     }
     return getDefaultMainPageContent();
 }
+
+// Debug function to help troubleshoot content loading
+function debugMainPageContent() {
+    console.log('🔍 DEBUG: Main Page Content Status');
+    console.log('Stored content:', localStorage.getItem(STORAGE_KEYS.mainpage));
+    console.log('Default content:', getDefaultMainPageContent());
+    console.log('Active editors:', Object.keys(window.EditorManager.editors));
+    console.log('Main page tab visible:', !document.getElementById('mainpage-tab')?.classList.contains('hidden'));
+    
+    // Try to force reload content
+    console.log('🔄 Force reloading content...');
+    setTimeout(() => {
+        loadMainPageContent();
+    }, 100);
+}
+
+// Make debug function available in browser console
+window.debugMainPageContent = debugMainPageContent;
