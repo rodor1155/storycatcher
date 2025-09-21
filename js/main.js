@@ -12,7 +12,29 @@ let publicMapMarkers = [];
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
+    
+    // Listen for admin updates
+    window.addEventListener('message', function(event) {
+        if (event.data === 'contentUpdated') {
+            // Refresh content when admin makes changes
+            refreshContent();
+        }
+    });
 });
+
+// Refresh content from localStorage
+async function refreshContent() {
+    try {
+        await loadAllData();
+        renderEpisodes();
+        renderClans();
+        renderLocations();
+        updatePublicMapMarkers();
+        console.log('Content refreshed from admin updates');
+    } catch (error) {
+        console.error('Error refreshing content:', error);
+    }
+}
 
 // Initialize all app functionality
 async function initializeApp() {
@@ -79,10 +101,19 @@ function setupNavigation() {
     });
 }
 
-// Load all data (static data since GitHub Pages doesn't support database)
+// Load all data (localStorage first, then fallback to static data)
 async function loadAllData() {
     try {
-        // Static episodes data
+        // Load from localStorage if available (from admin panel)
+        const storedEpisodes = localStorage.getItem('hiddenworld_episodes');
+        const storedClans = localStorage.getItem('hiddenworld_clans');
+        const storedLocations = localStorage.getItem('hiddenworld_locations');
+        
+        // Use stored data if available, otherwise use static defaults
+        if (storedEpisodes) {
+            allEpisodes = JSON.parse(storedEpisodes);
+        } else {
+            // Static episodes data (fallback)
         allEpisodes = [
             {
                 id: 'ep1',
@@ -115,8 +146,12 @@ async function loadAllData() {
                 status: 'published'
             }
         ];
+        }
 
-        // Static clans data
+        if (storedClans) {
+            allClans = JSON.parse(storedClans);
+        } else {
+            // Static clans data (fallback)
         allClans = [
             {
                 id: 'clan1',
@@ -174,8 +209,12 @@ async function loadAllData() {
                 status: 'active'
             }
         ];
+        }
 
-        // Static locations data (matching the map locations)
+        if (storedLocations) {
+            allLocations = JSON.parse(storedLocations);
+        } else {
+            // Static locations data (fallback, matching the map locations)
         allLocations = [
             {
                 id: 'loc1',
@@ -208,8 +247,9 @@ async function loadAllData() {
                 status: 'active'
             }
         ];
+        }
 
-        console.log('Static data loaded successfully');
+        console.log('Data loaded successfully (from ' + (storedEpisodes || storedClans || storedLocations ? 'localStorage + defaults' : 'static defaults') + ')');
     } catch (error) {
         console.error('Error loading static data:', error);
         throw error;
@@ -641,8 +681,8 @@ function initializePublicMap() {
             attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(publicMap);
         
-        // Add static sample locations since we don't have database
-        addStaticLocations();
+        // Add locations from current data
+        addDynamicLocations();
         
         console.log('Map initialized successfully');
     } catch (error) {
@@ -742,8 +782,81 @@ function addStaticLocations() {
 }
 
 function updatePublicMapMarkers() {
-    // This function is kept for compatibility but uses static data now
-    addStaticLocations();
+    if (!publicMap) return;
+    
+    // Clear existing markers
+    publicMapMarkers.forEach(marker => {
+        publicMap.removeLayer(marker);
+    });
+    publicMapMarkers = [];
+    
+    // Add current locations from allLocations array
+    addDynamicLocations();
+}
+
+function addDynamicLocations() {
+    if (!publicMap || !allLocations) return;
+    
+    // Create custom sparkly icon
+    const sparkleIcon = L.divIcon({
+        html: `
+            <div style="
+                width: 40px; 
+                height: 40px; 
+                background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #feca57);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 20px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                border: 3px solid white;
+            ">✨</div>
+        `,
+        className: 'sparkle-marker',
+        iconSize: [40, 40],
+        iconAnchor: [20, 40]
+    });
+    
+    // Add markers for each location in allLocations
+    allLocations.forEach((location, index) => {
+        if (location.latitude && location.longitude) {
+            const marker = L.marker([location.latitude, location.longitude], {
+                icon: sparkleIcon,
+                title: location.name
+            }).addTo(publicMap);
+            
+            const popupContent = `
+                <div style="font-family: 'Fredoka One', cursive; color: #1e293b; max-width: 300px;">
+                    <h3 style="margin: 0 0 10px 0; color: #d4af37; font-size: 18px;">
+                        ✨ ${location.name} ✨
+                    </h3>
+                    <div style="margin-bottom: 10px; font-family: 'Nunito', sans-serif;">
+                        <h4 style="color: #4ecdc4; margin: 0 0 5px 0; font-size: 14px;">🔮 The Magic Here:</h4>
+                        <p style="margin: 0; font-size: 13px; line-height: 1.4;">
+                            ${location.magical_description}
+                        </p>
+                    </div>
+                    <div style="font-family: 'Nunito', sans-serif;">
+                        <h4 style="color: #96ceb4; margin: 0 0 5px 0; font-size: 14px;">👀 Look For:</h4>
+                        <p style="margin: 0; font-size: 13px; line-height: 1.4;">
+                            ${location.what_to_look_for}
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            marker.bindPopup(popupContent);
+            
+            marker.on('click', () => {
+                // Add magical sound effect (if browser supports it)
+                playMagicalSound('sparkle');
+            });
+            
+            publicMapMarkers.push(marker);
+        }
+    });
 }
 
 function addMagicalEffects() {
