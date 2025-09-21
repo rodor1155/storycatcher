@@ -6,7 +6,7 @@
     <title>Admin Panel - The Hidden World of London</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@300;400;600;700&family=Kalam:wght@300;400;700&family=Schoolbell&family=Caveat:wght@400;700&family=Dancing+Script:wght@400;700&family=Handlee&family=Architects+Daughter&family=Indie+Flower&family=Shadows+Into+Light&family=Playfair+Display:wght@400;700&family=Merriweather:wght@300;400;700&family=Lora:wght@400;700&family=Crimson+Text:wght@400;700&family=Old+Standard+TT:wght@400;700&family=Cinzel:wght@400;600&family=Cormorant+Garamond:wght@300;400;700&family=Roboto:wght@300;400;700&family=Open+Sans:wght@300;400;700&family=Lato:wght@300;400;700&family=Source+Sans+Pro:wght@300;400;700&family=Raleway:wght@300;400;700&family=Montserrat:wght@300;400;700&family=Poppins:wght@300;400;700&family=Inter:wght@300;400;700&family=Work+Sans:wght@300;400;700&family=Abril+Fatface&family=Bangers&family=Creepster&family=Nosifer&family=Monoton&family=Orbitron:wght@400;700&family=Righteous&family=Faster+One&display=swap" rel="stylesheet">
     <!-- Quill.js WYSIWYG Editor - Free, no API key required -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
@@ -151,6 +151,63 @@
             transform: scale(1.1) !important;
         }
         
+        /* Comprehensive font classes for Quill editor */
+        .ql-font-arial { font-family: Arial, sans-serif !important; }
+        .ql-font-helvetica { font-family: Helvetica, sans-serif !important; }
+        .ql-font-times-new-roman { font-family: "Times New Roman", serif !important; }
+        .ql-font-courier-new { font-family: "Courier New", monospace !important; }
+        .ql-font-verdana { font-family: Verdana, sans-serif !important; }
+        .ql-font-georgia { font-family: Georgia, serif !important; }
+        .ql-font-palatino { font-family: Palatino, serif !important; }
+        .ql-font-garamond { font-family: Garamond, serif !important; }
+        .ql-font-bookman { font-family: Bookman, serif !important; }
+        .ql-font-comic-sans-ms { font-family: "Comic Sans MS", cursive !important; }
+        .ql-font-trebuchet-ms { font-family: "Trebuchet MS", sans-serif !important; }
+        .ql-font-arial-black { font-family: "Arial Black", sans-serif !important; }
+        .ql-font-impact { font-family: Impact, sans-serif !important; }
+        
+        /* Child-friendly fonts */
+        .ql-font-fredoka-one { font-family: "Fredoka One", cursive !important; }
+        .ql-font-nunito { font-family: "Nunito", sans-serif !important; }
+        .ql-font-kalam { font-family: "Kalam", cursive !important; }
+        .ql-font-schoolbell { font-family: "Schoolbell", cursive !important; }
+        .ql-font-caveat { font-family: "Caveat", cursive !important; }
+        .ql-font-dancing-script { font-family: "Dancing Script", cursive !important; }
+        .ql-font-handlee { font-family: "Handlee", cursive !important; }
+        .ql-font-architects-daughter { font-family: "Architects Daughter", cursive !important; }
+        .ql-font-indie-flower { font-family: "Indie Flower", cursive !important; }
+        .ql-font-shadows-into-light { font-family: "Shadows Into Light", cursive !important; }
+        
+        /* Elegant fonts */
+        .ql-font-playfair-display { font-family: "Playfair Display", serif !important; }
+        .ql-font-merriweather { font-family: "Merriweather", serif !important; }
+        .ql-font-lora { font-family: "Lora", serif !important; }
+        .ql-font-crimson-text { font-family: "Crimson Text", serif !important; }
+        .ql-font-old-standard-tt { font-family: "Old Standard TT", serif !important; }
+        .ql-font-cinzel { font-family: "Cinzel", serif !important; }
+        .ql-font-cormorant-garamond { font-family: "Cormorant Garamond", serif !important; }
+        
+        /* Modern fonts */
+        .ql-font-roboto { font-family: "Roboto", sans-serif !important; }
+        .ql-font-open-sans { font-family: "Open Sans", sans-serif !important; }
+        .ql-font-lato { font-family: "Lato", sans-serif !important; }
+        .ql-font-source-sans-pro { font-family: "Source Sans Pro", sans-serif !important; }
+        .ql-font-raleway { font-family: "Raleway", sans-serif !important; }
+        .ql-font-montserrat { font-family: "Montserrat", sans-serif !important; }
+        .ql-font-poppins { font-family: "Poppins", sans-serif !important; }
+        .ql-font-inter { font-family: "Inter", sans-serif !important; }
+        .ql-font-work-sans { font-family: "Work Sans", sans-serif !important; }
+        
+        /* Creative/Fun fonts */
+        .ql-font-abril-fatface { font-family: "Abril Fatface", cursive !important; }
+        .ql-font-bangers { font-family: "Bangers", cursive !important; }
+        .ql-font-creepster { font-family: "Creepster", cursive !important; }
+        .ql-font-nosifer { font-family: "Nosifer", cursive !important; }
+        .ql-font-monoton { font-family: "Monoton", cursive !important; }
+        .ql-font-orbitron { font-family: "Orbitron", sans-serif !important; }
+        .ql-font-righteous { font-family: "Righteous", cursive !important; }
+        .ql-font-faster-one { font-family: "Faster One", cursive !important; }
+        
         /* Style the font and size dropdowns */
         .ql-font .ql-picker-label, .ql-size .ql-picker-label {
             font-weight: 600 !important;
@@ -160,17 +217,20 @@
         /* Image resize functionality */
         .ql-editor img {
             cursor: pointer !important;
-            border: 2px solid transparent !important;
-            transition: border-color 0.3s ease !important;
+            border: 3px solid transparent !important;
+            transition: all 0.3s ease !important;
+            border-radius: 4px !important;
         }
         
         .ql-editor img:hover {
             border-color: #3b82f6 !important;
+            transform: scale(1.02) !important;
         }
         
         .ql-editor img.selected {
-            border-color: #3b82f6 !important;
-            box-shadow: 0 0 8px rgba(59, 130, 246, 0.3) !important;
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.5) !important;
+            transform: scale(1.02) !important;
         }
         
         /* Image resize handles */
@@ -366,9 +426,10 @@
                             <div class="mb-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
                                 <strong>💡 How to use the editor:</strong>
                                 <ul class="mt-1 ml-4 list-disc">
-                                    <li><strong>Fonts:</strong> Use the dropdown to change font style and size</li>
-                                    <li><strong>Images:</strong> Click the <span class="bg-blue-500 text-white px-1 rounded">📷</span> button to add pictures</li>
-                                    <li><strong>Resize Images:</strong> Click on any image to see resize handles. Drag the corners to make bigger/smaller!</li>
+                                    <li><strong>Fonts:</strong> Choose from 30+ fonts including child-friendly, elegant, and creative options</li>
+                                    <li><strong>Add Images:</strong> Click the <span class="bg-blue-500 text-white px-1 rounded">📷</span> button to add pictures</li>
+                                    <li><strong>Edit Images:</strong> Click any image to see resize handles + Replace/Delete/Copy buttons</li>
+                                    <li><strong>Resize Images:</strong> Click and drag the corner handles to make bigger/smaller</li>
                                     <li><strong>Text Colors:</strong> Select text, then click the <span style="color: red;">A</span> button to choose colors</li>
                                     <li><strong>Highlight Colors:</strong> Select text, then click the background color button to highlight</li>
                                     <li><strong>Formatting:</strong> Select text and click <strong>B</strong> for bold, <em>I</em> for italic</li>
