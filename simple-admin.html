@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - The Hidden World of London</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Quill.js WYSIWYG Editor - Free, no API key required -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <!-- Quill Image Resize Module -->
+    <script src="https://cdn.jsdelivr.net/npm/quill-image-resize-module@3.0.0/image-resize.min.js"></script>
+    <!-- Sortable.js for drag & drop reordering -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <style>
+        body { font-family: 'Nunito', sans-serif; }
+        .admin-card { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .btn-primary { background: #3b82f6; color: white; padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-success { background: #10b981; color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: #ef4444; color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; }
+        .btn-danger:hover { background: #dc2626; }
+        input, textarea, select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 16px; font-family: 'Nunito', sans-serif; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #374151; }
+        .hidden { display: none; }
+        .content-item { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+        .success-msg { background: #d1fae5; color: #065f46; padding: 12px; border-radius: 8px; margin-bottom: 16px; }
+        .error-msg { background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 16px; }
+        .wysiwyg-container { margin-bottom: 16px; }
+        .image-upload-zone { border: 2px dashed #d1d5db; border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 16px; cursor: pointer; transition: all 0.3s; }
+        .image-upload-zone:hover { border-color: #3b82f6; background-color: #f8fafc; }
+        .image-upload-zone.dragover { border-color: #10b981; background-color: #ecfdf5; }
+        .uploaded-image { max-width: 200px; max-height: 150px; border-radius: 8px; margin: 8px; }
+        
+        /* Enhanced Quill.js styling */
+        .ql-toolbar {
+            border-top: 1px solid #ccc !important;
+            border-left: 1px solid #ccc !important;
+            border-right: 1px solid #ccc !important;
+            border-bottom: none !important;
+            background: #f8f9fa !important;
+            padding: 8px !important;
+            border-radius: 8px 8px 0 0 !important;
+        }
+        
+        .ql-container {
+            border-bottom: 1px solid #ccc !important;
+            border-left: 1px solid #ccc !important;
+            border-right: 1px solid #ccc !important;
+            border-top: none !important;
+            border-radius: 0 0 8px 8px !important;
+            font-family: 'Nunito', sans-serif !important;
+            font-size: 15px !important;
+        }
+        
+        .ql-editor {
+            min-height: 200px !important;
+            font-family: 'Nunito', sans-serif !important;
+            font-size: 15px !important;
+            line-height: 1.6 !important;
+            padding: 12px 15px !important;
+        }
+        
+        .ql-toolbar .ql-formats {
+            margin-right: 8px !important;
+        }
+        
+        /* Smaller, more readable buttons for glasses users */
+        .ql-toolbar button {
+            width: 24px !important;
+            height: 24px !important;
+            margin: 1px !important;
+            padding: 2px !important;
+        }
+        
+        .ql-toolbar button:hover {
+            background-color: #e9ecef !important;
+            border-radius: 3px !important;
+        }
+        
+        .ql-toolbar .ql-picker {
+            color: #333 !important;
+            font-size: 13px !important;
+        }
+        
+        .ql-toolbar .ql-picker-label {
+            padding: 2px 4px !important;
+            font-size: 13px !important;
+        }
+        
+        /* Make dropdowns more compact */
+        .ql-toolbar .ql-font .ql-picker-label,
+        .ql-toolbar .ql-size .ql-picker-label,
+        .ql-toolbar .ql-header .ql-picker-label {
+            padding: 3px 6px !important;
+            font-size: 13px !important;
+            min-width: auto !important;
+        }
+        
+        /* Make image button more prominent but appropriately sized */
+        .ql-toolbar button.ql-image {
+            background-color: #3b82f6 !important;
+            color: white !important;
+            border-radius: 4px !important;
+            width: 28px !important;
+            height: 28px !important;
+            font-weight: bold !important;
+        }
+        
+        .ql-toolbar button.ql-image:hover {
+            background-color: #2563eb !important;
+        }
+        
+        /* Style the font and size dropdowns */
+        .ql-font .ql-picker-label, .ql-size .ql-picker-label {
+            font-weight: 600 !important;
+            color: #374151 !important;
+        }
+        
+        /* Image resize functionality */
+        .ql-editor img {
+            cursor: pointer !important;
+            border: 2px solid transparent !important;
+            transition: border-color 0.3s ease !important;
+        }
+        
+        .ql-editor img:hover {
+            border-color: #3b82f6 !important;
+        }
+        
+        .ql-editor img.selected {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.3) !important;
+        }
+        
+        /* Image resize handles */
+        .image-resize-handle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #3b82f6;
+            border: 2px solid white;
+            border-radius: 50%;
+            cursor: nw-resize;
+            z-index: 1000;
+        }
+        
+        .image-resize-handle.se {
+            bottom: -6px;
+            right: -6px;
+            cursor: nw-resize;
+        }
+        
+        .image-resize-handle.sw {
+            bottom: -6px;
+            left: -6px;
+            cursor: ne-resize;
+        }
+        
+        .image-resize-handle.ne {
+            top: -6px;
+            right: -6px;
+            cursor: ne-resize;
+        }
+        
+        .image-resize-handle.nw {
+            top: -6px;
+            left: -6px;
+            cursor: nw-resize;
+        }
+        
+        /* Episode reordering styles */
+        .episode-item {
+            cursor: move;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .episode-item:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .episode-item.sortable-chosen {
+            opacity: 0.8;
+            transform: rotate(5deg);
+        }
+        
+        .episode-item.sortable-ghost {
+            opacity: 0.4;
+            background: #f3f4f6;
+        }
+        
+        .drag-handle {
+            cursor: grab;
+            color: #6b7280;
+        }
+        
+        .drag-handle:hover {
+            color: #3b82f6;
+        }
+        
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+        
+        .reorder-info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #1d4ed8;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Login Section -->
+    <div id="login-section" class="flex items-center justify-center min-h-screen">
+        <div class="admin-card max-w-md w-full mx-4">
+            <div class="text-center mb-6">
+                <h1 class="text-2xl font-bold text-gray-800 mb-2">
+                    <i class="fas fa-castle text-purple-600 mr-2"></i>
+                    Admin Panel
+                </h1>
+                <p class="text-gray-600">The Hidden World of London</p>
+            </div>
+            
+            <div id="login-error" class="error-msg hidden">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                Incorrect password. Please try again.
+            </div>
+            
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <label for="password">Password:</label>
+                <input type="password" id="password" placeholder="Enter admin password" required>
+                
+                <button type="submit" class="btn-primary w-full">
+                    <i class="fas fa-key mr-2"></i>Login
+                </button>
+            </form>
+            
+            <div class="text-center mt-4">
+                <a href="index.html" class="text-blue-600 hover:text-blue-800">
+                    <i class="fas fa-arrow-left mr-1"></i>Back to Website
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b-2 border-purple-200">
+            <div class="max-w-6xl mx-auto px-4 py-4">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-castle text-purple-600 mr-2"></i>
+                        Content Manager
+                    </h1>
+                    <div class="flex items-center space-x-4">
+                        <a href="index.html" target="_blank" class="text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-external-link-alt mr-1"></i>View Website
+                        </a>
+                        <button onclick="logout()" class="text-red-600 hover:text-red-800">
+                            <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Success Message -->
+        <div id="success-message" class="hidden max-w-6xl mx-auto px-4 mt-4">
+            <div class="success-msg">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span id="success-text">Content saved successfully!</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="max-w-6xl mx-auto px-4 py-6">
+            <!-- Navigation Tabs -->
+            <div class="mb-6">
+                <div class="border-b border-gray-200">
+                    <nav class="flex space-x-8">
+                        <button onclick="showTab('episodes')" id="tab-episodes" class="tab-btn py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium">
+                            <i class="fas fa-book mr-2"></i>Episodes
+                        </button>
+                        <button onclick="showTab('clans')" id="tab-clans" class="tab-btn py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium">
+                            <i class="fas fa-gem mr-2"></i>Clan Stones
+                        </button>
+                        <button onclick="showTab('locations')" id="tab-locations" class="tab-btn py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium">
+                            <i class="fas fa-map-marker-alt mr-2"></i>Locations
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Episodes Tab -->
+            <div id="episodes-tab" class="tab-content hidden">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Add New Episode -->
+                    <div class="admin-card">
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">
+                            <i class="fas fa-plus-circle text-green-600 mr-2"></i>Add New Episode
+                        </h2>
+                        <form id="episode-form" onsubmit="addEpisode(event)">
+                            <label for="episode-title">Story Title:</label>
+                            <input type="text" id="episode-title" placeholder="e.g., The Mystery of Tower Bridge" required>
+                            
+                            <label for="episode-description">Short Description:</label>
+                            <textarea id="episode-description" rows="2" placeholder="Brief description that appears on the story card..." required></textarea>
+                            
+                            <label>Story Cover Image (optional):</label>
+                            <div class="image-upload-zone" onclick="document.getElementById('episode-cover-upload').click()">
+                                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+                                <p class="text-gray-500 mb-2">Click to upload cover image</p>
+                                <p class="text-xs text-gray-400">or drag & drop image here</p>
+                                <input type="file" id="episode-cover-upload" accept="image/*" style="display: none;" onchange="handleCoverImageUpload(event)">
+                                <div id="episode-cover-preview" class="mt-2"></div>
+                            </div>
+                            
+                            <label for="episode-content">Full Story - Use the rich text editor below:</label>
+                            <div class="mb-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
+                                <strong>💡 How to use the editor:</strong>
+                                <ul class="mt-1 ml-4 list-disc">
+                                    <li><strong>Fonts:</strong> Use the dropdown to change font style</li>
+                                    <li><strong>Images:</strong> Click the <span class="bg-blue-500 text-white px-1 rounded">📷</span> button to add pictures</li>
+                                    <li><strong>Resize Images:</strong> Click on any image to see resize handles. Drag the corners to make bigger/smaller!</li>
+                                    <li><strong>Formatting:</strong> Select text and click <strong>B</strong> for bold, <em>I</em> for italic</li>
+                                    <li><strong>Colors:</strong> Use the color buttons to change text and background colors</li>
+                                </ul>
+                            </div>
+                            <div class="wysiwyg-container">
+                                <textarea id="episode-content" placeholder="Start typing your magical story here..."></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-save mr-2"></i>Add Episode
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Existing Episodes -->
+                    <div class="admin-card">
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">
+                            <i class="fas fa-list mr-2"></i>Existing Episodes
+                        </h2>
+                        <div id="episodes-list">
+                            <!-- Episodes will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clans Tab -->
+            <div id="clans-tab" class="tab-content hidden">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Add New Clan -->
+                    <div class="admin-card">
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">
+                            <i class="fas fa-plus-circle text-green-600 mr-2"></i>Add New Clan Stone
+                        </h2>
+                        <form id="clan-form" onsubmit="addClan(event)">
+                            <label for="clan-name">Clan Name:</label>
+                            <input type="text" id="clan-name" placeholder="e.g., Music Clan" required>
+                            
+                            <label for="clan-origin">Origin Story:</label>
+                            <div class="mb-2 text-sm text-gray-600">
+                                📝 Use the toolbar above to format text, add colors, and insert images
+                            </div>
+                            <div class="wysiwyg-container">
+                                <textarea id="clan-origin" placeholder="How did this clan stone come to be? Click the 📷 button above to add images!" required></textarea>
+                            </div>
+                            
+                            <label for="clan-powers">Magic Powers:</label>
+                            <div class="wysiwyg-container">
+                                <textarea id="clan-powers" placeholder="What abilities does this clan give to children?" required></textarea>
+                            </div>
+                            
+                            <label for="clan-connection">How to Connect:</label>
+                            <div class="wysiwyg-container">
+                                <textarea id="clan-connection" placeholder="What should children do to connect with this stone?" required></textarea>
+                            </div>
+                            
+                            <label for="clan-color1">Primary Color:</label>
+                            <input type="color" id="clan-color1" value="#3b82f6">
+                            
+                            <label for="clan-color2">Secondary Color:</label>
+                            <input type="color" id="clan-color2" value="#8b5cf6">
+                            
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-save mr-2"></i>Add Clan Stone
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Existing Clans -->
+                    <div class="admin-card">
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">
+                            <i class="fas fa-list mr-2"></i>Existing Clan Stones
+                        </h2>
+                        <div id="clans-list">
+                            <!-- Clans will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Locations Tab -->
+            <div id="locations-tab" class="tab-content hidden">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Add New Location -->
+                    <div class="admin-card">
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">
+                            <i class="fas fa-plus-circle text-green-600 mr-2"></i>Add New Location
+                        </h2>
+                        <form id="location-form" onsubmit="addLocation(event)">
+                            <label for="location-name">Location Name:</label>
+                            <input type="text" id="location-name" placeholder="e.g., The Secret Garden of Russell Square" required>
+                            
+                            <label for="location-lat">Latitude:</label>
+                            <input type="number" step="any" id="location-lat" placeholder="51.5074" required>
+                            
+                            <label for="location-lng">Longitude:</label>
+                            <input type="number" step="any" id="location-lng" placeholder="-0.1278" required>
+                            
+                            <label for="location-magic">The Magic Here:</label>
+                            <div class="wysiwyg-container">
+                                <textarea id="location-magic" placeholder="What makes this place magical? Use the editor to format your description beautifully." required></textarea>
+                            </div>
+                            
+                            <label for="location-lookfor">What to Look For:</label>
+                            <div class="wysiwyg-container">
+                                <textarea id="location-lookfor" placeholder="What should children notice when they visit?" required></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-save mr-2"></i>Add Location
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Existing Locations -->
+                    <div class="admin-card">
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">
+                            <i class="fas fa-list mr-2"></i>Existing Locations
+                        </h2>
+                        <div id="locations-list">
+                            <!-- Locations will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/simple-admin.js"></script>
+</body>
+</html>
