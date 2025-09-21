@@ -142,12 +142,19 @@ window.EditorManager = {
                         reader.onload = function(e) {
                             const range = quill.getSelection(true);
                             quill.insertEmbed(range.index, 'image', e.target.result);
+                            // Add resize functionality to newly inserted image
+                            setTimeout(() => {
+                                window.EditorManager.setupImageResize(quill);
+                            }, 100);
                         };
                         reader.readAsDataURL(file);
                     }
                 };
                 input.click();
             });
+            
+            // Setup image resize for existing and new images
+            this.setupImageResize(quill);
             
             this.editors[id] = quill;
             console.log(`✅ Created: ${id}`);
@@ -167,6 +174,185 @@ window.EditorManager = {
         if (this.editors[id]) {
             this.editors[id].setContents([]);
         }
+    },
+    
+    // Setup comprehensive image resize functionality
+    setupImageResize: function(quill) {
+        // Handle clicks on images
+        quill.root.addEventListener('click', (e) => {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+                this.selectImage(e.target, quill);
+            } else {
+                // Click elsewhere, clear selection
+                this.clearImageSelection();
+            }
+        });
+        
+        // Handle new images being added
+        quill.on('text-change', () => {
+            // Add resize capability to any new images
+            setTimeout(() => {
+                const images = quill.root.querySelectorAll('img:not(.resize-enabled)');
+                images.forEach(img => {
+                    img.classList.add('resize-enabled');
+                    img.style.cursor = 'pointer';
+                });
+            }, 50);
+        });
+    },
+    
+    // Select and add resize handles to an image
+    selectImage: function(img, quill) {
+        // Clear any existing selections first
+        this.clearImageSelection();
+        
+        // Add selected class
+        img.classList.add('selected');
+        
+        // Create resize handles container
+        const handles = document.createElement('div');
+        handles.className = 'image-resize-container';
+        handles.style.position = 'absolute';
+        handles.style.zIndex = '1000';
+        handles.style.pointerEvents = 'none';
+        
+        // Position handles around the image
+        const rect = img.getBoundingClientRect();
+        const editorRect = quill.root.getBoundingClientRect();
+        const scrollTop = quill.root.scrollTop;
+        const scrollLeft = quill.root.scrollLeft;
+        
+        handles.style.left = (rect.left - editorRect.left + scrollLeft) + 'px';
+        handles.style.top = (rect.top - editorRect.top + scrollTop) + 'px';
+        handles.style.width = rect.width + 'px';
+        handles.style.height = rect.height + 'px';
+        
+        // Add corner handles
+        const corners = ['nw', 'ne', 'sw', 'se'];
+        corners.forEach(corner => {
+            const handle = document.createElement('div');
+            handle.className = `image-resize-handle ${corner}`;
+            handle.style.pointerEvents = 'auto';
+            handle.addEventListener('mousedown', (e) => this.startResize(e, img, corner, handles, quill));
+            handles.appendChild(handle);
+        });
+        
+        // Add size display
+        const sizeDisplay = document.createElement('div');
+        sizeDisplay.className = 'image-size-display';
+        sizeDisplay.style.position = 'absolute';
+        sizeDisplay.style.bottom = '-30px';
+        sizeDisplay.style.left = '0';
+        sizeDisplay.style.background = '#3b82f6';
+        sizeDisplay.style.color = 'white';
+        sizeDisplay.style.padding = '4px 8px';
+        sizeDisplay.style.borderRadius = '4px';
+        sizeDisplay.style.fontSize = '12px';
+        sizeDisplay.style.fontFamily = 'monospace';
+        sizeDisplay.style.pointerEvents = 'none';
+        sizeDisplay.textContent = `${Math.round(rect.width)} × ${Math.round(rect.height)}px`;
+        handles.appendChild(sizeDisplay);
+        
+        quill.root.appendChild(handles);
+        
+        console.log('🖼️ Image selected with resize handles');
+    },
+    
+    // Clear image selection and handles
+    clearImageSelection: function() {
+        document.querySelectorAll('img.selected').forEach(img => {
+            img.classList.remove('selected');
+        });
+        document.querySelectorAll('.image-resize-container').forEach(container => {
+            container.remove();
+        });
+    },
+    
+    // Start image resize
+    startResize: function(e, img, corner, handles, quill) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const startWidth = img.offsetWidth;
+        const startHeight = img.offsetHeight;
+        const aspectRatio = startWidth / startHeight;
+        
+        console.log(`🔄 Starting resize from ${corner} corner`);
+        
+        const resize = (e) => {
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+            
+            let newWidth = startWidth;
+            let newHeight = startHeight;
+            
+            // Calculate new dimensions based on corner
+            if (corner.includes('e')) {
+                newWidth = startWidth + deltaX;
+            }
+            if (corner.includes('w')) {
+                newWidth = startWidth - deltaX;
+            }
+            if (corner.includes('s')) {
+                newHeight = startHeight + deltaY;
+            }
+            if (corner.includes('n')) {
+                newHeight = startHeight - deltaY;
+            }
+            
+            // Maintain aspect ratio by using the larger change
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                newHeight = newWidth / aspectRatio;
+            } else {
+                newWidth = newHeight * aspectRatio;
+            }
+            
+            // Apply size constraints
+            newWidth = Math.max(50, Math.min(800, newWidth));
+            newHeight = Math.max(30, Math.min(600, newHeight));
+            
+            // Apply new size
+            img.style.width = newWidth + 'px';
+            img.style.height = newHeight + 'px';
+            img.setAttribute('width', Math.round(newWidth));
+            img.setAttribute('height', Math.round(newHeight));
+            
+            // Update size display
+            const sizeDisplay = handles.querySelector('.image-size-display');
+            if (sizeDisplay) {
+                sizeDisplay.textContent = `${Math.round(newWidth)} × ${Math.round(newHeight)}px`;
+            }
+            
+            // Update handles position
+            const rect = img.getBoundingClientRect();
+            const editorRect = quill.root.getBoundingClientRect();
+            const scrollTop = quill.root.scrollTop;
+            const scrollLeft = quill.root.scrollLeft;
+            
+            handles.style.left = (rect.left - editorRect.left + scrollLeft) + 'px';
+            handles.style.top = (rect.top - editorRect.top + scrollTop) + 'px';
+            handles.style.width = rect.width + 'px';
+            handles.style.height = rect.height + 'px';
+        };
+        
+        const stopResize = () => {
+            document.removeEventListener('mousemove', resize);
+            document.removeEventListener('mouseup', stopResize);
+            console.log('✅ Image resize completed');
+            
+            // Show success message
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'fixed top-20 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50';
+            messageDiv.textContent = '✅ Image resized successfully!';
+            document.body.appendChild(messageDiv);
+            setTimeout(() => messageDiv.remove(), 2000);
+        };
+        
+        document.addEventListener('mousemove', resize);
+        document.addEventListener('mouseup', stopResize);
     }
 };
 
