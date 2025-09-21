@@ -156,6 +156,13 @@ window.EditorManager = {
             // Setup image resize for existing and new images
             this.setupImageResize(quill);
             
+            // DEBUG: Add immediate click test
+            setTimeout(() => {
+                console.log('🔍 Testing image setup for editor:', id);
+                const testImages = quill.root.querySelectorAll('img');
+                console.log('📷 Found images:', testImages.length);
+            }, 1000);
+            
             this.editors[id] = quill;
             console.log(`✅ Created: ${id}`);
             
@@ -178,37 +185,67 @@ window.EditorManager = {
     
     // Setup comprehensive image resize functionality
     setupImageResize: function(quill) {
-        // Handle clicks on images
-        quill.root.addEventListener('click', (e) => {
-            if (e.target.tagName === 'IMG') {
+        console.log('🔧 Setting up image resize for editor');
+        
+        // More direct approach - use both click and mousedown
+        const handleImageClick = (e) => {
+            console.log('📱 Event on:', e.target.tagName, e.type);
+            if (e.target && e.target.tagName === 'IMG') {
+                console.log('🖼️ Image detected, selecting...');
                 e.preventDefault();
+                e.stopPropagation();
                 this.selectImage(e.target, quill);
+                return false;
             } else {
-                // Click elsewhere, clear selection
+                console.log('🔄 Non-image click, clearing selection');
                 this.clearImageSelection();
             }
+        };
+        
+        // Add multiple event listeners for better coverage
+        quill.root.addEventListener('click', handleImageClick, true);
+        quill.root.addEventListener('mousedown', handleImageClick, true);
+        
+        // Also listen for new content
+        quill.on('text-change', () => {
+            setTimeout(() => {
+                const images = quill.root.querySelectorAll('img');
+                console.log(`🔍 Found ${images.length} images in editor`);
+                images.forEach((img, index) => {
+                    if (!img.classList.contains('resize-setup')) {
+                        img.classList.add('resize-setup');
+                        img.style.cursor = 'pointer';
+                        img.title = 'Click to resize this image';
+                        console.log(`✅ Setup image ${index + 1} for resize`);
+                    }
+                });
+            }, 100);
         });
         
-        // Handle new images being added
-        quill.on('text-change', () => {
-            // Add resize capability to any new images
-            setTimeout(() => {
-                const images = quill.root.querySelectorAll('img:not(.resize-enabled)');
-                images.forEach(img => {
-                    img.classList.add('resize-enabled');
-                    img.style.cursor = 'pointer';
-                });
-            }, 50);
-        });
+        // Immediate setup for any existing images
+        setTimeout(() => {
+            const images = quill.root.querySelectorAll('img');
+            console.log(`🔍 Initial setup: Found ${images.length} existing images`);
+            images.forEach((img, index) => {
+                img.classList.add('resize-setup');
+                img.style.cursor = 'pointer';
+                img.title = 'Click to resize this image';
+                console.log(`✅ Setup existing image ${index + 1}`);
+            });
+        }, 500);
     },
     
     // Select and add resize handles to an image
     selectImage: function(img, quill) {
+        console.log('🎯 selectImage called');
+        alert('Image clicked! Resize handles should appear.'); // DEBUG
+        
         // Clear any existing selections first
         this.clearImageSelection();
         
         // Add selected class
         img.classList.add('selected');
+        console.log('✅ Added selected class to image');
         
         // Create resize handles container
         const handles = document.createElement('div');
@@ -216,6 +253,8 @@ window.EditorManager = {
         handles.style.position = 'absolute';
         handles.style.zIndex = '1000';
         handles.style.pointerEvents = 'none';
+        handles.style.border = '2px solid red'; // DEBUG: Make container visible
+        console.log('📦 Created handles container');
         
         // Position handles around the image
         const rect = img.getBoundingClientRect();
@@ -234,8 +273,14 @@ window.EditorManager = {
             const handle = document.createElement('div');
             handle.className = `image-resize-handle ${corner}`;
             handle.style.pointerEvents = 'auto';
+            // DEBUG: Make handles more visible
+            handle.style.background = 'red';
+            handle.style.width = '20px';
+            handle.style.height = '20px';
+            handle.style.border = '2px solid white';
             handle.addEventListener('mousedown', (e) => this.startResize(e, img, corner, handles, quill));
             handles.appendChild(handle);
+            console.log(`🔹 Created ${corner} handle`);
         });
         
         // Add size display
@@ -257,6 +302,9 @@ window.EditorManager = {
         quill.root.appendChild(handles);
         
         console.log('🖼️ Image selected with resize handles');
+        console.log('📍 Handles container position:', handles.style.left, handles.style.top);
+        console.log('📏 Handles container size:', handles.style.width, handles.style.height);
+        console.log('👀 Handles in DOM:', quill.root.querySelector('.image-resize-container') !== null);
     },
     
     // Clear image selection and handles
@@ -716,9 +764,14 @@ function loadAllContent() {
     setTimeout(initializeDragAndDrop, 100);
 }
 
-// Episode Management
+// Episode Management (handles both create and update)
 function addEpisode(event) {
     event.preventDefault();
+    
+    // Check if we're editing an existing episode
+    const form = document.getElementById('episode-form');
+    const editingId = form.querySelector('#editing-episode-id');
+    const isEditing = editingId && editingId.value;
     
     // Get content from editor
     const richContent = window.EditorManager.getContent('episode-content') || document.getElementById('episode-content').value;
@@ -727,20 +780,43 @@ function addEpisode(event) {
     const coverPreview = document.getElementById('episode-cover-preview');
     const coverImage = coverPreview ? coverPreview.dataset.coverImage : null;
     
-    const episode = {
-        id: 'ep' + Date.now(),
-        title: document.getElementById('episode-title').value,
-        meta_description: document.getElementById('episode-description').value,
-        content: richContent,
-        image_url: coverImage,
-        created_at: Date.now(),
-        page_type: 'episode',
-        status: 'published'
-    };
-    
     // Get existing episodes
     const episodes = getStoredData('episodes');
-    episodes.unshift(episode); // Add to beginning
+    
+    if (isEditing) {
+        // UPDATE existing episode
+        const episodeIndex = episodes.findIndex(ep => ep.id === editingId.value);
+        if (episodeIndex !== -1) {
+            // Keep original creation time and ID
+            episodes[episodeIndex] = {
+                ...episodes[episodeIndex], // Keep existing data
+                title: document.getElementById('episode-title').value,
+                meta_description: document.getElementById('episode-description').value,
+                content: richContent,
+                image_url: coverImage,
+                updated_at: Date.now() // Add update timestamp
+            };
+            
+            console.log('📝 Updated episode:', editingId.value);
+            showSuccess('Episode updated successfully!');
+        }
+    } else {
+        // CREATE new episode
+        const episode = {
+            id: 'ep' + Date.now(),
+            title: document.getElementById('episode-title').value,
+            meta_description: document.getElementById('episode-description').value,
+            content: richContent,
+            image_url: coverImage,
+            created_at: Date.now(),
+            page_type: 'episode',
+            status: 'published'
+        };
+        
+        episodes.push(episode); // Add to end (Episode 4, 5, 6...)
+        console.log('➕ Created new episode');
+        showSuccess('Episode added successfully as Episode ' + episodes.length + '!');
+    }
     
     // Save to localStorage
     localStorage.setItem(STORAGE_KEYS.episodes, JSON.stringify(episodes));
@@ -748,17 +824,11 @@ function addEpisode(event) {
     // Update main.js data
     updateMainJsData();
     
-    // Clear form and reload
-    document.getElementById('episode-form').reset();
-    window.EditorManager.clear('episode-content');
-    // Clear cover image preview
-    if (coverPreview) {
-        coverPreview.innerHTML = '';
-        delete coverPreview.dataset.coverImage;
-    }
+    // Reset form to create mode
+    cancelEpisodeEdit();
     
+    // Reload episodes list
     loadEpisodes();
-    showSuccess('Episode added successfully with rich formatting!');
 }
 
 function loadEpisodes() {
@@ -795,9 +865,14 @@ function loadEpisodes() {
                         </div>
                     </div>
                 </div>
-                <button onclick="deleteEpisode('${episode.id}')" class="btn-danger text-sm">
-                    <i class="fas fa-trash"></i>
-                </button>
+                <div class="flex space-x-2">
+                    <button onclick="editEpisode('${episode.id}')" class="btn-success text-sm" title="Edit this episode">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteEpisode('${episode.id}')" class="btn-danger text-sm" title="Delete this episode">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
             </div>
             <p class="text-gray-600 text-sm mb-2 ml-8">${episode.meta_description}</p>
             <p class="text-gray-500 text-xs ml-8">${stripHtmlForDisplay(episode.content, 150)}</p>
@@ -848,6 +923,169 @@ function initializeEpisodeReordering() {
             showSuccess('Episodes reordered successfully! The website will show the new order.');
         }
     });
+}
+
+// Episode editing functionality
+function editEpisode(episodeId) {
+    console.log('📝 Editing episode:', episodeId);
+    
+    // Find the episode
+    const episodes = getStoredData('episodes');
+    const episode = episodes.find(ep => ep.id === episodeId);
+    
+    if (!episode) {
+        alert('Episode not found!');
+        return;
+    }
+    
+    // Switch to episodes tab if not already there
+    showTab('episodes');
+    
+    // Scroll to the form
+    setTimeout(() => {
+        const form = document.getElementById('episode-form');
+        if (form) {
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // Populate the form
+        populateEpisodeForm(episode);
+        
+        // Show editing indicator
+        showEditingMessage(episode.title);
+        
+    }, 100);
+}
+
+// Populate episode form with existing data
+function populateEpisodeForm(episode) {
+    console.log('📋 Populating form with episode data');
+    
+    // Fill basic fields
+    document.getElementById('episode-title').value = episode.title;
+    document.getElementById('episode-description').value = episode.meta_description;
+    
+    // Handle cover image
+    const coverPreview = document.getElementById('episode-cover-preview');
+    if (episode.image_url && coverPreview) {
+        coverPreview.innerHTML = `
+            <div class="mt-2">
+                <img src="${episode.image_url}" class="uploaded-image" alt="Cover preview">
+                <p class="text-sm text-gray-600 mt-1">Current cover image (upload new to replace)</p>
+            </div>
+        `;
+        coverPreview.dataset.coverImage = episode.image_url;
+    }
+    
+    // Fill rich text editor content
+    setTimeout(() => {
+        const contentEditor = window.EditorManager.editors['episode-content'];
+        if (contentEditor) {
+            contentEditor.root.innerHTML = episode.content;
+            console.log('✅ Populated rich text editor');
+        } else {
+            // Fallback to textarea
+            const textarea = document.getElementById('episode-content');
+            if (textarea) {
+                textarea.value = episode.content;
+            }
+        }
+    }, 200);
+    
+    // Change form to update mode
+    setFormToUpdateMode(episode.id);
+}
+
+// Set form to update mode instead of create mode
+function setFormToUpdateMode(episodeId) {
+    const form = document.getElementById('episode-form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    // Change submit button
+    submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Update Episode';
+    submitBtn.classList.remove('btn-primary');
+    submitBtn.classList.add('bg-orange-500', 'hover:bg-orange-600');
+    
+    // Add hidden field for episode ID
+    let hiddenId = form.querySelector('#editing-episode-id');
+    if (!hiddenId) {
+        hiddenId = document.createElement('input');
+        hiddenId.type = 'hidden';
+        hiddenId.id = 'editing-episode-id';
+        form.appendChild(hiddenId);
+    }
+    hiddenId.value = episodeId;
+    
+    // Add cancel button
+    let cancelBtn = form.querySelector('#cancel-edit-btn');
+    if (!cancelBtn) {
+        cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.id = 'cancel-edit-btn';
+        cancelBtn.className = 'ml-4 bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-2 rounded-lg';
+        cancelBtn.innerHTML = '<i class="fas fa-times mr-2"></i>Cancel';
+        cancelBtn.onclick = cancelEpisodeEdit;
+        submitBtn.parentNode.appendChild(cancelBtn);
+    }
+    
+    console.log('🔄 Form switched to update mode');
+}
+
+// Cancel episode editing
+function cancelEpisodeEdit() {
+    const form = document.getElementById('episode-form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const hiddenId = form.querySelector('#editing-episode-id');
+    const cancelBtn = form.querySelector('#cancel-edit-btn');
+    
+    // Reset form
+    form.reset();
+    window.EditorManager.clear('episode-content');
+    
+    // Clear cover preview
+    const coverPreview = document.getElementById('episode-cover-preview');
+    if (coverPreview) {
+        coverPreview.innerHTML = '';
+        delete coverPreview.dataset.coverImage;
+    }
+    
+    // Reset submit button
+    submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Add Episode';
+    submitBtn.classList.add('btn-primary');
+    submitBtn.classList.remove('bg-orange-500', 'hover:bg-orange-600');
+    
+    // Remove hidden ID and cancel button
+    if (hiddenId) hiddenId.remove();
+    if (cancelBtn) cancelBtn.remove();
+    
+    hideEditingMessage();
+    console.log('❌ Episode edit cancelled');
+}
+
+// Show editing message
+function showEditingMessage(episodeTitle) {
+    const container = document.querySelector('#episodes-tab .admin-card');
+    let msg = container.querySelector('#editing-message');
+    
+    if (!msg) {
+        msg = document.createElement('div');
+        msg.id = 'editing-message';
+        msg.className = 'mb-4 p-3 bg-orange-100 border border-orange-300 rounded text-orange-800';
+        container.insertBefore(msg, container.firstChild);
+    }
+    
+    msg.innerHTML = `
+        <i class="fas fa-edit mr-2"></i>
+        <strong>Editing Episode:</strong> "${episodeTitle}"
+    `;
+}
+
+// Hide editing message
+function hideEditingMessage() {
+    const msg = document.querySelector('#editing-message');
+    if (msg) {
+        msg.remove();
+    }
 }
 
 function deleteEpisode(episodeId) {
