@@ -114,6 +114,43 @@
             background-color: #2563eb !important;
         }
         
+        /* Make color buttons more prominent */
+        .ql-toolbar .ql-color .ql-picker-label,
+        .ql-toolbar .ql-background .ql-picker-label {
+            border: 1px solid #ccc !important;
+            border-radius: 3px !important;
+            padding: 3px !important;
+            margin: 1px !important;
+        }
+        
+        .ql-toolbar .ql-color .ql-picker-label:hover,
+        .ql-toolbar .ql-background .ql-picker-label:hover {
+            background-color: #f0f0f0 !important;
+            border-color: #999 !important;
+        }
+        
+        /* Color picker dropdown styling */
+        .ql-color-picker .ql-picker-options {
+            padding: 8px !important;
+            background: white !important;
+            border: 2px solid #ccc !important;
+            border-radius: 6px !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+        }
+        
+        .ql-color-picker .ql-picker-item {
+            width: 20px !important;
+            height: 20px !important;
+            margin: 2px !important;
+            border: 1px solid #ddd !important;
+            border-radius: 3px !important;
+        }
+        
+        .ql-color-picker .ql-picker-item:hover {
+            border-color: #333 !important;
+            transform: scale(1.1) !important;
+        }
+        
         /* Style the font and size dropdowns */
         .ql-font .ql-picker-label, .ql-size .ql-picker-label {
             font-weight: 600 !important;
@@ -329,11 +366,12 @@
                             <div class="mb-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
                                 <strong>💡 How to use the editor:</strong>
                                 <ul class="mt-1 ml-4 list-disc">
-                                    <li><strong>Fonts:</strong> Use the dropdown to change font style</li>
+                                    <li><strong>Fonts:</strong> Use the dropdown to change font style and size</li>
                                     <li><strong>Images:</strong> Click the <span class="bg-blue-500 text-white px-1 rounded">📷</span> button to add pictures</li>
                                     <li><strong>Resize Images:</strong> Click on any image to see resize handles. Drag the corners to make bigger/smaller!</li>
+                                    <li><strong>Text Colors:</strong> Select text, then click the <span style="color: red;">A</span> button to choose colors</li>
+                                    <li><strong>Highlight Colors:</strong> Select text, then click the background color button to highlight</li>
                                     <li><strong>Formatting:</strong> Select text and click <strong>B</strong> for bold, <em>I</em> for italic</li>
-                                    <li><strong>Colors:</strong> Use the color buttons to change text and background colors</li>
                                 </ul>
                             </div>
                             <div class="wysiwyg-container">
