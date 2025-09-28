@@ -100,20 +100,38 @@ window.EditorManager = {
             container.style.minHeight = '250px';
             textarea.parentNode.appendChild(container);
             
+            console.log(`🎨 Creating editor for ${id} with enhanced font support`);
+            
+            // Register fonts with Quill (one-time only)
+            if (!window.quillFontsConfigured) {
+                try {
+                    const Font = Quill.import('formats/font');
+                    const fontList = [
+                        'arial', 'helvetica', 'times-new-roman', 'courier-new', 'verdana', 'georgia',
+                        'fredoka-one', 'nunito', 'kalam', 'schoolbell', 'caveat', 'dancing-script', 'handlee', 'architects-daughter', 'indie-flower', 'shadows-into-light',
+                        'playfair-display', 'merriweather', 'lora', 'crimson-text', 'old-standard-tt', 'cinzel', 'cormorant-garamond',
+                        'roboto', 'open-sans', 'lato', 'source-sans-pro', 'raleway', 'montserrat', 'poppins', 'inter', 'work-sans',
+                        'abril-fatface', 'bangers', 'creepster', 'nosifer', 'monoton', 'orbitron', 'righteous', 'faster-one'
+                    ];
+                    Font.whitelist = fontList;
+                    Quill.register(Font, true);
+                    window.quillFontsConfigured = true;
+                    console.log(`✅ Registered ${fontList.length} fonts with Quill`);
+                } catch (error) {
+                    console.error('❌ Error registering fonts:', error);
+                }
+            }
+
             const quill = new Quill(`#${id}-quill`, {
                 theme: 'snow',
                 modules: {
                     toolbar: [
                         [{ 'font': [
-                            false, // Default font
-                            'arial', 'helvetica', 'times-new-roman', 'courier-new', 'verdana', 'georgia', 'palatino', 'garamond', 'bookman', 'comic-sans-ms', 'trebuchet-ms', 'arial-black', 'impact',
-                            // Child-friendly fonts
+                            false, // Default
+                            'arial', 'helvetica', 'times-new-roman', 'courier-new', 'verdana', 'georgia',
                             'fredoka-one', 'nunito', 'kalam', 'schoolbell', 'caveat', 'dancing-script', 'handlee', 'architects-daughter', 'indie-flower', 'shadows-into-light',
-                            // Elegant fonts  
                             'playfair-display', 'merriweather', 'lora', 'crimson-text', 'old-standard-tt', 'cinzel', 'cormorant-garamond',
-                            // Modern fonts
                             'roboto', 'open-sans', 'lato', 'source-sans-pro', 'raleway', 'montserrat', 'poppins', 'inter', 'work-sans',
-                            // Creative fonts
                             'abril-fatface', 'bangers', 'creepster', 'nosifer', 'monoton', 'orbitron', 'righteous', 'faster-one'
                         ] }],
                         [{ 'size': ['small', false, 'large', 'huge'] }],  
@@ -169,6 +187,32 @@ window.EditorManager = {
             
             // Setup image resize for existing and new images
             this.setupImageResize(quill);
+            
+            // Debug font dropdown after creation
+            setTimeout(() => {
+                const fontPicker = container.querySelector('.ql-font');
+                if (fontPicker) {
+                    console.log(`✅ Font picker found for ${id}`);
+                    
+                    // Check dropdown options
+                    const options = fontPicker.querySelectorAll('.ql-picker-item');
+                    console.log(`📝 Font options available: ${options.length}`);
+                    
+                    // Log each font option
+                    options.forEach((option, index) => {
+                        const value = option.getAttribute('data-value') || 'default';
+                        console.log(`Font ${index}: ${value}`);
+                    });
+                    
+                    // Check if dropdown opens correctly
+                    const label = fontPicker.querySelector('.ql-picker-label');
+                    if (label) {
+                        console.log('🖱️ Font dropdown label found - fonts should be clickable');
+                    }
+                } else {
+                    console.warn(`❌ Font picker NOT found for ${id}`);
+                }
+            }, 1000);
             
             // DEBUG: Add immediate click test
             setTimeout(() => {
@@ -1297,36 +1341,81 @@ function deleteEpisode(episodeId) {
 
 // Clan Management
 function addClan(event) {
+    console.log('🔮 Add Clan function called');
     event.preventDefault();
     
-    // Get content from editors
-    
-    const clan = {
-        id: 'clan' + Date.now(),
-        name: document.getElementById('clan-name').value,
-        stone_description: window.EditorManager.getContent('clan-origin') || document.getElementById('clan-origin').value,
-        offering: window.EditorManager.getContent('clan-powers') || document.getElementById('clan-powers').value,
-        resonance_note: window.EditorManager.getContent('clan-connection') || document.getElementById('clan-connection').value,
-        color_primary: document.getElementById('clan-color1').value,
-        color_secondary: document.getElementById('clan-color2').value,
-        emblem_url: null,
-        status: 'active'
-    };
-    
-    const clans = getStoredData('clans');
-    clans.push(clan);
-    
-    localStorage.setItem(STORAGE_KEYS.clans, JSON.stringify(clans));
-    updateMainJsData();
-    
-    // Clear form including editors
-    document.getElementById('clan-form').reset();
-    window.EditorManager.clear('clan-origin');
-    window.EditorManager.clear('clan-powers');
-    window.EditorManager.clear('clan-connection');
-    
-    loadClans();
-    showSuccess('Clan stone added successfully with rich formatting!');
+    try {
+        // Get content from editors with debugging
+        const clanName = document.getElementById('clan-name').value;
+        const originContent = window.EditorManager.getContent('clan-origin') || document.getElementById('clan-origin').value;
+        const powersContent = window.EditorManager.getContent('clan-powers') || document.getElementById('clan-powers').value;
+        const connectionContent = window.EditorManager.getContent('clan-connection') || document.getElementById('clan-connection').value;
+        
+        console.log('📝 Form data:', {
+            name: clanName,
+            origin: originContent?.substring(0, 50) + '...',
+            powers: powersContent?.substring(0, 50) + '...',
+            connection: connectionContent?.substring(0, 50) + '...'
+        });
+        
+        // Validate required fields
+        if (!clanName || clanName.trim() === '') {
+            alert('Please enter a clan name!');
+            return;
+        }
+        
+        if (!originContent || originContent.trim() === '') {
+            alert('Please enter the clan origin story!');
+            return;
+        }
+        
+        if (!powersContent || powersContent.trim() === '') {
+            alert('Please enter the clan powers!');
+            return;
+        }
+        
+        if (!connectionContent || connectionContent.trim() === '') {
+            alert('Please enter how to connect with the clan!');
+            return;
+        }
+        
+        const clan = {
+            id: 'clan' + Date.now(),
+            name: clanName,
+            stone_description: originContent,
+            offering: powersContent,
+            resonance_note: connectionContent,
+            color_primary: document.getElementById('clan-color1').value,
+            color_secondary: document.getElementById('clan-color2').value,
+            emblem_url: null,
+            status: 'active'
+        };
+        
+        console.log('💎 Created clan object:', clan);
+        
+        const clans = getStoredData('clans');
+        console.log('📚 Existing clans:', clans.length);
+        
+        clans.push(clan);
+        console.log('📚 Clans after adding:', clans.length);
+        
+        localStorage.setItem(STORAGE_KEYS.clans, JSON.stringify(clans));
+        updateMainJsData();
+        
+        // Clear form including editors
+        document.getElementById('clan-form').reset();
+        window.EditorManager.clear('clan-origin');
+        window.EditorManager.clear('clan-powers');
+        window.EditorManager.clear('clan-connection');
+        
+        loadClans();
+        showSuccess('Clan stone added successfully with rich formatting!');
+        console.log('✅ Clan added successfully');
+        
+    } catch (error) {
+        console.error('❌ Error adding clan:', error);
+        alert('Error adding clan: ' + error.message);
+    }
 }
 
 function loadClans() {
