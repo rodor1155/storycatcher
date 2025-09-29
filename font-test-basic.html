@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Basic Quill Test</title>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <style>
+        body { padding: 20px; font-family: Arial, sans-serif; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Most Basic Quill Test</h1>
+    <p>This uses DEFAULT Quill settings - no custom fonts at all:</p>
+    
+    <div id="editor" style="height: 300px;"></div>
+    
+    <div id="results" style="margin-top: 20px; padding: 10px; background: #f0f0f0;"></div>
+    
+    <script>
+        console.log('🎨 Creating most basic Quill editor...');
+        
+        // Absolutely minimal Quill setup
+        const quill = new Quill('#editor', {
+            theme: 'snow'
+            // No custom modules, no custom toolbar - just default everything
+        });
+        
+        quill.setText('This is a basic Quill editor with default settings.');
+        
+        // See what we got
+        setTimeout(() => {
+            const results = document.getElementById('results');
+            const toolbar = document.querySelector('.ql-toolbar');
+            
+            let html = '<h3>Results:</h3>';
+            html += `<p><strong>Toolbar found:</strong> ${!!toolbar}</p>`;
+            
+            if (toolbar) {
+                html += `<p><strong>Toolbar HTML:</strong><br><code>${toolbar.innerHTML}</code></p>`;
+                
+                // Look for ANY font elements
+                const fontElements = toolbar.querySelectorAll('[class*="font"], .ql-font');
+                html += `<p><strong>Font-related elements found:</strong> ${fontElements.length}</p>`;
+                
+                fontElements.forEach((el, i) => {
+                    html += `<p>Element ${i}: ${el.tagName} - class: "${el.className}" - content: "${el.textContent}"</p>`;
+                });
+            }
+            
+            results.innerHTML = html;
+        }, 1000);
+    </script>
+</body>
+</html>
