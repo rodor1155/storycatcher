@@ -34,10 +34,14 @@
         }
         
         /* Font classes for content */
+        .ql-font-serif { font-family: Georgia, serif !important; }
+        .ql-font-monospace { font-family: "Courier New", monospace !important; }
         .ql-font-arial { font-family: Arial, sans-serif !important; }
-        .ql-font-comic-sans { font-family: "Comic Sans MS", cursive !important; }
-        .ql-font-georgia { font-family: Georgia, serif !important; }
         .ql-font-helvetica { font-family: Helvetica, sans-serif !important; }
+        .ql-font-georgia { font-family: Georgia, serif !important; }
+        .ql-font-times-new-roman { font-family: "Times New Roman", serif !important; }
+        .ql-font-courier-new { font-family: "Courier New", monospace !important; }
+        .ql-font-verdana { font-family: Verdana, sans-serif !important; }
     </style>
 </head>
 <body>
@@ -55,12 +59,12 @@
     <script>
         console.log('🎨 Font Test v2 Starting...');
         
-        // Method 1: Try without custom font registration first
+        // WORKING METHOD: Use Quill's built-in font system
         const quill = new Quill('#test-editor', {
             theme: 'snow',
             modules: {
                 toolbar: [
-                    [{ 'font': ['arial', 'comic-sans', 'georgia', 'helvetica'] }],
+                    [{ 'font': ['serif', 'monospace', 'arial', 'helvetica', 'georgia', 'times-new-roman', 'courier-new', 'verdana', 'trebuchet-ms', 'comic-sans-ms', 'impact', 'lucida-sans', 'tahoma', 'fredoka-one', 'nunito', 'kalam', 'cinzel', 'schoolbell', 'caveat', 'dancing-script', 'playfair-display', 'merriweather', 'lora', 'open-sans', 'roboto', 'montserrat', 'poppins', 'raleway', 'source-sans-pro'] }],
                     ['bold', 'italic'],
                     [{ 'size': ['small', false, 'large'] }]
                 ]
