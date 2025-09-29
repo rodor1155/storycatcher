@@ -102,28 +102,15 @@ window.EditorManager = {
             
             console.log(`🎨 Creating editor for ${id} with enhanced font support`);
             
-            // Try a completely different approach - register fonts globally first
-            if (typeof window.quillFontsSetup === 'undefined') {
-                console.log('🎨 Setting up Quill fonts...');
-                
-                // First approach: Basic font whitelist
-                try {
-                    var Font = Quill.import('formats/font');
-                    Font.whitelist = ['arial', 'comic-sans-ms', 'courier-new', 'georgia', 'helvetica', 'lucida'];
-                    Quill.register(Font, true);
-                    console.log('✅ Basic fonts registered');
-                } catch (e) {
-                    console.log('❌ Basic font registration failed:', e);
-                }
-                
-                window.quillFontsSetup = true;
-            }
+            // NEW APPROACH: Let's try NO custom font registration
+            // Just use what Quill gives us by default
+            console.log('🎨 Setting up editor without custom fonts (testing basic approach)...');
 
             const quill = new Quill(`#${id}-quill`, {
                 theme: 'snow',
                 modules: {
                     toolbar: [
-                        [{ 'font': ['arial', 'comic-sans-ms', 'courier-new', 'georgia', 'helvetica', 'lucida'] }],
+                        [{ 'font': [] }], // Let Quill use its default fonts
                         [{ 'size': ['small', false, 'large', 'huge'] }],  
                         [{ 'header': [1, 2, 3, false] }],
                         ['bold', 'italic', 'underline', 'strike'],
