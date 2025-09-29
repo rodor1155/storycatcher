@@ -102,38 +102,28 @@ window.EditorManager = {
             
             console.log(`🎨 Creating editor for ${id} with enhanced font support`);
             
-            // Register fonts with Quill (one-time only)
-            if (!window.quillFontsConfigured) {
+            // Try a completely different approach - register fonts globally first
+            if (typeof window.quillFontsSetup === 'undefined') {
+                console.log('🎨 Setting up Quill fonts...');
+                
+                // First approach: Basic font whitelist
                 try {
-                    const Font = Quill.import('formats/font');
-                    const fontList = [
-                        'arial', 'helvetica', 'times-new-roman', 'courier-new', 'verdana', 'georgia',
-                        'fredoka-one', 'nunito', 'kalam', 'schoolbell', 'caveat', 'dancing-script', 'handlee', 'architects-daughter', 'indie-flower', 'shadows-into-light',
-                        'playfair-display', 'merriweather', 'lora', 'crimson-text', 'old-standard-tt', 'cinzel', 'cormorant-garamond',
-                        'roboto', 'open-sans', 'lato', 'source-sans-pro', 'raleway', 'montserrat', 'poppins', 'inter', 'work-sans',
-                        'abril-fatface', 'bangers', 'creepster', 'nosifer', 'monoton', 'orbitron', 'righteous', 'faster-one'
-                    ];
-                    Font.whitelist = fontList;
+                    var Font = Quill.import('formats/font');
+                    Font.whitelist = ['arial', 'comic-sans-ms', 'courier-new', 'georgia', 'helvetica', 'lucida'];
                     Quill.register(Font, true);
-                    window.quillFontsConfigured = true;
-                    console.log(`✅ Registered ${fontList.length} fonts with Quill`);
-                } catch (error) {
-                    console.error('❌ Error registering fonts:', error);
+                    console.log('✅ Basic fonts registered');
+                } catch (e) {
+                    console.log('❌ Basic font registration failed:', e);
                 }
+                
+                window.quillFontsSetup = true;
             }
 
             const quill = new Quill(`#${id}-quill`, {
                 theme: 'snow',
                 modules: {
                     toolbar: [
-                        [{ 'font': [
-                            false, // Default
-                            'arial', 'helvetica', 'times-new-roman', 'courier-new', 'verdana', 'georgia',
-                            'fredoka-one', 'nunito', 'kalam', 'schoolbell', 'caveat', 'dancing-script', 'handlee', 'architects-daughter', 'indie-flower', 'shadows-into-light',
-                            'playfair-display', 'merriweather', 'lora', 'crimson-text', 'old-standard-tt', 'cinzel', 'cormorant-garamond',
-                            'roboto', 'open-sans', 'lato', 'source-sans-pro', 'raleway', 'montserrat', 'poppins', 'inter', 'work-sans',
-                            'abril-fatface', 'bangers', 'creepster', 'nosifer', 'monoton', 'orbitron', 'righteous', 'faster-one'
-                        ] }],
+                        [{ 'font': ['arial', 'comic-sans-ms', 'courier-new', 'georgia', 'helvetica', 'lucida'] }],
                         [{ 'size': ['small', false, 'large', 'huge'] }],  
                         [{ 'header': [1, 2, 3, false] }],
                         ['bold', 'italic', 'underline', 'strike'],
@@ -188,31 +178,45 @@ window.EditorManager = {
             // Setup image resize for existing and new images
             this.setupImageResize(quill);
             
-            // Debug font dropdown after creation
+            // Aggressive debugging
             setTimeout(() => {
+                console.log(`🔍 DEBUGGING FONTS for ${id}`);
+                
+                const toolbar = container.querySelector('.ql-toolbar');
+                console.log('Toolbar found:', !!toolbar);
+                
                 const fontPicker = container.querySelector('.ql-font');
+                console.log('Font picker found:', !!fontPicker);
+                
                 if (fontPicker) {
-                    console.log(`✅ Font picker found for ${id}`);
+                    const label = fontPicker.querySelector('.ql-picker-label');
+                    console.log('Font label found:', !!label);
+                    if (label) console.log('Label text:', label.textContent);
                     
-                    // Check dropdown options
                     const options = fontPicker.querySelectorAll('.ql-picker-item');
-                    console.log(`📝 Font options available: ${options.length}`);
+                    console.log(`Font options count: ${options.length}`);
                     
-                    // Log each font option
                     options.forEach((option, index) => {
                         const value = option.getAttribute('data-value') || 'default';
-                        console.log(`Font ${index}: ${value}`);
+                        const text = option.textContent;
+                        console.log(`  Font ${index}: "${value}" = "${text}"`);
                     });
                     
-                    // Check if dropdown opens correctly
-                    const label = fontPicker.querySelector('.ql-picker-label');
+                    // Force click the dropdown to test
                     if (label) {
-                        console.log('🖱️ Font dropdown label found - fonts should be clickable');
+                        console.log('🖱️ Simulating font dropdown click...');
+                        label.click();
+                        
+                        setTimeout(() => {
+                            const isOpen = fontPicker.classList.contains('ql-expanded');
+                            console.log('Dropdown opened:', isOpen);
+                        }, 100);
                     }
                 } else {
-                    console.warn(`❌ Font picker NOT found for ${id}`);
+                    console.error(`❌ NO FONT PICKER FOUND for ${id}!`);
+                    console.log('Available toolbar elements:', toolbar ? toolbar.innerHTML : 'NO TOOLBAR');
                 }
-            }, 1000);
+            }, 2000);
             
             // DEBUG: Add immediate click test
             setTimeout(() => {
@@ -220,6 +224,30 @@ window.EditorManager = {
                 const testImages = quill.root.querySelectorAll('img');
                 console.log('📷 Found images:', testImages.length);
             }, 1000);
+            
+            // Try to force add fonts after creation
+            setTimeout(() => {
+                try {
+                    const fontPicker = container.querySelector('.ql-font .ql-picker-options');
+                    if (fontPicker && fontPicker.children.length <= 1) {
+                        console.log('🔧 Force-adding fonts to dropdown...');
+                        
+                        const fonts = ['arial', 'georgia', 'helvetica', 'comic-sans-ms'];
+                        fonts.forEach(font => {
+                            const item = document.createElement('span');
+                            item.className = 'ql-picker-item';
+                            item.setAttribute('data-value', font);
+                            item.textContent = font.charAt(0).toUpperCase() + font.slice(1);
+                            item.style.fontFamily = font;
+                            fontPicker.appendChild(item);
+                        });
+                        
+                        console.log(`✅ Force-added ${fonts.length} fonts`);
+                    }
+                } catch (error) {
+                    console.log('❌ Force-add fonts failed:', error);
+                }
+            }, 1500);
             
             this.editors[id] = quill;
             console.log(`✅ Created: ${id}`);
