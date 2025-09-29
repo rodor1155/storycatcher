@@ -102,15 +102,13 @@ window.EditorManager = {
             
             console.log(`🎨 Creating editor for ${id} with enhanced font support`);
             
-            // NEW APPROACH: Let's try NO custom font registration
-            // Just use what Quill gives us by default
-            console.log('🎨 Setting up editor without custom fonts (testing basic approach)...');
+            console.log(`🎨 Creating editor for ${id} with working font system`);
 
             const quill = new Quill(`#${id}-quill`, {
                 theme: 'snow',
                 modules: {
                     toolbar: [
-                        [{ 'font': [] }], // Let Quill use its default fonts
+                        [{ 'font': ['serif', 'monospace', 'arial', 'helvetica', 'georgia', 'times-new-roman', 'courier-new', 'verdana', 'trebuchet-ms', 'comic-sans-ms', 'impact', 'lucida-sans', 'tahoma', 'fredoka-one', 'nunito', 'kalam', 'cinzel', 'schoolbell', 'caveat', 'dancing-script', 'playfair-display', 'merriweather', 'lora', 'open-sans', 'roboto', 'montserrat', 'poppins', 'raleway', 'source-sans-pro'] }],
                         [{ 'size': ['small', false, 'large', 'huge'] }],  
                         [{ 'header': [1, 2, 3, false] }],
                         ['bold', 'italic', 'underline', 'strike'],
@@ -165,45 +163,16 @@ window.EditorManager = {
             // Setup image resize for existing and new images
             this.setupImageResize(quill);
             
-            // Aggressive debugging
+            // Verify fonts loaded correctly
             setTimeout(() => {
-                console.log(`🔍 DEBUGGING FONTS for ${id}`);
-                
-                const toolbar = container.querySelector('.ql-toolbar');
-                console.log('Toolbar found:', !!toolbar);
-                
                 const fontPicker = container.querySelector('.ql-font');
-                console.log('Font picker found:', !!fontPicker);
-                
                 if (fontPicker) {
-                    const label = fontPicker.querySelector('.ql-picker-label');
-                    console.log('Font label found:', !!label);
-                    if (label) console.log('Label text:', label.textContent);
-                    
                     const options = fontPicker.querySelectorAll('.ql-picker-item');
-                    console.log(`Font options count: ${options.length}`);
-                    
-                    options.forEach((option, index) => {
-                        const value = option.getAttribute('data-value') || 'default';
-                        const text = option.textContent;
-                        console.log(`  Font ${index}: "${value}" = "${text}"`);
-                    });
-                    
-                    // Force click the dropdown to test
-                    if (label) {
-                        console.log('🖱️ Simulating font dropdown click...');
-                        label.click();
-                        
-                        setTimeout(() => {
-                            const isOpen = fontPicker.classList.contains('ql-expanded');
-                            console.log('Dropdown opened:', isOpen);
-                        }, 100);
-                    }
+                    console.log(`✅ ${id}: Font dropdown created with ${options.length} fonts`);
                 } else {
-                    console.error(`❌ NO FONT PICKER FOUND for ${id}!`);
-                    console.log('Available toolbar elements:', toolbar ? toolbar.innerHTML : 'NO TOOLBAR');
+                    console.warn(`⚠️ ${id}: No font dropdown found`);
                 }
-            }, 2000);
+            }, 1000);
             
             // DEBUG: Add immediate click test
             setTimeout(() => {
