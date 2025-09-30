@@ -13,6 +13,9 @@ const STORAGE_KEYS = {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Register custom fonts with Quill before any editors are created
+    registerQuillFonts();
+    
     // Check if already logged in
     if (isLoggedIn()) {
         showDashboard();
@@ -21,6 +24,37 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeWYSIWYG();
     }
 });
+
+// Global font registration for Quill
+function registerQuillFonts() {
+    if (typeof Quill === 'undefined') {
+        console.log('⏳ Quill not loaded yet, will register fonts when creating editors');
+        return;
+    }
+    
+    console.log('🔤 Registering global fonts with Quill...');
+    
+    // Get Quill's Font class
+    const Font = Quill.import('formats/font');
+    
+    // Define all our custom fonts
+    const customFonts = [
+        'serif', 'monospace', 'arial', 'helvetica', 'georgia', 'times-new-roman', 
+        'courier-new', 'verdana', 'trebuchet-ms', 'comic-sans-ms', 'impact', 
+        'lucida-sans', 'tahoma', 'fredoka-one', 'nunito', 'kalam', 'cinzel', 
+        'schoolbell', 'caveat', 'dancing-script', 'playfair-display', 'merriweather', 
+        'lora', 'open-sans', 'roboto', 'montserrat', 'poppins', 'raleway', 'source-sans-pro'
+    ];
+    
+    // Add custom fonts to Quill's whitelist
+    Font.whitelist = [...Font.whitelist, ...customFonts];
+    
+    // Register the updated Font with Quill
+    Quill.register(Font, true);
+    
+    console.log(`✅ Registered ${customFonts.length} global fonts with Quill`);
+    window.quillFontsRegistered = true;
+}
 
 // Robust WYSIWYG Editor Management System
 window.EditorManager = {
@@ -93,6 +127,9 @@ window.EditorManager = {
     // Create single editor
     createSingle: function(id, textarea) {
         try {
+            // First, register custom fonts with Quill
+            this.registerCustomFonts();
+            
             textarea.style.display = 'none';
             
             const container = document.createElement('div');
@@ -187,6 +224,15 @@ window.EditorManager = {
         } catch (error) {
             console.error(`❌ Failed: ${id}`, error);
         }
+    },
+    
+    // Register custom fonts with Quill's Font module
+    registerCustomFonts: function() {
+        if (this.fontsRegistered || window.quillFontsRegistered) return; // Only register once
+        
+        // Call global registration function
+        registerQuillFonts();
+        this.fontsRegistered = true;
     },
     
     // Get content from editor
