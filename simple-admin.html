@@ -363,6 +363,124 @@
         .ql-font-raleway { font-family: "Raleway", sans-serif !important; }
         .ql-font-source-sans-pro { font-family: "Source Sans Pro", sans-serif !important; }
         
+        /* Strengthen font class specificity for Quill editor */
+        .ql-editor .ql-font-serif,
+        .ql-editor span.ql-font-serif { 
+            font-family: Georgia, serif !important; 
+        }
+        .ql-editor .ql-font-monospace,
+        .ql-editor span.ql-font-monospace { 
+            font-family: "Courier New", monospace !important; 
+        }
+        .ql-editor .ql-font-arial,
+        .ql-editor span.ql-font-arial { 
+            font-family: Arial, sans-serif !important; 
+        }
+        .ql-editor .ql-font-helvetica,
+        .ql-editor span.ql-font-helvetica { 
+            font-family: Helvetica, sans-serif !important; 
+        }
+        .ql-editor .ql-font-georgia,
+        .ql-editor span.ql-font-georgia { 
+            font-family: Georgia, serif !important; 
+        }
+        .ql-editor .ql-font-times-new-roman,
+        .ql-editor span.ql-font-times-new-roman { 
+            font-family: "Times New Roman", serif !important; 
+        }
+        .ql-editor .ql-font-courier-new,
+        .ql-editor span.ql-font-courier-new { 
+            font-family: "Courier New", monospace !important; 
+        }
+        .ql-editor .ql-font-verdana,
+        .ql-editor span.ql-font-verdana { 
+            font-family: Verdana, sans-serif !important; 
+        }
+        .ql-editor .ql-font-trebuchet-ms,
+        .ql-editor span.ql-font-trebuchet-ms { 
+            font-family: "Trebuchet MS", sans-serif !important; 
+        }
+        .ql-editor .ql-font-comic-sans-ms,
+        .ql-editor span.ql-font-comic-sans-ms { 
+            font-family: "Comic Sans MS", cursive !important; 
+        }
+        .ql-editor .ql-font-impact,
+        .ql-editor span.ql-font-impact { 
+            font-family: Impact, sans-serif !important; 
+        }
+        .ql-editor .ql-font-lucida-sans,
+        .ql-editor span.ql-font-lucida-sans { 
+            font-family: "Lucida Sans", sans-serif !important; 
+        }
+        .ql-editor .ql-font-tahoma,
+        .ql-editor span.ql-font-tahoma { 
+            font-family: Tahoma, sans-serif !important; 
+        }
+        .ql-editor .ql-font-fredoka-one,
+        .ql-editor span.ql-font-fredoka-one { 
+            font-family: "Fredoka One", cursive !important; 
+        }
+        .ql-editor .ql-font-nunito,
+        .ql-editor span.ql-font-nunito { 
+            font-family: "Nunito", sans-serif !important; 
+        }
+        .ql-editor .ql-font-kalam,
+        .ql-editor span.ql-font-kalam { 
+            font-family: "Kalam", cursive !important; 
+        }
+        .ql-editor .ql-font-cinzel,
+        .ql-editor span.ql-font-cinzel { 
+            font-family: "Cinzel", serif !important; 
+        }
+        .ql-editor .ql-font-schoolbell,
+        .ql-editor span.ql-font-schoolbell { 
+            font-family: "Schoolbell", cursive !important; 
+        }
+        .ql-editor .ql-font-caveat,
+        .ql-editor span.ql-font-caveat { 
+            font-family: "Caveat", cursive !important; 
+        }
+        .ql-editor .ql-font-dancing-script,
+        .ql-editor span.ql-font-dancing-script { 
+            font-family: "Dancing Script", cursive !important; 
+        }
+        .ql-editor .ql-font-playfair-display,
+        .ql-editor span.ql-font-playfair-display { 
+            font-family: "Playfair Display", serif !important; 
+        }
+        .ql-editor .ql-font-merriweather,
+        .ql-editor span.ql-font-merriweather { 
+            font-family: "Merriweather", serif !important; 
+        }
+        .ql-editor .ql-font-lora,
+        .ql-editor span.ql-font-lora { 
+            font-family: "Lora", serif !important; 
+        }
+        .ql-editor .ql-font-open-sans,
+        .ql-editor span.ql-font-open-sans { 
+            font-family: "Open Sans", sans-serif !important; 
+        }
+        .ql-editor .ql-font-roboto,
+        .ql-editor span.ql-font-roboto { 
+            font-family: "Roboto", sans-serif !important; 
+        }
+        .ql-editor .ql-font-montserrat,
+        .ql-editor span.ql-font-montserrat { 
+            font-family: "Montserrat", sans-serif !important; 
+        }
+        .ql-editor .ql-font-poppins,
+        .ql-editor span.ql-font-poppins { 
+            font-family: "Poppins", sans-serif !important; 
+        }
+        .ql-editor .ql-font-raleway,
+        .ql-editor span.ql-font-raleway { 
+            font-family: "Raleway", sans-serif !important; 
+        }
+        .ql-editor .ql-font-source-sans-pro,
+        .ql-editor span.ql-font-source-sans-pro { 
+            font-family: "Source Sans Pro", sans-serif !important; 
+        }
+        
         /* Modern fonts */
         .ql-font-roboto { font-family: "Roboto", sans-serif !important; }
         .ql-font-open-sans { font-family: "Open Sans", sans-serif !important; }
@@ -971,6 +1089,40 @@
     
     // Also run fix periodically to catch new editors
     setInterval(fixFontDropdowns, 3000);
+    
+    // Debug font selection
+    function debugFontSelection() {
+        setTimeout(() => {
+            const editors = document.querySelectorAll('.ql-editor');
+            editors.forEach((editor, i) => {
+                // Monitor for font changes
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.type === 'attributes' || mutation.type === 'childList') {
+                            const spans = editor.querySelectorAll('span[class*="ql-font"]');
+                            spans.forEach((span, j) => {
+                                const classes = span.className;
+                                const style = window.getComputedStyle(span);
+                                const fontFamily = style.fontFamily;
+                                console.log(`🎨 Font span ${j}: class="${classes}", computed font="${fontFamily}"`);
+                            });
+                        }
+                    });
+                });
+                
+                observer.observe(editor, { 
+                    attributes: true, 
+                    childList: true, 
+                    subtree: true,
+                    attributeFilter: ['class']
+                });
+                
+                console.log(`👀 Monitoring editor ${i} for font changes`);
+            });
+        }, 2000);
+    }
+    
+    document.addEventListener('DOMContentLoaded', debugFontSelection);
     </script>
 </body>
 </html>
