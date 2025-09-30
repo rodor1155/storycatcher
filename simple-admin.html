@@ -1123,6 +1123,86 @@
     }
     
     document.addEventListener('DOMContentLoaded', debugFontSelection);
+    
+    // Debug font picker clicks
+    function debugFontClicks() {
+        setTimeout(() => {
+            console.log('🖱️ Setting up font click debugging...');
+            
+            const fontPickers = document.querySelectorAll('.ql-font');
+            fontPickers.forEach((picker, i) => {
+                const options = picker.querySelectorAll('.ql-picker-item');
+                options.forEach((option, j) => {
+                    option.addEventListener('click', function() {
+                        const dataValue = this.getAttribute('data-value');
+                        console.log(`🖱️ CLICKED font option: "${dataValue}"`);
+                        
+                        // Check if font gets applied in 100ms
+                        setTimeout(() => {
+                            const editors = document.querySelectorAll('.ql-editor');
+                            editors.forEach((editor, k) => {
+                                const selection = editor.ownerDocument.getSelection();
+                                if (selection.rangeCount > 0) {
+                                    const range = selection.getRangeAt(0);
+                                    const container = range.commonAncestorContainer;
+                                    const element = container.nodeType === Node.TEXT_NODE ? container.parentElement : container;
+                                    
+                                    console.log(`📝 Selected element in editor ${k}:`, element);
+                                    console.log(`📝 Element classes:`, element.className);
+                                    console.log(`📝 Computed font:`, window.getComputedStyle(element).fontFamily);
+                                    
+                                    // Check for font spans
+                                    const fontSpans = editor.querySelectorAll('[class*="ql-font"]');
+                                    console.log(`📝 Found ${fontSpans.length} font spans in editor ${k}`);
+                                    fontSpans.forEach((span, l) => {
+                                        console.log(`  Span ${l}: class="${span.className}", font="${window.getComputedStyle(span).fontFamily}"`);
+                                    });
+                                }
+                            });
+                        }, 100);
+                        
+                        return true; // Allow the click to proceed
+                    });
+                });
+            });
+            
+            console.log(`✅ Added click listeners to ${fontPickers.length} font pickers`);
+        }, 2000);
+    }
+    
+    document.addEventListener('DOMContentLoaded', debugFontClicks);
+    
+    // Test if CSS font classes work
+    function testFontClasses() {
+        setTimeout(() => {
+            console.log('🧪 Testing if CSS font classes work...');
+            
+            const editors = document.querySelectorAll('.ql-editor');
+            editors.forEach((editor, i) => {
+                // Create test elements
+                const testSpan = document.createElement('span');
+                testSpan.textContent = 'TEST FONT - ';
+                testSpan.className = 'ql-font-comic-sans-ms';
+                testSpan.style.color = 'red';
+                testSpan.style.fontSize = '18px';
+                
+                const testSpan2 = document.createElement('span'); 
+                testSpan2.textContent = 'TEST ARIAL';
+                testSpan2.className = 'ql-font-arial';
+                testSpan2.style.color = 'blue';
+                testSpan2.style.fontSize = '18px';
+                
+                editor.insertBefore(testSpan, editor.firstChild);
+                editor.insertBefore(testSpan2, editor.firstChild);
+                
+                console.log(`🧪 Added test fonts to editor ${i}`);
+                console.log(`🧪 Comic Sans computed font: ${window.getComputedStyle(testSpan).fontFamily}`);
+                console.log(`🧪 Arial computed font: ${window.getComputedStyle(testSpan2).fontFamily}`);
+            });
+        }, 3000);
+    }
+    
+    document.addEventListener('DOMContentLoaded', testFontClasses);
     </script>
 </body>
 </html>
