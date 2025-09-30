@@ -151,20 +151,180 @@
             transform: scale(1.1) !important;
         }
         
-        /* Comprehensive font classes for Quill editor */
+        /* Quill font picker display names - Updated 2024-12-20 */
+        .ql-snow .ql-picker.ql-font .ql-picker-label:not([data-value])::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item:not([data-value])::before {
+            content: 'Sans Serif' !important;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=serif]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=serif]::before {
+            content: 'Serif' !important;
+            font-family: Georgia, serif !important;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=monospace]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=monospace]::before {
+            content: 'Monospace' !important;
+            font-family: "Courier New", monospace !important;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=arial]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=arial]::before {
+            content: 'Arial' !important;
+            font-family: Arial, sans-serif !important;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=helvetica]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=helvetica]::before {
+            content: 'Helvetica' !important;
+            font-family: Helvetica, sans-serif !important;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=georgia]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=georgia]::before {
+            content: 'Georgia';
+            font-family: Georgia, serif;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=times-new-roman]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=times-new-roman]::before {
+            content: 'Times New Roman';
+            font-family: "Times New Roman", serif;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=courier-new]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=courier-new]::before {
+            content: 'Courier New';
+            font-family: "Courier New", monospace;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=verdana]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=verdana]::before {
+            content: 'Verdana';
+            font-family: Verdana, sans-serif;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=trebuchet-ms]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=trebuchet-ms]::before {
+            content: 'Trebuchet MS';
+            font-family: "Trebuchet MS", sans-serif;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=comic-sans-ms]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=comic-sans-ms]::before {
+            content: 'Comic Sans MS';
+            font-family: "Comic Sans MS", cursive;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=impact]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=impact]::before {
+            content: 'Impact';
+            font-family: Impact, sans-serif;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=lucida-sans]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=lucida-sans]::before {
+            content: 'Lucida Sans';
+            font-family: "Lucida Sans", sans-serif;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=tahoma]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=tahoma]::before {
+            content: 'Tahoma';
+            font-family: Tahoma, sans-serif;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=fredoka-one]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=fredoka-one]::before {
+            content: 'Fredoka One';
+            font-family: "Fredoka One", cursive;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=nunito]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=nunito]::before {
+            content: 'Nunito';
+            font-family: "Nunito", sans-serif;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=kalam]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=kalam]::before {
+            content: 'Kalam';
+            font-family: "Kalam", cursive;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=cinzel]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=cinzel]::before {
+            content: 'Cinzel';
+            font-family: "Cinzel", serif;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=schoolbell]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=schoolbell]::before {
+            content: 'Schoolbell';
+            font-family: "Schoolbell", cursive;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=caveat]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=caveat]::before {
+            content: 'Caveat';
+            font-family: "Caveat", cursive;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=dancing-script]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=dancing-script]::before {
+            content: 'Dancing Script';
+            font-family: "Dancing Script", cursive;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=playfair-display]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=playfair-display]::before {
+            content: 'Playfair Display';
+            font-family: "Playfair Display", serif;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=merriweather]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=merriweather]::before {
+            content: 'Merriweather';
+            font-family: "Merriweather", serif;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=lora]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=lora]::before {
+            content: 'Lora';
+            font-family: "Lora", serif;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=open-sans]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=open-sans]::before {
+            content: 'Open Sans';
+            font-family: "Open Sans", sans-serif;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=roboto]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=roboto]::before {
+            content: 'Roboto';
+            font-family: "Roboto", sans-serif;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=montserrat]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=montserrat]::before {
+            content: 'Montserrat';
+            font-family: "Montserrat", sans-serif;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=poppins]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=poppins]::before {
+            content: 'Poppins';
+            font-family: "Poppins", sans-serif;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=raleway]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=raleway]::before {
+            content: 'Raleway';
+            font-family: "Raleway", sans-serif;
+        }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=source-sans-pro]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=source-sans-pro]::before {
+            content: 'Source Sans Pro';
+            font-family: "Source Sans Pro", sans-serif;
+        }
+        
+        /* Force Quill font picker refresh */
+        .ql-picker.ql-font .ql-picker-options {
+            display: block !important;
+        }
+        .ql-picker.ql-font .ql-picker-item::before {
+            display: inline !important;
+        }
+        
+        /* Basic font classes that work with Quill's default system */
+        .ql-font-serif { font-family: Georgia, serif !important; }
+        .ql-font-monospace { font-family: "Courier New", monospace !important; }
         .ql-font-arial { font-family: Arial, sans-serif !important; }
         .ql-font-helvetica { font-family: Helvetica, sans-serif !important; }
+        .ql-font-georgia { font-family: Georgia, serif !important; }
         .ql-font-times-new-roman { font-family: "Times New Roman", serif !important; }
         .ql-font-courier-new { font-family: "Courier New", monospace !important; }
         .ql-font-verdana { font-family: Verdana, sans-serif !important; }
-        .ql-font-georgia { font-family: Georgia, serif !important; }
-        .ql-font-palatino { font-family: Palatino, serif !important; }
-        .ql-font-garamond { font-family: Garamond, serif !important; }
-        .ql-font-bookman { font-family: Bookman, serif !important; }
-        .ql-font-comic-sans-ms { font-family: "Comic Sans MS", cursive !important; }
-        .ql-font-trebuchet-ms { font-family: "Trebuchet MS", sans-serif !important; }
-        .ql-font-arial-black { font-family: "Arial Black", sans-serif !important; }
-        .ql-font-impact { font-family: Impact, sans-serif !important; }
+        
+        /* Google Fonts that are loaded in the page */
+        .ql-font-fredoka-one { font-family: "Fredoka One", cursive !important; }
+        .ql-font-nunito { font-family: "Nunito", sans-serif !important; }
+        .ql-font-kalam { font-family: "Kalam", cursive !important; }
+        .ql-font-cinzel { font-family: "Cinzel", serif !important; }
         
         /* Child-friendly fonts */
         .ql-font-fredoka-one { font-family: "Fredoka One", cursive !important; }
@@ -186,6 +346,21 @@
         .ql-font-old-standard-tt { font-family: "Old Standard TT", serif !important; }
         .ql-font-cinzel { font-family: "Cinzel", serif !important; }
         .ql-font-cormorant-garamond { font-family: "Cormorant Garamond", serif !important; }
+        
+        /* System fonts */
+        .ql-font-trebuchet-ms { font-family: "Trebuchet MS", sans-serif !important; }
+        .ql-font-comic-sans-ms { font-family: "Comic Sans MS", cursive !important; }
+        .ql-font-impact { font-family: Impact, sans-serif !important; }
+        .ql-font-lucida-sans { font-family: "Lucida Sans", sans-serif !important; }
+        .ql-font-tahoma { font-family: Tahoma, sans-serif !important; }
+        
+        /* Modern popular fonts */
+        .ql-font-open-sans { font-family: "Open Sans", sans-serif !important; }
+        .ql-font-roboto { font-family: "Roboto", sans-serif !important; }
+        .ql-font-montserrat { font-family: "Montserrat", sans-serif !important; }
+        .ql-font-poppins { font-family: "Poppins", sans-serif !important; }
+        .ql-font-raleway { font-family: "Raleway", sans-serif !important; }
+        .ql-font-source-sans-pro { font-family: "Source Sans Pro", sans-serif !important; }
         
         /* Modern fonts */
         .ql-font-roboto { font-family: "Roboto", sans-serif !important; }
@@ -687,5 +862,82 @@
     </div>
 
     <script src="js/simple-admin.js"></script>
+    
+    <script>
+    // Font names mapping
+    const fontNames = {
+        'serif': 'Serif',
+        'monospace': 'Monospace', 
+        'arial': 'Arial',
+        'helvetica': 'Helvetica',
+        'georgia': 'Georgia',
+        'times-new-roman': 'Times New Roman',
+        'courier-new': 'Courier New',
+        'verdana': 'Verdana',
+        'trebuchet-ms': 'Trebuchet MS',
+        'comic-sans-ms': 'Comic Sans MS',
+        'impact': 'Impact',
+        'lucida-sans': 'Lucida Sans',
+        'tahoma': 'Tahoma',
+        'fredoka-one': 'Fredoka One',
+        'nunito': 'Nunito',
+        'kalam': 'Kalam',
+        'cinzel': 'Cinzel',
+        'schoolbell': 'Schoolbell',
+        'caveat': 'Caveat',
+        'dancing-script': 'Dancing Script',
+        'playfair-display': 'Playfair Display',
+        'merriweather': 'Merriweather',
+        'lora': 'Lora',
+        'open-sans': 'Open Sans',
+        'roboto': 'Roboto',
+        'montserrat': 'Montserrat',
+        'poppins': 'Poppins',
+        'raleway': 'Raleway',
+        'source-sans-pro': 'Source Sans Pro'
+    };
+    
+    // Fix font dropdown display names
+    function fixFontDropdowns() {
+        setTimeout(() => {
+            console.log('🔧 FIXING font dropdowns...');
+            
+            const fontPickers = document.querySelectorAll('.ql-font');
+            console.log(`Found ${fontPickers.length} font pickers`);
+            
+            fontPickers.forEach((picker, i) => {
+                const options = picker.querySelectorAll('.ql-picker-item');
+                console.log(`Font picker ${i + 1}: ${options.length} options`);
+                
+                options.forEach((option, j) => {
+                    const dataValue = option.getAttribute('data-value');
+                    if (dataValue && fontNames[dataValue]) {
+                        // Force set the text content directly
+                        option.textContent = fontNames[dataValue];
+                        console.log(`✅ Set ${dataValue} → "${fontNames[dataValue]}"`);
+                    } else if (!dataValue) {
+                        option.textContent = 'Sans Serif';
+                    }
+                });
+                
+                // Also fix the picker labels
+                const labels = picker.querySelectorAll('.ql-picker-label');
+                labels.forEach(label => {
+                    const dataValue = label.getAttribute('data-value');
+                    if (dataValue && fontNames[dataValue]) {
+                        label.setAttribute('data-label', fontNames[dataValue]);
+                    }
+                });
+            });
+            
+        }, 1000);
+    }
+    
+    // Run fix when page loads and when new editors are created
+    document.addEventListener('DOMContentLoaded', fixFontDropdowns);
+    
+    // Also run fix periodically to catch new editors
+    setInterval(fixFontDropdowns, 3000);
+    </script>
 </body>
 </html>
