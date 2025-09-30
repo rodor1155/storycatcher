@@ -167,9 +167,12 @@
             font-family: "Courier New", monospace !important;
         }
         .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=arial]::before,
-        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=arial]::before {
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=arial]::before,
+        .ql-font .ql-picker-item[data-value=arial]::before,
+        [data-value=arial]::before {
             content: 'Arial' !important;
             font-family: Arial, sans-serif !important;
+            display: inline !important;
         }
         .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=helvetica]::before,
         .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=helvetica]::before {
@@ -308,6 +311,12 @@
         }
         .ql-picker.ql-font .ql-picker-item::before {
             display: inline !important;
+        }
+        
+        /* Alternative font display method using CSS variables */
+        .ql-picker.ql-font .ql-picker-item::after {
+            content: var(--font-name, 'Sans Serif');
+            font-weight: normal;
         }
         
         /* Basic font classes that work with Quill's default system */
@@ -906,26 +915,58 @@
             console.log(`Found ${fontPickers.length} font pickers`);
             
             fontPickers.forEach((picker, i) => {
-                const options = picker.querySelectorAll('.ql-picker-item');
-                console.log(`Font picker ${i + 1}: ${options.length} options`);
+                console.log(`🔍 Examining font picker ${i + 1}:`, picker);
+                
+                // Check different possible selectors
+                let options = picker.querySelectorAll('.ql-picker-item');
+                console.log(`  Direct .ql-picker-item: ${options.length}`);
+                
+                if (options.length === 0) {
+                    options = picker.querySelectorAll('[data-value]');
+                    console.log(`  [data-value] elements: ${options.length}`);
+                }
+                
+                if (options.length === 0) {
+                    // Try looking in dropdown menu
+                    const dropdown = picker.querySelector('.ql-picker-options');
+                    if (dropdown) {
+                        options = dropdown.querySelectorAll('span');
+                        console.log(`  Dropdown spans: ${options.length}`);
+                    }
+                }
+                
+                console.log(`Font picker ${i + 1} structure:`, picker.innerHTML.substring(0, 200) + '...');
                 
                 options.forEach((option, j) => {
                     const dataValue = option.getAttribute('data-value');
+                    const currentText = option.textContent || option.innerText;
+                    console.log(`  Option ${j}: data-value="${dataValue}", current text="${currentText}"`);
+                    
                     if (dataValue && fontNames[dataValue]) {
-                        // Force set the text content directly
+                        // Try multiple methods to set the text
                         option.textContent = fontNames[dataValue];
+                        option.innerText = fontNames[dataValue];
+                        option.setAttribute('title', fontNames[dataValue]);
+                        
+                        // Also try setting via CSS
+                        option.style.setProperty('--font-name', `"${fontNames[dataValue]}"`);
+                        
                         console.log(`✅ Set ${dataValue} → "${fontNames[dataValue]}"`);
                     } else if (!dataValue) {
                         option.textContent = 'Sans Serif';
+                        option.innerText = 'Sans Serif';
                     }
                 });
                 
-                // Also fix the picker labels
+                // Also fix the picker labels  
                 const labels = picker.querySelectorAll('.ql-picker-label');
-                labels.forEach(label => {
+                console.log(`  Found ${labels.length} labels`);
+                labels.forEach((label, k) => {
                     const dataValue = label.getAttribute('data-value');
+                    console.log(`  Label ${k}: data-value="${dataValue}"`);
                     if (dataValue && fontNames[dataValue]) {
                         label.setAttribute('data-label', fontNames[dataValue]);
+                        label.textContent = fontNames[dataValue];
                     }
                 });
             });
