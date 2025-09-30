@@ -305,14 +305,6 @@
             font-family: "Source Sans Pro", sans-serif;
         }
         
-        /* Force Quill font picker refresh */
-        .ql-picker.ql-font .ql-picker-options {
-            display: block !important;
-        }
-        .ql-picker.ql-font .ql-picker-item::before {
-            display: inline !important;
-        }
-        
         /* Alternative font display method using CSS variables */
         .ql-picker.ql-font .ql-picker-item::after {
             content: var(--font-name, 'Sans Serif');
