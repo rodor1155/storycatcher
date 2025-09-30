@@ -983,7 +983,7 @@
     <script src="js/simple-admin.js"></script>
     
     <script>
-    // Font names mapping
+    // Font names mapping for better display in dropdowns
     const fontNames = {
         'serif': 'Serif',
         'monospace': 'Monospace', 
@@ -1019,68 +1019,31 @@
     // Fix font dropdown display names
     function fixFontDropdowns() {
         setTimeout(() => {
-            console.log('🔧 FIXING font dropdowns...');
-            
             const fontPickers = document.querySelectorAll('.ql-font');
-            console.log(`Found ${fontPickers.length} font pickers`);
             
-            fontPickers.forEach((picker, i) => {
-                console.log(`🔍 Examining font picker ${i + 1}:`, picker);
+            fontPickers.forEach((picker) => {
+                const options = picker.querySelectorAll('.ql-picker-item');
                 
-                // Check different possible selectors
-                let options = picker.querySelectorAll('.ql-picker-item');
-                console.log(`  Direct .ql-picker-item: ${options.length}`);
-                
-                if (options.length === 0) {
-                    options = picker.querySelectorAll('[data-value]');
-                    console.log(`  [data-value] elements: ${options.length}`);
-                }
-                
-                if (options.length === 0) {
-                    // Try looking in dropdown menu
-                    const dropdown = picker.querySelector('.ql-picker-options');
-                    if (dropdown) {
-                        options = dropdown.querySelectorAll('span');
-                        console.log(`  Dropdown spans: ${options.length}`);
-                    }
-                }
-                
-                console.log(`Font picker ${i + 1} structure:`, picker.innerHTML.substring(0, 200) + '...');
-                
-                options.forEach((option, j) => {
+                options.forEach((option) => {
                     const dataValue = option.getAttribute('data-value');
-                    const currentText = option.textContent || option.innerText;
-                    console.log(`  Option ${j}: data-value="${dataValue}", current text="${currentText}"`);
                     
                     if (dataValue && fontNames[dataValue]) {
-                        // Try multiple methods to set the text
                         option.textContent = fontNames[dataValue];
-                        option.innerText = fontNames[dataValue];
                         option.setAttribute('title', fontNames[dataValue]);
-                        
-                        // Also try setting via CSS
-                        option.style.setProperty('--font-name', `"${fontNames[dataValue]}"`);
-                        
-                        console.log(`✅ Set ${dataValue} → "${fontNames[dataValue]}"`);
                     } else if (!dataValue) {
                         option.textContent = 'Sans Serif';
-                        option.innerText = 'Sans Serif';
                     }
                 });
                 
                 // Also fix the picker labels  
                 const labels = picker.querySelectorAll('.ql-picker-label');
-                console.log(`  Found ${labels.length} labels`);
-                labels.forEach((label, k) => {
+                labels.forEach((label) => {
                     const dataValue = label.getAttribute('data-value');
-                    console.log(`  Label ${k}: data-value="${dataValue}"`);
                     if (dataValue && fontNames[dataValue]) {
                         label.setAttribute('data-label', fontNames[dataValue]);
-                        label.textContent = fontNames[dataValue];
                     }
                 });
             });
-            
         }, 1000);
     }
     
@@ -1089,120 +1052,6 @@
     
     // Also run fix periodically to catch new editors
     setInterval(fixFontDropdowns, 3000);
-    
-    // Debug font selection
-    function debugFontSelection() {
-        setTimeout(() => {
-            const editors = document.querySelectorAll('.ql-editor');
-            editors.forEach((editor, i) => {
-                // Monitor for font changes
-                const observer = new MutationObserver((mutations) => {
-                    mutations.forEach((mutation) => {
-                        if (mutation.type === 'attributes' || mutation.type === 'childList') {
-                            const spans = editor.querySelectorAll('span[class*="ql-font"]');
-                            spans.forEach((span, j) => {
-                                const classes = span.className;
-                                const style = window.getComputedStyle(span);
-                                const fontFamily = style.fontFamily;
-                                console.log(`🎨 Font span ${j}: class="${classes}", computed font="${fontFamily}"`);
-                            });
-                        }
-                    });
-                });
-                
-                observer.observe(editor, { 
-                    attributes: true, 
-                    childList: true, 
-                    subtree: true,
-                    attributeFilter: ['class']
-                });
-                
-                console.log(`👀 Monitoring editor ${i} for font changes`);
-            });
-        }, 2000);
-    }
-    
-    document.addEventListener('DOMContentLoaded', debugFontSelection);
-    
-    // Debug font picker clicks
-    function debugFontClicks() {
-        setTimeout(() => {
-            console.log('🖱️ Setting up font click debugging...');
-            
-            const fontPickers = document.querySelectorAll('.ql-font');
-            fontPickers.forEach((picker, i) => {
-                const options = picker.querySelectorAll('.ql-picker-item');
-                options.forEach((option, j) => {
-                    option.addEventListener('click', function() {
-                        const dataValue = this.getAttribute('data-value');
-                        console.log(`🖱️ CLICKED font option: "${dataValue}"`);
-                        
-                        // Check if font gets applied in 100ms
-                        setTimeout(() => {
-                            const editors = document.querySelectorAll('.ql-editor');
-                            editors.forEach((editor, k) => {
-                                const selection = editor.ownerDocument.getSelection();
-                                if (selection.rangeCount > 0) {
-                                    const range = selection.getRangeAt(0);
-                                    const container = range.commonAncestorContainer;
-                                    const element = container.nodeType === Node.TEXT_NODE ? container.parentElement : container;
-                                    
-                                    console.log(`📝 Selected element in editor ${k}:`, element);
-                                    console.log(`📝 Element classes:`, element.className);
-                                    console.log(`📝 Computed font:`, window.getComputedStyle(element).fontFamily);
-                                    
-                                    // Check for font spans
-                                    const fontSpans = editor.querySelectorAll('[class*="ql-font"]');
-                                    console.log(`📝 Found ${fontSpans.length} font spans in editor ${k}`);
-                                    fontSpans.forEach((span, l) => {
-                                        console.log(`  Span ${l}: class="${span.className}", font="${window.getComputedStyle(span).fontFamily}"`);
-                                    });
-                                }
-                            });
-                        }, 100);
-                        
-                        return true; // Allow the click to proceed
-                    });
-                });
-            });
-            
-            console.log(`✅ Added click listeners to ${fontPickers.length} font pickers`);
-        }, 2000);
-    }
-    
-    document.addEventListener('DOMContentLoaded', debugFontClicks);
-    
-    // Test if CSS font classes work
-    function testFontClasses() {
-        setTimeout(() => {
-            console.log('🧪 Testing if CSS font classes work...');
-            
-            const editors = document.querySelectorAll('.ql-editor');
-            editors.forEach((editor, i) => {
-                // Create test elements
-                const testSpan = document.createElement('span');
-                testSpan.textContent = 'TEST FONT - ';
-                testSpan.className = 'ql-font-comic-sans-ms';
-                testSpan.style.color = 'red';
-                testSpan.style.fontSize = '18px';
-                
-                const testSpan2 = document.createElement('span'); 
-                testSpan2.textContent = 'TEST ARIAL';
-                testSpan2.className = 'ql-font-arial';
-                testSpan2.style.color = 'blue';
-                testSpan2.style.fontSize = '18px';
-                
-                editor.insertBefore(testSpan, editor.firstChild);
-                editor.insertBefore(testSpan2, editor.firstChild);
-                
-                console.log(`🧪 Added test fonts to editor ${i}`);
-                console.log(`🧪 Comic Sans computed font: ${window.getComputedStyle(testSpan).fontFamily}`);
-                console.log(`🧪 Arial computed font: ${window.getComputedStyle(testSpan2).fontFamily}`);
-            });
-        }, 3000);
-    }
-    
-    document.addEventListener('DOMContentLoaded', testFontClasses);
     </script>
 </body>
 </html>
