@@ -101,8 +101,6 @@ window.EditorManager = {
             textarea.parentNode.appendChild(container);
             
             console.log(`🎨 Creating editor for ${id} with enhanced font support`);
-            
-            console.log(`🎨 Creating editor for ${id} with working font system`);
 
             const quill = new Quill(`#${id}-quill`, {
                 theme: 'snow',
@@ -181,29 +179,7 @@ window.EditorManager = {
                 console.log('📷 Found images:', testImages.length);
             }, 1000);
             
-            // Try to force add fonts after creation
-            setTimeout(() => {
-                try {
-                    const fontPicker = container.querySelector('.ql-font .ql-picker-options');
-                    if (fontPicker && fontPicker.children.length <= 1) {
-                        console.log('🔧 Force-adding fonts to dropdown...');
-                        
-                        const fonts = ['arial', 'georgia', 'helvetica', 'comic-sans-ms'];
-                        fonts.forEach(font => {
-                            const item = document.createElement('span');
-                            item.className = 'ql-picker-item';
-                            item.setAttribute('data-value', font);
-                            item.textContent = font.charAt(0).toUpperCase() + font.slice(1);
-                            item.style.fontFamily = font;
-                            fontPicker.appendChild(item);
-                        });
-                        
-                        console.log(`✅ Force-added ${fonts.length} fonts`);
-                    }
-                } catch (error) {
-                    console.log('❌ Force-add fonts failed:', error);
-                }
-            }, 1500);
+
             
             this.editors[id] = quill;
             console.log(`✅ Created: ${id}`);
