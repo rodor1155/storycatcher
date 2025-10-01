@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - The Hidden World of London</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@300;400;600;700&family=Kalam:wght@300;400;700&family=Schoolbell&family=Caveat:wght@400;700&family=Dancing+Script:wght@400;700&family=Handlee&family=Architects+Daughter&family=Indie+Flower&family=Shadows+Into+Light&family=Playfair+Display:wght@400;700&family=Merriweather:wght@300;400;700&family=Lora:wght@400;700&family=Crimson+Text:wght@400;700&family=Old+Standard+TT:wght@400;700&family=Cinzel:wght@400;600&family=Cormorant+Garamond:wght@300;400;700&family=Roboto:wght@300;400;700&family=Open+Sans:wght@300;400;700&family=Lato:wght@300;400;700&family=Source+Sans+Pro:wght@300;400;700&family=Raleway:wght@300;400;700&family=Montserrat:wght@300;400;700&family=Poppins:wght@300;400;700&family=Inter:wght@300;400;700&family=Work+Sans:wght@300;400;700&family=Abril+Fatface&family=Bangers&family=Creepster&family=Nosifer&family=Monoton&family=Orbitron:wght@400;700&family=Righteous&family=Faster+One&display=swap" rel="stylesheet">
+    <!-- Quill.js WYSIWYG Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <!-- Sortable.js for drag & drop reordering -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <style>
+        body { font-family: 'Nunito', sans-serif; }
+        .admin-card { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .btn-primary { background: #3b82f6; color: white; padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-success { background: #10b981; color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: #ef4444; color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; }
+        .btn-danger:hover { background: #dc2626; }
+        input, textarea, select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 16px; font-family: 'Nunito', sans-serif; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #374151; }
+        .hidden { display: none; }
+        .content-item { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+        .success-msg { background: #d1fae5; color: #065f46; padding: 12px; border-radius: 8px; margin-bottom: 16px; }
+        .error-msg { background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 16px; }
+        .wysiwyg-container { margin-bottom: 16px; }
+        .image-upload-zone { border: 2px dashed #d1d5db; border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 16px; cursor: pointer; transition: all 0.3s; }
+        .image-upload-zone:hover { border-color: #3b82f6; background-color: #f8fafc; }
+        .image-upload-zone.dragover { border-color: #10b981; background-color: #ecfdf5; }
+        .uploaded-image { max-width: 200px; max-height: 150px; border-radius: 8px; margin: 8px; }
+        
+        /* Enhanced Quill.js styling */
+        .ql-toolbar {
+            border-top: 1px solid #ccc !important;
+            border-left: 1px solid #ccc !important;
+            border-right: 1px solid #ccc !important;
+            border-bottom: none !important;
+            background: #f8f9fa !important;
+            padding: 8px !important;
+            border-radius: 8px 8px 0 0 !important;
+        }
+        
+        .ql-container {
+            border-bottom: 1px solid #ccc !important;
+            border-left: 1px solid #ccc !important;
+            border-right: 1px solid #ccc !important;
+            border-top: none !important;
+            border-radius: 0 0 8px 8px !important;
+            background: white !important;
+        }
+        
+        .ql-editor {
+            min-height: 200px !important;
+            font-family: 'Nunito', sans-serif !important;
+            font-size: 16px !important;
+            line-height: 1.6 !important;
+        }
+
+        /* Episode reordering styles */
+        .reorder-info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+            color: #1e40af;
+            font-size: 14px;
+        }
+
+        .drag-handle {
+            cursor: grab;
+            color: #9ca3af;
+            padding: 4px;
+            margin-right: 8px;
+        }
+
+        .drag-handle:hover {
+            color: #374151;
+        }
+
+        .sortable-chosen {
+            opacity: 0.8;
+            transform: rotate(2deg);
+        }
+
+        .sortable-ghost {
+            opacity: 0.4;
+            background: #f3f4f6;
+        }
+
+        .episode-item {
+            cursor: move;
+            transition: all 0.2s ease;
+        }
+
+        .episode-item:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-color: #d1d5db;
+        }
+        
+        /* Font classes for Quill editor content */
+        .ql-editor .ql-font-serif { font-family: serif !important; }
+        .ql-editor .ql-font-monospace { font-family: monospace !important; }
+        .ql-editor .ql-font-arial { font-family: Arial, sans-serif !important; }
+        .ql-editor .ql-font-helvetica { font-family: Helvetica, Arial, sans-serif !important; }
+        .ql-editor .ql-font-georgia { font-family: Georgia, serif !important; }
+        .ql-editor .ql-font-times-new-roman { font-family: "Times New Roman", Times, serif !important; }
+        .ql-editor .ql-font-courier-new { font-family: "Courier New", Courier, monospace !important; }
+        .ql-editor .ql-font-verdana { font-family: Verdana, Arial, sans-serif !important; }
+        .ql-editor .ql-font-trebuchet-ms { font-family: "Trebuchet MS", Arial, sans-serif !important; }
+        .ql-editor .ql-font-comic-sans-ms { font-family: "Comic Sans MS", cursive !important; }
+        .ql-editor .ql-font-impact { font-family: Impact, Arial, sans-serif !important; }
+        .ql-editor .ql-font-lucida-sans { font-family: "Lucida Sans", Arial, sans-serif !important; }
+        .ql-editor .ql-font-tahoma { font-family: Tahoma, Arial, sans-serif !important; }
+        .ql-editor .ql-font-fredoka-one { font-family: "Fredoka One", cursive !important; }
+        .ql-editor .ql-font-nunito { font-family: "Nunito", sans-serif !important; }
+        .ql-editor .ql-font-kalam { font-family: "Kalam", cursive !important; }
+        .ql-editor .ql-font-cinzel { font-family: "Cinzel", serif !important; }
+        .ql-editor .ql-font-schoolbell { font-family: "Schoolbell", cursive !important; }
+        .ql-editor .ql-font-caveat { font-family: "Caveat", cursive !important; }
+        .ql-editor .ql-font-dancing-script { font-family: "Dancing Script", cursive !important; }
+        .ql-editor .ql-font-playfair-display { font-family: "Playfair Display", serif !important; }
+        .ql-editor .ql-font-merriweather { font-family: "Merriweather", serif !important; }
+        .ql-editor .ql-font-lora { font-family: "Lora", serif !important; }
+        .ql-editor .ql-font-open-sans { font-family: "Open Sans", sans-serif !important; }
+        .ql-editor .ql-font-roboto { font-family: "Roboto", sans-serif !important; }
+        .ql-editor .ql-font-montserrat { font-family: "Montserrat", sans-serif !important; }
+        .ql-editor .ql-font-poppins { font-family: "Poppins", sans-serif !important; }
+        .ql-editor .ql-font-raleway { font-family: "Raleway", sans-serif !important; }
+        .ql-editor .ql-font-source-sans-pro { font-family: "Source Sans Pro", sans-serif !important; }
+        
+        /* Dropdown display names using CSS content */
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=serif]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=serif]::before { content: 'Serif'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=monospace]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=monospace]::before { content: 'Monospace'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=arial]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=arial]::before { content: 'Arial'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=helvetica]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=helvetica]::before { content: 'Helvetica'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=georgia]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=georgia]::before { content: 'Georgia'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=times-new-roman]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=times-new-roman]::before { content: 'Times New Roman'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=courier-new]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=courier-new]::before { content: 'Courier New'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=verdana]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=verdana]::before { content: 'Verdana'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=trebuchet-ms]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=trebuchet-ms]::before { content: 'Trebuchet MS'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=comic-sans-ms]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=comic-sans-ms]::before { content: 'Comic Sans MS'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=impact]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=impact]::before { content: 'Impact'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=lucida-sans]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=lucida-sans]::before { content: 'Lucida Sans'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=tahoma]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=tahoma]::before { content: 'Tahoma'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=fredoka-one]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=fredoka-one]::before { content: 'Fredoka One'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=nunito]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=nunito]::before { content: 'Nunito'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=kalam]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=kalam]::before { content: 'Kalam'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=cinzel]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=cinzel]::before { content: 'Cinzel'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=schoolbell]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=schoolbell]::before { content: 'Schoolbell'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=caveat]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=caveat]::before { content: 'Caveat'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=dancing-script]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=dancing-script]::before { content: 'Dancing Script'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=playfair-display]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=playfair-display]::before { content: 'Playfair Display'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=merriweather]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=merriweather]::before { content: 'Merriweather'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=lora]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=lora]::before { content: 'Lora'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=open-sans]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=open-sans]::before { content: 'Open Sans'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=roboto]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=roboto]::before { content: 'Roboto'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=montserrat]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=montserrat]::before { content: 'Montserrat'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=poppins]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=poppins]::before { content: 'Poppins'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=raleway]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=raleway]::before { content: 'Raleway'; }
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value=source-sans-pro]::before, 
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=source-sans-pro]::before { content: 'Source Sans Pro'; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <!-- Login Section -->
+    <div id="login-section" class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div>
+                <h2 class="mt-6 text-center text-3xl font-extrabold text-white">
+                    🏰 The Hidden World of London
+                </h2>
+                <p class="mt-2 text-center text-sm text-gray-300">
+                    Admin Panel - Content Management System
+                </p>
+            </div>
+            <form class="mt-8 space-y-6" onsubmit="handleLogin(event)">
+                <div>
+                    <label for="password" class="sr-only">Password</label>
+                    <input id="password" name="password" type="password" required 
+                           class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 
+                           placeholder="Enter admin password">
+                </div>
+                <div>
+                    <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                            <i class="fas fa-key text-indigo-500 group-hover:text-indigo-400"></i>
+                        </span>
+                        Access Admin Panel
+                    </button>
+                </div>
+                <div id="login-error" class="hidden">
+                    <div class="rounded-md bg-red-50 p-4">
+                        <div class="text-sm text-red-700">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            Invalid password. Please try again.
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="hidden min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <h1 class="text-xl font-bold text-gray-900">
+                            🏰 The Hidden World of London - Admin Panel
+                        </h1>
+                    </div>
+                    <div class="flex items-center">
+                        <button onclick="logout()" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Success Message -->
+        <div id="success-message" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            <div class="success-msg">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span id="success-text">Success!</span>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex space-x-8">
+                    <button id="tab-episodes" onclick="showTab('episodes')" class="tab-btn border-blue-500 text-blue-600 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                        <i class="fas fa-book mr-2"></i>Episodes
+                    </button>
+                    <button id="tab-clans" onclick="showTab('clans')" class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                        <i class="fas fa-gem mr-2"></i>Clan Stones
+                    </button>
+                    <button id="tab-locations" onclick="showTab('locations')" class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                        <i class="fas fa-map-marker-alt mr-2"></i>Locations
+                    </button>
+                    <button id="tab-mainpage" onclick="showTab('mainpage')" class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                        <i class="fas fa-home mr-2"></i>Main Page
+                    </button>
+                </nav>
+            </div>
+        </nav>
+
+        <!-- Content Areas -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            
+            <!-- Episodes Tab -->
+            <div id="episodes-tab" class="tab-content">
+                <div class="admin-card">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                        <i class="fas fa-book text-blue-600 mr-3"></i>Manage Episodes
+                    </h2>
+                    
+                    <form id="episode-form" onsubmit="addEpisode(event)" class="mb-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="episode-title">Episode Title</label>
+                                <input type="text" id="episode-title" required placeholder="e.g., The Awakening of the Thames Stones">
+                            </div>
+                            <div>
+                                <label for="episode-description">Short Description</label>
+                                <input type="text" id="episode-description" required placeholder="Brief episode summary for listings">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="episode-cover">Cover Image (Optional)</label>
+                            <div class="image-upload-zone" onclick="document.getElementById('episode-cover').click()">
+                                <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                <p class="text-gray-600">Click to upload or drag and drop cover image</p>
+                                <input type="file" id="episode-cover" class="hidden" accept="image/*" onchange="handleCoverImageUpload(event)">
+                            </div>
+                            <div id="episode-cover-preview"></div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label>Episode Content</label>
+                            <div class="wysiwyg-container">
+                                <textarea id="episode-content" placeholder="Write your magical story here... Use the rich text editor to format with different fonts, colors, and styles!"></textarea>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save mr-2"></i>Add Episode
+                        </button>
+                    </form>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">📚 Existing Episodes</h3>
+                    <div id="episodes-list"></div>
+                </div>
+            </div>
+
+            <!-- Clans Tab -->
+            <div id="clans-tab" class="tab-content hidden">
+                <div class="admin-card">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                        <i class="fas fa-gem text-purple-600 mr-3"></i>Manage Clan Stones
+                    </h2>
+                    
+                    <form id="clan-form" onsubmit="addClan(event)" class="mb-8">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div>
+                                <label for="clan-name">Clan Name</label>
+                                <input type="text" id="clan-name" required placeholder="e.g., River Clan">
+                            </div>
+                            <div>
+                                <label for="clan-color1">Primary Color</label>
+                                <input type="color" id="clan-color1" value="#3b82f6" style="height: 50px;">
+                            </div>
+                            <div>
+                                <label for="clan-color2">Secondary Color</label>
+                                <input type="color" id="clan-color2" value="#06b6d4" style="height: 50px;">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                            <div>
+                                <label>Stone Origin Story</label>
+                                <div class="wysiwyg-container">
+                                    <textarea id="clan-origin" placeholder="Describe how this clan stone came to be..."></textarea>
+                                </div>
+                            </div>
+                            <div>
+                                <label>Powers & Abilities</label>
+                                <div class="wysiwyg-container">
+                                    <textarea id="clan-powers" placeholder="What powers does this clan offer its members?"></textarea>
+                                </div>
+                            </div>
+                            <div>
+                                <label>How to Connect</label>
+                                <div class="wysiwyg-container">
+                                    <textarea id="clan-connection" placeholder="How can someone connect with this clan stone?"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save mr-2"></i>Add Clan Stone
+                        </button>
+                    </form>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">🔮 Existing Clan Stones</h3>
+                    <div id="clans-list"></div>
+                </div>
+            </div>
+
+            <!-- Locations Tab -->
+            <div id="locations-tab" class="tab-content hidden">
+                <div class="admin-card">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                        <i class="fas fa-map-marker-alt text-red-600 mr-3"></i>Manage Magical Locations
+                    </h2>
+                    
+                    <form id="location-form" onsubmit="addLocation(event)" class="mb-8">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div>
+                                <label for="location-name">Location Name</label>
+                                <input type="text" id="location-name" required placeholder="e.g., Cleopatra's Needle">
+                            </div>
+                            <div>
+                                <label for="location-lat">Latitude</label>
+                                <input type="number" id="location-lat" step="any" required placeholder="e.g., 51.5081">
+                            </div>
+                            <div>
+                                <label for="location-lng">Longitude</label>
+                                <input type="number" id="location-lng" step="any" required placeholder="e.g., -0.1195">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label>Magical Description</label>
+                                <div class="wysiwyg-container">
+                                    <textarea id="location-magic" placeholder="Describe the magical properties of this location..."></textarea>
+                                </div>
+                            </div>
+                            <div>
+                                <label>What to Look For</label>
+                                <div class="wysiwyg-container">
+                                    <textarea id="location-lookfor" placeholder="Give visitors clues about what to observe here..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save mr-2"></i>Add Location
+                        </button>
+                    </form>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">🗺️ Existing Locations</h3>
+                    <div id="locations-list"></div>
+                </div>
+            </div>
+
+            <!-- Main Page Tab -->
+            <div id="mainpage-tab" class="tab-content hidden">
+                <div class="admin-card">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                        <i class="fas fa-home text-green-600 mr-3"></i>Customize Main Page Content
+                    </h2>
+                    
+                    <form onsubmit="saveMainPageContent(event)" class="space-y-8">
+                        <!-- Hero Section -->
+                        <div class="border border-gray-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">🎭 Hero Section</h3>
+                            <div class="grid grid-cols-1 gap-4">
+                                <div>
+                                    <label>Main Title</label>
+                                    <div class="wysiwyg-container">
+                                        <textarea id="hero-title" placeholder="Your main headline..."></textarea>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label>Subtitle</label>
+                                    <div class="wysiwyg-container">
+                                        <textarea id="hero-subtitle" placeholder="Supporting text under the main title..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Episodes Section -->
+                        <div class="border border-gray-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">📚 Episodes Section</h3>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <div>
+                                    <label>Section Title</label>
+                                    <div class="wysiwyg-container">
+                                        <textarea id="episodes-title" placeholder="Episodes section title..."></textarea>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label>Section Description</label>
+                                    <div class="wysiwyg-container">
+                                        <textarea id="episodes-description" placeholder="Brief description of the episodes section..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Clan Stones Section -->
+                        <div class="border border-gray-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">🔮 Clan Stones Section</h3>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <div>
+                                    <label>Section Title</label>
+                                    <div class="wysiwyg-container">
+                                        <textarea id="stones-title" placeholder="Clan stones section title..."></textarea>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label>Section Description</label>
+                                    <div class="wysiwyg-container">
+                                        <textarea id="stones-description" placeholder="Brief description of the clan stones..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hidden London Section -->
+                        <div class="border border-gray-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">🗺️ Hidden London Section</h3>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <div>
+                                    <label>Section Title</label>
+                                    <div class="wysiwyg-container">
+                                        <textarea id="london-title" placeholder="Locations section title..."></textarea>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label>Section Description</label>
+                                    <div class="wysiwyg-container">
+                                        <textarea id="london-description" placeholder="Brief description of magical locations..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- About Section -->
+                        <div class="border border-gray-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">ℹ️ About Section</h3>
+                            <div>
+                                <label>About Content</label>
+                                <div class="wysiwyg-container">
+                                    <textarea id="about-content" placeholder="Detailed information about your project..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer Section -->
+                        <div class="border border-gray-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">👣 Footer</h3>
+                            <div>
+                                <label>Footer Tagline</label>
+                                <div class="wysiwyg-container">
+                                    <textarea id="footer-tagline" placeholder="A memorable closing message..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-4">
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-save mr-2"></i>Save Main Page Content
+                            </button>
+                            <button type="button" onclick="resetMainPageContent()" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-2 rounded-lg">
+                                <i class="fas fa-undo mr-2"></i>Reset to Defaults
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/simple-admin-reset.js"></script>
+    <script>
+    // Font names mapping for better display in dropdowns
+    const fontNames = {
+        'serif': 'Serif',
+        'monospace': 'Monospace', 
+        'arial': 'Arial',
+        'helvetica': 'Helvetica',
+        'georgia': 'Georgia',
+        'times-new-roman': 'Times New Roman',
+        'courier-new': 'Courier New',
+        'verdana': 'Verdana',
+        'trebuchet-ms': 'Trebuchet MS',
+        'comic-sans-ms': 'Comic Sans MS',
+        'impact': 'Impact',
+        'lucida-sans': 'Lucida Sans',
+        'tahoma': 'Tahoma',
+        'fredoka-one': 'Fredoka One',
+        'nunito': 'Nunito',
+        'kalam': 'Kalam',
+        'cinzel': 'Cinzel',
+        'schoolbell': 'Schoolbell',
+        'caveat': 'Caveat',
+        'dancing-script': 'Dancing Script',
+        'playfair-display': 'Playfair Display',
+        'merriweather': 'Merriweather',
+        'lora': 'Lora',
+        'open-sans': 'Open Sans',
+        'roboto': 'Roboto',
+        'montserrat': 'Montserrat',
+        'poppins': 'Poppins',
+        'raleway': 'Raleway',
+        'source-sans-pro': 'Source Sans Pro'
+    };
+    
+    // Fix font dropdown display names
+    function fixFontDropdowns() {
+        setTimeout(() => {
+            const fontPickers = document.querySelectorAll('.ql-font');
+            
+            fontPickers.forEach((picker) => {
+                const options = picker.querySelectorAll('.ql-picker-item');
+                
+                options.forEach((option) => {
+                    const dataValue = option.getAttribute('data-value');
+                    
+                    if (dataValue && fontNames[dataValue]) {
+                        option.textContent = fontNames[dataValue];
+                        option.setAttribute('title', fontNames[dataValue]);
+                    } else if (!dataValue) {
+                        option.textContent = 'Sans Serif';
+                    }
+                });
+                
+                // Also fix the picker labels  
+                const labels = picker.querySelectorAll('.ql-picker-label');
+                labels.forEach((label) => {
+                    const dataValue = label.getAttribute('data-value');
+                    if (dataValue && fontNames[dataValue]) {
+                        label.setAttribute('data-label', fontNames[dataValue]);
+                    }
+                });
+            });
+        }, 1000);
+    }
+    
+    // Run fix when page loads and when new editors are created
+    document.addEventListener('DOMContentLoaded', fixFontDropdowns);
+    
+    // Also run fix periodically to catch new editors
+    setInterval(fixFontDropdowns, 3000);
+    </script>
+</body>
+</html>
