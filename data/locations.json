@@ -1,0 +1,32 @@
+[
+  {
+    "id": "loc1",
+    "name": "The Hidden Pool of Hampstead Heath",
+    "latitude": 51.5558,
+    "longitude": -0.1608,
+    "magical_description": "Deep within Hampstead Heath lies a pool that only appears at dawn and dusk, when the light is neither day nor night.",
+    "what_to_look_for": "Look for the ancient oak tree with silver bark that seems to shimmer. The pool appears in its shadow when you whisper 'Show me wonder.'",
+    "image_url": null,
+    "status": "active"
+  },
+  {
+    "id": "loc2",
+    "name": "The Whispering Gallery Secret Door",
+    "latitude": 51.5138,
+    "longitude": -0.0984,
+    "magical_description": "In St. Pauls Cathedral famous Whispering Gallery, there is one stone that whispers back.",
+    "what_to_look_for": "Find the stone that feels warm when all others are cool. It has a tiny carving of a feather.",
+    "image_url": null,
+    "status": "active"
+  },
+  {
+    "id": "loc3",
+    "name": "The Time Garden of Greenwich",
+    "latitude": 51.4769,
+    "longitude": -0.0005,
+    "magical_description": "Where the Prime Meridian crosses through Greenwich Park, there grows a garden where each flower blooms in a different season.",
+    "what_to_look_for": "Stand exactly on the meridian line at sunset. Look for flowers that should not be blooming in the current season.",
+    "image_url": null,
+    "status": "active"
+  }
+]

@@ -1,1 +1,57 @@
-
+[
+  {
+    "id": "clan1",
+    "name": "River Clan",
+    "stone_description": "The River Clan stone emerged from the Thames itself, carrying the wisdom of waters that have flowed for thousands of years. It glows with the blue-green light of deep water and hums with the rhythm of tides.",
+    "offering": "The power to understand any language, to flow around obstacles like water, and to hear the stories that rivers tell. Members can communicate with all water creatures and feel the emotions of anyone who has touched the same water.",
+    "resonance_note": "Place your hand on any flowing water and whisper \"I hear your stories.\" The stone will respond when you truly mean it.",
+    "color_primary": "#0EA5E9",
+    "color_secondary": "#06B6D4",
+    "emblem_url": null,
+    "status": "active"
+  },
+  {
+    "id": "clan2",
+    "name": "Sky Clan",
+    "stone_description": "High above London, where the pigeons nest on St. Paul's Cathedral, the Sky Clan stone catches every whisper carried by the wind. It shimmers like captured starlight and hums with the frequency of dreams taking flight.",
+    "offering": "The gift of understanding the language of birds, the ability to find lost things by following the wind, and the power to send messages through clouds. Members can sense weather changes and feel the emotions of anyone who has looked up at the same sky.",
+    "resonance_note": "Stand on any high place in London, spread your arms wide, and whisper to the wind \"I am ready to fly.\" The stone will call to those who truly wish to soar.",
+    "color_primary": "#3B82F6",
+    "color_secondary": "#8B5CF6",
+    "emblem_url": null,
+    "status": "active"
+  },
+  {
+    "id": "clan3",
+    "name": "Earth Clan",
+    "stone_description": "Deep beneath the streets of London, where the old Roman foundations still stand, the Earth Clan stone pulses with the heartbeat of the city itself. It appears as rough granite but glows with inner warmth like embers in a fireplace.",
+    "offering": "The ability to speak with growing things, to find hidden passages and secret doors, and to sense the history held in stones and soil. Members can make plants grow faster and understand the stories that buildings tell.",
+    "resonance_note": "Place both hands on bare earth (even in a small garden or park) and whisper \"I hear the deep songs.\" The stone responds to those who listen to what has been growing for centuries.",
+    "color_primary": "#059669",
+    "color_secondary": "#D97706",
+    "emblem_url": null,
+    "status": "active"
+  },
+  {
+    "id": "clan4",
+    "name": "Fire Clan",
+    "stone_description": "Born from the Great Fire of London in 1666, the Fire Clan stone holds the memory of transformation and renewal. It appears as smooth obsidian but warm to the touch, with flames that dance just beneath its surface.",
+    "offering": "The power to kindle warmth in cold hearts, to see through illusions and lies, and to light the way in dark places. Members can sense danger before it arrives and inspire courage in others during difficult times.",
+    "resonance_note": "Light a single candle and stare into the flame while whispering \"I carry light in darkness.\" The stone calls to those who are willing to be a beacon for others.",
+    "color_primary": "#DC2626",
+    "color_secondary": "#F59E0B",
+    "emblem_url": null,
+    "status": "active"
+  },
+  {
+    "id": "clan5",
+    "name": "Shadow Clan",
+    "stone_description": "The Shadow Clan stone hides in the spaces between light and dark, in the quiet corners where secrets gather. It appears different to each person who sees it, but always seems to absorb light rather than reflect it.",
+    "offering": "The gift of moving unseen when needed, of hearing secrets whispered in shadows, and of understanding the thoughts of creatures that prefer darkness. Members can find lost things and help others discover hidden truths about themselves.",
+    "resonance_note": "Stand in your own shadow at midday and whisper \"I embrace what is hidden.\" The stone reveals itself to those who are not afraid of mysteries.",
+    "color_primary": "#6B7280",
+    "color_secondary": "#4C1D95",
+    "emblem_url": null,
+    "status": "active"
+  }
+]
