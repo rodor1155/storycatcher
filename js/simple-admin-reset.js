@@ -4,7 +4,7 @@
 // Database Integration Functions
 async function syncToDatabase(type, data) {
     try {
-        if (window.dataManager) {
+        if (window.dataManager && window.dataManager.databaseAvailable) {
             if (type === 'episodes') {
                 await window.dataManager.saveEpisode(data);
             } else if (type === 'clans') {
@@ -13,15 +13,17 @@ async function syncToDatabase(type, data) {
                 await window.dataManager.saveLocation(data);
             }
             console.log('✅ Synced to database:', type, data.id);
+        } else {
+            console.log('ℹ️ Database not available, content saved locally only');
         }
     } catch (error) {
-        console.warn('⚠️ Database sync failed (content saved locally):', error);
+        console.warn('⚠️ Database sync failed (content saved locally):', error.message);
     }
 }
 
 async function deleteFromDatabase(type, id) {
     try {
-        if (window.dataManager) {
+        if (window.dataManager && window.dataManager.databaseAvailable) {
             if (type === 'episodes') {
                 await window.dataManager.deleteEpisode(id);
             } else if (type === 'clans') {
@@ -30,9 +32,11 @@ async function deleteFromDatabase(type, id) {
                 await window.dataManager.deleteLocation(id);
             }
             console.log('🗑️ Deleted from database:', type, id);
+        } else {
+            console.log('ℹ️ Database not available, deleted locally only');
         }
     } catch (error) {
-        console.warn('⚠️ Database delete failed:', error);
+        console.warn('⚠️ Database delete failed:', error.message);
     }
 }
 

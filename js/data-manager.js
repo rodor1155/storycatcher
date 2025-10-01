@@ -6,8 +6,12 @@
 
 class DataManager {
     constructor() {
-        this.useDatabase = true; // Primary mode: use database
+        this.useDatabase = false; // Start with false, will be enabled if database works
         this.cache = new Map(); // In-memory cache for performance
+        this.databaseAvailable = false;
+        
+        // Test database availability
+        this.testDatabaseConnection();
         
         // Storage keys for localStorage fallback
         this.STORAGE_KEYS = {
@@ -17,29 +21,64 @@ class DataManager {
             main_page_content: 'hiddenworld_mainpage_content'
         };
     }
+    
+    // Test if database is available
+    async testDatabaseConnection() {
+        try {
+            console.log('🌐 Testing database connection...');
+            const response = await fetch('tables/episodes?limit=1', {
+                method: 'GET',
+                headers: {'Content-Type': 'application/json'}
+            });
+            
+            if (response.ok) {
+                this.databaseAvailable = true;
+                this.useDatabase = true;
+                console.log('✅ Database connection successful');
+            } else {
+                console.log('⚠️ Database not available, using localStorage only');
+                this.databaseAvailable = false;
+                this.useDatabase = false;
+            }
+        } catch (error) {
+            console.log('⚠️ Database not available, using localStorage only:', error.message);
+            this.databaseAvailable = false;
+            this.useDatabase = false;
+        }
+    }
 
     // === EPISODES ===
     async getEpisodes() {
-        try {
-            if (this.useDatabase) {
+        // Always try localStorage first for faster loading
+        const localData = this.getFromLocalStorage('episodes');
+        
+        // If database is available, try to get latest data
+        if (this.databaseAvailable && this.useDatabase) {
+            try {
                 const response = await fetch('tables/episodes');
                 if (response.ok) {
                     const result = await response.json();
                     console.log('📖 Loaded episodes from database:', result.data.length);
                     return result.data.map(this.convertFromDb);
                 }
+            } catch (error) {
+                console.warn('⚠️ Database request failed, using localStorage:', error.message);
             }
-        } catch (error) {
-            console.warn('⚠️ Database unavailable, using localStorage:', error);
         }
         
-        // Fallback to localStorage
-        return this.getFromLocalStorage('episodes');
+        // Return localStorage data (with defaults if empty)
+        console.log('📖 Loaded episodes from localStorage:', localData.length);
+        return localData;
     }
 
     async saveEpisode(episode) {
-        try {
-            if (this.useDatabase) {
+        // Always save to localStorage first (for reliability)
+        this.saveToLocalStorage('episodes', episode);
+        console.log('✅ Episode saved to localStorage:', episode.id);
+        
+        // Try to save to database if available
+        if (this.databaseAvailable && this.useDatabase) {
+            try {
                 const dbEpisode = this.convertToDb(episode);
                 
                 // Check if episode exists
@@ -63,18 +102,14 @@ class DataManager {
                 }
                 
                 if (response.ok) {
-                    console.log('✅ Episode saved to database:', episode.id);
-                    // Also save to localStorage as backup
-                    this.saveToLocalStorage('episodes', episode);
+                    console.log('✅ Episode also synced to database:', episode.id);
                     return await response.json();
                 }
+            } catch (error) {
+                console.warn('⚠️ Database sync failed (episode saved locally):', error.message);
             }
-        } catch (error) {
-            console.warn('⚠️ Database save failed, using localStorage only:', error);
         }
         
-        // Fallback to localStorage
-        this.saveToLocalStorage('episodes', episode);
         return episode;
     }
 
@@ -115,20 +150,26 @@ class DataManager {
 
     // === CLANS ===
     async getClans() {
-        try {
-            if (this.useDatabase) {
+        // Always try localStorage first for faster loading
+        const localData = this.getFromLocalStorage('clans');
+        
+        // If database is available, try to get latest data
+        if (this.databaseAvailable && this.useDatabase) {
+            try {
                 const response = await fetch('tables/clans');
                 if (response.ok) {
                     const result = await response.json();
                     console.log('🔮 Loaded clans from database:', result.data.length);
                     return result.data.map(this.convertFromDb);
                 }
+            } catch (error) {
+                console.warn('⚠️ Database request failed, using localStorage:', error.message);
             }
-        } catch (error) {
-            console.warn('⚠️ Database unavailable, using localStorage:', error);
         }
         
-        return this.getFromLocalStorage('clans');
+        // Return localStorage data (with defaults if empty)
+        console.log('🔮 Loaded clans from localStorage:', localData.length);
+        return localData;
     }
 
     async saveClan(clan) {
@@ -197,20 +238,26 @@ class DataManager {
 
     // === LOCATIONS ===
     async getLocations() {
-        try {
-            if (this.useDatabase) {
+        // Always try localStorage first for faster loading
+        const localData = this.getFromLocalStorage('locations');
+        
+        // If database is available, try to get latest data
+        if (this.databaseAvailable && this.useDatabase) {
+            try {
                 const response = await fetch('tables/locations');
                 if (response.ok) {
                     const result = await response.json();
                     console.log('🗺️ Loaded locations from database:', result.data.length);
                     return result.data.map(this.convertFromDb);
                 }
+            } catch (error) {
+                console.warn('⚠️ Database request failed, using localStorage:', error.message);
             }
-        } catch (error) {
-            console.warn('⚠️ Database unavailable, using localStorage:', error);
         }
         
-        return this.getFromLocalStorage('locations');
+        // Return localStorage data (with defaults if empty)
+        console.log('🗺️ Loaded locations from localStorage:', localData.length);
+        return localData;
     }
 
     async saveLocation(location) {
@@ -369,7 +416,19 @@ class DataManager {
     }
 }
 
-// Create global instance
-window.dataManager = new DataManager();
-
-console.log('🌐 Data Manager initialized with database support');
+// Create global instance safely
+try {
+    window.dataManager = new DataManager();
+    console.log('🌐 Data Manager initialized with database support');
+} catch (error) {
+    console.error('❌ Failed to initialize DataManager:', error.message);
+    // Create a fallback object that just uses localStorage
+    window.dataManager = {
+        databaseAvailable: false,
+        useDatabase: false,
+        async getEpisodes() { return JSON.parse(localStorage.getItem('hiddenworld_episodes') || '[]'); },
+        async getClans() { return JSON.parse(localStorage.getItem('hiddenworld_clans') || '[]'); },
+        async getLocations() { return JSON.parse(localStorage.getItem('hiddenworld_locations') || '[]'); }
+    };
+    console.log('⚠️ Using fallback DataManager (localStorage only)');
+}

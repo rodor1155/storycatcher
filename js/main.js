@@ -9,6 +9,53 @@ let allLocations = [];
 let publicMap = null;
 let publicMapMarkers = [];
 
+// Default data functions
+function getDefaultEpisodes() {
+    return [
+        {
+            id: 'ep1',
+            title: 'The Awakening of the Thames Stones',
+            meta_description: 'Discover how the ancient clan stones first awakened along the Thames, calling to children who could hear their magical whispers.',
+            content: '<p>Long ago, when London was just a collection of villages along the Thames, five mysterious stones appeared overnight. Each stone hummed with a different magical frequency...</p><p>The River Clan stone emerged first, glowing blue-green like the deepest part of the Thames. Children walking along the river banks began to hear whispers in languages they had never learned...</p>',
+            created_at: Date.now() - 86400000,
+            image_url: null,
+            page_type: 'episode',
+            status: 'published'
+        }
+    ];
+}
+
+function getDefaultClans() {
+    return [
+        {
+            id: 'clan1',
+            name: 'River Clan',
+            stone_description: 'The River Clan stone emerged from the Thames itself, carrying the wisdom of waters that have flowed for thousands of years. It glows with the blue-green light of deep water and hums with the rhythm of tides.',
+            offering: 'The power to understand any language, to flow around obstacles like water, and to hear the stories that rivers tell.',
+            resonance_note: 'Place your hand on any flowing water and whisper "I hear your stories." The stone will respond when you truly mean it.',
+            color_primary: '#0EA5E9',
+            color_secondary: '#06B6D4',
+            emblem_url: null,
+            status: 'active'
+        }
+    ];
+}
+
+function getDefaultLocations() {
+    return [
+        {
+            id: 'loc1',
+            name: 'The Hidden Pool of Hampstead Heath',
+            latitude: 51.5558,
+            longitude: -0.1608,
+            magical_description: 'Deep within Hampstead Heath lies a pool that only appears at dawn and dusk, when the light is neither day nor night.',
+            what_to_look_for: 'Look for the ancient oak tree with silver bark that seems to shimmer. The pool appears in its shadow when you whisper "Show me wonder."',
+            image_url: null,
+            status: 'active'
+        }
+    ];
+}
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
@@ -106,21 +153,33 @@ function setupNavigation() {
 // Load all data (localStorage first, then fallback to static data)
 async function loadAllData() {
     try {
-        // Load data using the new DataManager (with database support)
-        allEpisodes = await getEpisodes();
-        allClans = await getClans();
-        allLocations = await getLocations();
+        console.log('🌐 Starting data load...');
         
-        console.log('🌐 Data loaded successfully from database/localStorage');
+        // Load data using the new DataManager (with database support)
+        allEpisodes = await getEpisodes() || [];
+        allClans = await getClans() || [];
+        allLocations = await getLocations() || [];
+        
+        console.log('✅ Data loaded successfully');
         console.log(`📊 Episodes: ${allEpisodes.length}, Clans: ${allClans.length}, Locations: ${allLocations.length}`);
         
+        // Ensure we have some data to display
+        if (allEpisodes.length === 0 && allClans.length === 0 && allLocations.length === 0) {
+            console.log('⚠️ No data found, loading defaults...');
+            // Force load defaults if everything is empty
+            allEpisodes = getDefaultEpisodes();
+            allClans = getDefaultClans(); 
+            allLocations = getDefaultLocations();
+        }
+        
     } catch (error) {
-        console.error('❌ Error loading data:', error);
-        // Fallback to empty arrays to prevent crashes
-        allEpisodes = [];
-        allClans = [];
-        allLocations = [];
-        throw error;
+        console.error('❌ Error loading data, using defaults:', error.message);
+        // Fallback to default data to prevent crashes
+        allEpisodes = getDefaultEpisodes() || [];
+        allClans = getDefaultClans() || [];
+        allLocations = getDefaultLocations() || [];
+        
+        console.log('📊 Using default data - Episodes:', allEpisodes.length, 'Clans:', allClans.length, 'Locations:', allLocations.length);
     }
 }
 

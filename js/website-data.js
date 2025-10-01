@@ -22,21 +22,30 @@ async function getEpisodes() {
     try {
         if (window.dataManager) {
             const episodes = await window.dataManager.getEpisodes();
-            // Sort by creation date, newest first
-            return episodes.sort((a, b) => b.created_at - a.created_at);
+            if (episodes && Array.isArray(episodes) && episodes.length > 0) {
+                // Sort by creation date, newest first
+                return episodes.sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
+            }
         }
     } catch (error) {
-        console.warn('⚠️ Using localStorage fallback for episodes:', error);
+        console.warn('⚠️ DataManager error, using localStorage fallback:', error.message);
     }
     
     // Fallback to localStorage
-    const stored = localStorage.getItem(STORAGE_KEYS.episodes);
-    if (stored) {
-        const episodes = JSON.parse(stored);
-        return episodes.sort((a, b) => b.created_at - a.created_at);
+    try {
+        const stored = localStorage.getItem(STORAGE_KEYS.episodes);
+        if (stored) {
+            const episodes = JSON.parse(stored);
+            if (Array.isArray(episodes) && episodes.length > 0) {
+                return episodes.sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
+            }
+        }
+    } catch (error) {
+        console.warn('⚠️ localStorage error, using defaults:', error.message);
     }
     
-    // Default episodes if none stored
+    // Default episodes if nothing else works
+    console.log('📖 Using default episodes');
     return getDefaultEpisodes();
 }
 
@@ -44,18 +53,30 @@ async function getEpisodes() {
 async function getClans() {
     try {
         if (window.dataManager) {
-            return await window.dataManager.getClans();
+            const clans = await window.dataManager.getClans();
+            if (clans && Array.isArray(clans) && clans.length > 0) {
+                return clans;
+            }
         }
     } catch (error) {
-        console.warn('⚠️ Using localStorage fallback for clans:', error);
+        console.warn('⚠️ DataManager error, using localStorage fallback:', error.message);
     }
     
     // Fallback to localStorage
-    const stored = localStorage.getItem(STORAGE_KEYS.clans);
-    if (stored) {
-        return JSON.parse(stored);
+    try {
+        const stored = localStorage.getItem(STORAGE_KEYS.clans);
+        if (stored) {
+            const clans = JSON.parse(stored);
+            if (Array.isArray(clans) && clans.length > 0) {
+                return clans;
+            }
+        }
+    } catch (error) {
+        console.warn('⚠️ localStorage error, using defaults:', error.message);
     }
     
+    // Default clans if nothing else works
+    console.log('🔮 Using default clans');
     return getDefaultClans();
 }
 
@@ -63,18 +84,30 @@ async function getClans() {
 async function getLocations() {
     try {
         if (window.dataManager) {
-            return await window.dataManager.getLocations();
+            const locations = await window.dataManager.getLocations();
+            if (locations && Array.isArray(locations) && locations.length > 0) {
+                return locations;
+            }
         }
     } catch (error) {
-        console.warn('⚠️ Using localStorage fallback for locations:', error);
+        console.warn('⚠️ DataManager error, using localStorage fallback:', error.message);
     }
     
     // Fallback to localStorage
-    const stored = localStorage.getItem(STORAGE_KEYS.locations);
-    if (stored) {
-        return JSON.parse(stored);
+    try {
+        const stored = localStorage.getItem(STORAGE_KEYS.locations);
+        if (stored) {
+            const locations = JSON.parse(stored);
+            if (Array.isArray(locations) && locations.length > 0) {
+                return locations;
+            }
+        }
+    } catch (error) {
+        console.warn('⚠️ localStorage error, using defaults:', error.message);
     }
     
+    // Default locations if nothing else works
+    console.log('🗺️ Using default locations');
     return getDefaultLocations();
 }
 
