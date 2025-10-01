@@ -1001,138 +1001,140 @@ function initializeDragAndDrop() {
 }
 
 // Content Management Functions
-function loadAllContent() {
-    loadEpisodes();
-    loadClans();
-    loadLocations();
-    // Don't load main page content here initially - it will load when tab is shown
-    // Initialize drag and drop after content loads
-    setTimeout(initializeDragAndDrop, 100);
+async function loadAllContent() {
+    try {
+        // Check for migration first
+        await checkForLocalStorageMigration();
+        
+        // Load all content from API
+        await loadEpisodes();
+        await loadClans();
+        await loadLocations();
+        // Don't load main page content here initially - it will load when tab is shown
+        
+        // Initialize drag and drop after content loads
+        setTimeout(initializeDragAndDrop, 100);
+        
+    } catch (error) {
+        console.error('❌ Failed to load content:', error);
+        alert('Failed to load content: ' + error.message);
+    }
 }
 
 // Episode Management (handles both create and update)
-function addEpisode(event) {
+async function addEpisode(event) {
     event.preventDefault();
     
-    // Check if we're editing an existing episode
-    const form = document.getElementById('episode-form');
-    const editingId = form.querySelector('#editing-episode-id');
-    const isEditing = editingId && editingId.value;
-    
-    // Get content from editor
-    const richContent = window.EditorManager.getContent('episode-content') || document.getElementById('episode-content').value;
-    
-    // Get cover image if uploaded
-    const coverPreview = document.getElementById('episode-cover-preview');
-    const coverImage = coverPreview ? coverPreview.dataset.coverImage : null;
-    
-    // Get existing episodes
-    const episodes = getStoredData('episodes');
-    
-    if (isEditing) {
-        // UPDATE existing episode
-        const episodeIndex = episodes.findIndex(ep => ep.id === editingId.value);
-        if (episodeIndex !== -1) {
-            // Keep original creation time and ID
-            episodes[episodeIndex] = {
-                ...episodes[episodeIndex], // Keep existing data
-                title: document.getElementById('episode-title').value,
-                meta_description: document.getElementById('episode-description').value,
-                content: richContent,
-                image_url: coverImage,
-                updated_at: Date.now() // Add update timestamp
-            };
-            
-            console.log('📝 Updated episode:', editingId.value);
-            showSuccess('Episode updated successfully!');
-        }
-    } else {
-        // CREATE new episode
-        const episode = {
-            id: 'ep' + Date.now(),
+    try {
+        // Check if we're editing an existing episode
+        const form = document.getElementById('episode-form');
+        const editingId = form.querySelector('#editing-episode-id');
+        const isEditing = editingId && editingId.value;
+        
+        // Get content from editor
+        const richContent = window.EditorManager.getContent('episode-content') || document.getElementById('episode-content').value;
+        
+        // Get cover image if uploaded
+        const coverPreview = document.getElementById('episode-cover-preview');
+        const coverImage = coverPreview ? coverPreview.dataset.coverImage : null;
+        
+        const episodeData = {
             title: document.getElementById('episode-title').value,
             meta_description: document.getElementById('episode-description').value,
             content: richContent,
             image_url: coverImage,
-            created_at: Date.now(),
             page_type: 'episode',
             status: 'published'
         };
         
-        episodes.push(episode); // Add to end (Episode 4, 5, 6...)
-        console.log('➕ Created new episode');
-        showSuccess('Episode added successfully as Episode ' + episodes.length + '!');
+        if (isEditing) {
+            // UPDATE existing episode
+            await window.contentAPI.updateEpisode(editingId.value, episodeData);
+            console.log('📝 Updated episode:', editingId.value);
+            showSuccess('Episode updated successfully!');
+        } else {
+            // CREATE new episode
+            episodeData.id = 'ep' + Date.now();
+            await window.contentAPI.createEpisode(episodeData);
+            console.log('➕ Created new episode');
+            showSuccess('Episode added successfully!');
+        }
+        
+        // Reset form to create mode
+        cancelEpisodeEdit();
+        
+        // Reload episodes list
+        await loadEpisodes();
+        
+    } catch (error) {
+        console.error('❌ Episode save failed:', error);
+        alert('Failed to save episode: ' + error.message);
     }
-    
-    // Save to localStorage
-    localStorage.setItem(STORAGE_KEYS.episodes, JSON.stringify(episodes));
-    
-    // Update main.js data
-    updateMainJsData();
-    
-    // Reset form to create mode
-    cancelEpisodeEdit();
-    
-    // Reload episodes list
-    loadEpisodes();
 }
 
-function loadEpisodes() {
-    const episodes = getStoredData('episodes');
-    const container = document.getElementById('episodes-list');
-    
-    if (episodes.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 italic">No episodes yet. Add your first magical story!</p>';
-        return;
-    }
-    
-    // Add reorder instructions
-    let html = `
-        <div class="reorder-info">
-            <i class="fas fa-info-circle mr-2"></i>
-            <strong>💡 Tip:</strong> Drag episodes by the <i class="fas fa-grip-vertical"></i> handle to reorder them. The first episode appears first on the website.
-        </div>
-        <div id="sortable-episodes">
-    `;
-    
-    html += episodes.map((episode, index) => `
-        <div class="episode-item content-item" data-episode-id="${episode.id}">
-            <div class="flex justify-between items-start mb-2">
-                <div class="flex items-center">
-                    <span class="drag-handle mr-3" title="Drag to reorder">
-                        <i class="fas fa-grip-vertical text-lg"></i>
-                    </span>
-                    <div>
-                        <div class="flex items-center mb-1">
-                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2">
-                                Episode ${index + 1}
-                            </span>
-                            <h3 class="font-bold text-gray-800">${episode.title}</h3>
+async function loadEpisodes() {
+    try {
+        const episodes = await window.contentAPI.getEpisodes();
+        const container = document.getElementById('episodes-list');
+        
+        if (episodes.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 italic">No episodes yet. Add your first magical story!</p>';
+            return;
+        }
+        
+        // Add reorder instructions
+        let html = `
+            <div class="reorder-info">
+                <i class="fas fa-info-circle mr-2"></i>
+                <strong>💡 Tip:</strong> Drag episodes by the <i class="fas fa-grip-vertical"></i> handle to reorder them. The first episode appears first on the website.
+            </div>
+            <div id="sortable-episodes">
+        `;
+        
+        html += episodes.map((episode, index) => `
+            <div class="episode-item content-item" data-episode-id="${episode.id}">
+                <div class="flex justify-between items-start mb-2">
+                    <div class="flex items-center">
+                        <span class="drag-handle mr-3" title="Drag to reorder">
+                            <i class="fas fa-grip-vertical text-lg"></i>
+                        </span>
+                        <div>
+                            <div class="flex items-center mb-1">
+                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2">
+                                    Episode ${index + 1}
+                                </span>
+                                <h3 class="font-bold text-gray-800">${episode.title}</h3>
+                            </div>
                         </div>
                     </div>
+                    <div class="flex space-x-2">
+                        <button onclick="editEpisode('${episode.id}')" class="btn-success text-sm" title="Edit this episode">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteEpisode('${episode.id}')" class="btn-danger text-sm" title="Delete this episode">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="flex space-x-2">
-                    <button onclick="editEpisode('${episode.id}')" class="btn-success text-sm" title="Edit this episode">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="deleteEpisode('${episode.id}')" class="btn-danger text-sm" title="Delete this episode">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                <p class="text-gray-600 text-sm mb-2 ml-8">${episode.meta_description}</p>
+                <p class="text-gray-500 text-xs ml-8">${stripHtmlForDisplay(episode.content, 150)}</p>
+                <div class="text-xs text-gray-400 mt-2 ml-8">
+                    ${episode.created_at ? `Created: ${new Date(episode.created_at).toLocaleDateString()}` : 'Recently added'}
                 </div>
             </div>
-            <p class="text-gray-600 text-sm mb-2 ml-8">${episode.meta_description}</p>
-            <p class="text-gray-500 text-xs ml-8">${stripHtmlForDisplay(episode.content, 150)}</p>
-            <div class="text-xs text-gray-400 mt-2 ml-8">
-                Created: ${new Date(episode.created_at).toLocaleDateString()}
-            </div>
-        </div>
-    `).join('');
-    
-    html += '</div>';
-    container.innerHTML = html;
-    
-    // Initialize drag and drop
-    initializeEpisodeReordering();
+        `).join('');
+        
+        html += '</div>';
+        container.innerHTML = html;
+        
+        // Initialize drag and drop
+        initializeEpisodeReordering();
+        
+    } catch (error) {
+        console.error('❌ Failed to load episodes:', error);
+        const container = document.getElementById('episodes-list');
+        container.innerHTML = `<p class="text-red-500">❌ Failed to load episodes: ${error.message}</p>`;
+    }
 }
 
 // Initialize episode drag and drop reordering
@@ -1145,62 +1147,74 @@ function initializeEpisodeReordering() {
         animation: 150,
         ghostClass: 'sortable-ghost',
         chosenClass: 'sortable-chosen',
-        onEnd: function(evt) {
-            // Get current episode order
-            const episodes = getStoredData('episodes');
-            const reorderedEpisodes = [];
-            
-            // Get new order from DOM
-            const episodeElements = sortableContainer.children;
-            for (let element of episodeElements) {
-                const episodeId = element.dataset.episodeId;
-                const episode = episodes.find(ep => ep.id === episodeId);
-                if (episode) {
-                    reorderedEpisodes.push(episode);
+        onEnd: async function(evt) {
+            try {
+                // Get current episodes from API
+                const episodes = await window.contentAPI.getEpisodes();
+                const reorderedEpisodes = [];
+                
+                // Get new order from DOM
+                const episodeElements = sortableContainer.children;
+                for (let element of episodeElements) {
+                    const episodeId = element.dataset.episodeId;
+                    const episode = episodes.find(ep => ep.id === episodeId);
+                    if (episode) {
+                        reorderedEpisodes.push(episode);
+                    }
                 }
+                
+                // Save new order to API
+                await window.contentAPI.reorderEpisodes(reorderedEpisodes);
+                
+                // Reload to update episode numbers
+                await loadEpisodes();
+                showSuccess('Episodes reordered successfully! The website will show the new order.');
+                
+            } catch (error) {
+                console.error('❌ Failed to reorder episodes:', error);
+                alert('Failed to reorder episodes: ' + error.message);
+                // Reload to restore original order
+                loadEpisodes();
             }
-            
-            // Save new order
-            localStorage.setItem(STORAGE_KEYS.episodes, JSON.stringify(reorderedEpisodes));
-            updateMainJsData();
-            
-            // Reload to update episode numbers
-            loadEpisodes();
-            showSuccess('Episodes reordered successfully! The website will show the new order.');
         }
     });
 }
 
 // Episode editing functionality
-function editEpisode(episodeId) {
+async function editEpisode(episodeId) {
     console.log('📝 Editing episode:', episodeId);
     
-    // Find the episode
-    const episodes = getStoredData('episodes');
-    const episode = episodes.find(ep => ep.id === episodeId);
-    
-    if (!episode) {
-        alert('Episode not found!');
-        return;
-    }
-    
-    // Switch to episodes tab if not already there
-    showTab('episodes');
-    
-    // Scroll to the form
-    setTimeout(() => {
-        const form = document.getElementById('episode-form');
-        if (form) {
-            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    try {
+        // Find the episode
+        const episode = await window.contentAPI.getEpisode(episodeId);
+        
+        if (!episode) {
+            alert('Episode not found!');
+            return;
         }
         
-        // Populate the form
-        populateEpisodeForm(episode);
+        // Switch to episodes tab if not already there
+        showTab('episodes');
         
-        // Show editing indicator
-        showEditingMessage(episode.title);
+        // Scroll to the form
+        setTimeout(() => {
+            const form = document.getElementById('episode-form');
+            if (form) {
+                form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            
+            // Populate the form
+            populateEpisodeForm(episode);
+            
+            // Show editing indicator
+            showEditingMessage(episode.title);
+            
+        }, 100);
         
-    }, 100);
+    } catch (error) {
+        console.error('❌ Failed to load episode for editing:', error);
+        alert('Failed to load episode: ' + error.message);
+    }
 }
 
 // Populate episode form with existing data
@@ -1334,35 +1348,32 @@ function hideEditingMessage() {
     }
 }
 
-function deleteEpisode(episodeId) {
+async function deleteEpisode(episodeId) {
     if (confirm('Are you sure you want to delete this episode?')) {
-        const episodes = getStoredData('episodes');
-        const filtered = episodes.filter(ep => ep.id !== episodeId);
-        localStorage.setItem(STORAGE_KEYS.episodes, JSON.stringify(filtered));
-        updateMainJsData();
-        loadEpisodes();
-        showSuccess('Episode deleted successfully!');
+        try {
+            await window.contentAPI.deleteEpisode(episodeId);
+            await loadEpisodes();
+            showSuccess('Episode deleted successfully!');
+        } catch (error) {
+            console.error('❌ Failed to delete episode:', error);
+            alert('Failed to delete episode: ' + error.message);
+        }
     }
 }
 
 // Clan Management
-function addClan(event) {
+async function addClan(event) {
     console.log('🔮 Add Clan function called');
     event.preventDefault();
     
     try {
-        // Get content from editors with debugging
+        // Get content from editors
         const clanName = document.getElementById('clan-name').value;
         const originContent = window.EditorManager.getContent('clan-origin') || document.getElementById('clan-origin').value;
         const powersContent = window.EditorManager.getContent('clan-powers') || document.getElementById('clan-powers').value;
         const connectionContent = window.EditorManager.getContent('clan-connection') || document.getElementById('clan-connection').value;
         
-        console.log('📝 Form data:', {
-            name: clanName,
-            origin: originContent?.substring(0, 50) + '...',
-            powers: powersContent?.substring(0, 50) + '...',
-            connection: connectionContent?.substring(0, 50) + '...'
-        });
+        console.log('📝 Form data collected');
         
         // Validate required fields
         if (!clanName || clanName.trim() === '') {
@@ -1385,7 +1396,7 @@ function addClan(event) {
             return;
         }
         
-        const clan = {
+        const clanData = {
             id: 'clan' + Date.now(),
             name: clanName,
             stone_description: originContent,
@@ -1397,16 +1408,8 @@ function addClan(event) {
             status: 'active'
         };
         
-        console.log('💎 Created clan object:', clan);
-        
-        const clans = getStoredData('clans');
-        console.log('📚 Existing clans:', clans.length);
-        
-        clans.push(clan);
-        console.log('📚 Clans after adding:', clans.length);
-        
-        localStorage.setItem(STORAGE_KEYS.clans, JSON.stringify(clans));
-        updateMainJsData();
+        console.log('💎 Creating clan...');
+        await window.contentAPI.createClan(clanData);
         
         // Clear form including editors
         document.getElementById('clan-form').reset();
@@ -1414,7 +1417,7 @@ function addClan(event) {
         window.EditorManager.clear('clan-powers');
         window.EditorManager.clear('clan-connection');
         
-        loadClans();
+        await loadClans();
         showSuccess('Clan stone added successfully with rich formatting!');
         console.log('✅ Clan added successfully');
         
@@ -1424,118 +1427,127 @@ function addClan(event) {
     }
 }
 
-function loadClans() {
-    const clans = getStoredData('clans');
-    const container = document.getElementById('clans-list');
-    
-    if (clans.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 italic">No clan stones yet. Create your first magical clan!</p>';
-        return;
+async function loadClans() {
+    try {
+        const clans = await window.contentAPI.getClans();
+        const container = document.getElementById('clans-list');
+        
+        if (clans.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 italic">No clan stones yet. Create your first magical clan!</p>';
+            return;
+        }
+        
+        container.innerHTML = clans.map(clan => `
+            <div class="content-item">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-bold text-gray-800">${clan.name}</h3>
+                    <button onclick="deleteClan('${clan.id}')" class="btn-danger text-sm">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="flex items-center mb-2">
+                    <div class="w-4 h-4 rounded-full mr-2" style="background: linear-gradient(45deg, ${clan.color_primary}, ${clan.color_secondary})"></div>
+                    <p class="text-gray-600 text-sm">${stripHtmlForDisplay(clan.offering, 100)}</p>
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('❌ Failed to load clans:', error);
+        const container = document.getElementById('clans-list');
+        container.innerHTML = `<p class="text-red-500">❌ Failed to load clans: ${error.message}</p>`;
     }
-    
-    container.innerHTML = clans.map(clan => `
-        <div class="content-item">
-            <div class="flex justify-between items-start mb-2">
-                <h3 class="font-bold text-gray-800">${clan.name}</h3>
-                <button onclick="deleteClan('${clan.id}')" class="btn-danger text-sm">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-            <div class="flex items-center mb-2">
-                <div class="w-4 h-4 rounded-full mr-2" style="background: linear-gradient(45deg, ${clan.color_primary}, ${clan.color_secondary})"></div>
-                <p class="text-gray-600 text-sm">${stripHtmlForDisplay(clan.offering, 100)}</p>
-            </div>
-        </div>
-    `).join('');
 }
 
-function deleteClan(clanId) {
+async function deleteClan(clanId) {
     if (confirm('Are you sure you want to delete this clan stone?')) {
-        const clans = getStoredData('clans');
-        const filtered = clans.filter(clan => clan.id !== clanId);
-        localStorage.setItem(STORAGE_KEYS.clans, JSON.stringify(filtered));
-        updateMainJsData();
-        loadClans();
-        showSuccess('Clan stone deleted successfully!');
+        try {
+            await window.contentAPI.deleteClan(clanId);
+            await loadClans();
+            showSuccess('Clan stone deleted successfully!');
+        } catch (error) {
+            console.error('❌ Failed to delete clan:', error);
+            alert('Failed to delete clan: ' + error.message);
+        }
     }
 }
 
 // Location Management
-function addLocation(event) {
+async function addLocation(event) {
     event.preventDefault();
     
-    // Get content from editors
-    
-    const location = {
-        id: 'loc' + Date.now(),
-        name: document.getElementById('location-name').value,
-        latitude: parseFloat(document.getElementById('location-lat').value),
-        longitude: parseFloat(document.getElementById('location-lng').value),
-        magical_description: window.EditorManager.getContent('location-magic') || document.getElementById('location-magic').value,
-        what_to_look_for: window.EditorManager.getContent('location-lookfor') || document.getElementById('location-lookfor').value,
-        image_url: null,
-        status: 'active'
-    };
-    
-    const locations = getStoredData('locations');
-    locations.push(location);
-    
-    localStorage.setItem(STORAGE_KEYS.locations, JSON.stringify(locations));
-    updateMainJsData();
-    
-    // Clear form including editors
-    document.getElementById('location-form').reset();
-    window.EditorManager.clear('location-magic');
-    window.EditorManager.clear('location-lookfor');
-    
-    loadLocations();
-    showSuccess('Location added successfully with rich formatting!');
+    try {
+        const locationData = {
+            id: 'loc' + Date.now(),
+            name: document.getElementById('location-name').value,
+            latitude: parseFloat(document.getElementById('location-lat').value),
+            longitude: parseFloat(document.getElementById('location-lng').value),
+            magical_description: window.EditorManager.getContent('location-magic') || document.getElementById('location-magic').value,
+            what_to_look_for: window.EditorManager.getContent('location-lookfor') || document.getElementById('location-lookfor').value,
+            image_url: null,
+            status: 'active'
+        };
+        
+        await window.contentAPI.createLocation(locationData);
+        
+        // Clear form including editors
+        document.getElementById('location-form').reset();
+        window.EditorManager.clear('location-magic');
+        window.EditorManager.clear('location-lookfor');
+        
+        await loadLocations();
+        showSuccess('Location added successfully with rich formatting!');
+        
+    } catch (error) {
+        console.error('❌ Failed to add location:', error);
+        alert('Failed to add location: ' + error.message);
+    }
 }
 
-function loadLocations() {
-    const locations = getStoredData('locations');
-    const container = document.getElementById('locations-list');
-    
-    if (locations.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 italic">No locations yet. Add your first magical place!</p>';
-        return;
-    }
-    
-    container.innerHTML = locations.map(location => `
-        <div class="content-item">
-            <div class="flex justify-between items-start mb-2">
-                <h3 class="font-bold text-gray-800">${location.name}</h3>
-                <button onclick="deleteLocation('${location.id}')" class="btn-danger text-sm">
-                    <i class="fas fa-trash"></i>
-                </button>
+async function loadLocations() {
+    try {
+        const locations = await window.contentAPI.getLocations();
+        const container = document.getElementById('locations-list');
+        
+        if (locations.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 italic">No locations yet. Add your first magical place!</p>';
+            return;
+        }
+        
+        container.innerHTML = locations.map(location => `
+            <div class="content-item">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-bold text-gray-800">${location.name}</h3>
+                    <button onclick="deleteLocation('${location.id}')" class="btn-danger text-sm">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <p class="text-gray-600 text-sm mb-1">${stripHtmlForDisplay(location.magical_description, 100)}</p>
+                <p class="text-xs text-gray-400">📍 ${location.latitude}, ${location.longitude}</p>
             </div>
-            <p class="text-gray-600 text-sm mb-1">${stripHtmlForDisplay(location.magical_description, 100)}</p>
-            <p class="text-xs text-gray-400">📍 ${location.latitude}, ${location.longitude}</p>
-        </div>
-    `).join('');
+        `).join('');
+        
+    } catch (error) {
+        console.error('❌ Failed to load locations:', error);
+        const container = document.getElementById('locations-list');
+        container.innerHTML = `<p class="text-red-500">❌ Failed to load locations: ${error.message}</p>`;
+    }
 }
 
-function deleteLocation(locationId) {
+async function deleteLocation(locationId) {
     if (confirm('Are you sure you want to delete this location?')) {
-        const locations = getStoredData('locations');
-        const filtered = locations.filter(loc => loc.id !== locationId);
-        localStorage.setItem(STORAGE_KEYS.locations, JSON.stringify(filtered));
-        updateMainJsData();
-        loadLocations();
-        showSuccess('Location deleted successfully!');
+        try {
+            await window.contentAPI.deleteLocation(locationId);
+            await loadLocations();
+            showSuccess('Location deleted successfully!');
+        } catch (error) {
+            console.error('❌ Failed to delete location:', error);
+            alert('Failed to delete location: ' + error.message);
+        }
     }
 }
 
-// Utility Functions
-function getStoredData(type) {
-    const stored = localStorage.getItem(STORAGE_KEYS[type]);
-    if (stored) {
-        return JSON.parse(stored);
-    }
-    
-    // Return default data if none stored
-    return getDefaultData(type);
-}
+// Utility Functions - Now using API instead of localStorage
 
 function getDefaultData(type) {
     const defaults = {
@@ -1674,9 +1686,8 @@ function stripHtmlForDisplay(html, maxLength = 100) {
 }
 
 function updateMainJsData() {
-    // This creates a notification for the user to update the main site
-    // In a real implementation, this would automatically update the main.js file
-    console.log('Content updated in localStorage. Main site will refresh automatically.');
+    // Content is now automatically available through the API
+    console.log('✅ Content updated in cloud database - available to all devices immediately!');
     
     // Update the main site's data by dispatching a custom event
     if (window.opener || window.parent !== window) {
@@ -1702,77 +1713,87 @@ function showSuccess(message) {
 }
 
 // Main Page Content Management
-function saveMainPageContent(event) {
+async function saveMainPageContent(event) {
     event.preventDefault();
     console.log('💾 Saving main page content...');
     
-    // Collect content from all editors and fallback to textareas
-    const content = {
-        hero: {
-            title: window.EditorManager.getContent('hero-title') || document.getElementById('hero-title').value,
-            subtitle: window.EditorManager.getContent('hero-subtitle') || document.getElementById('hero-subtitle').value
-        },
-        episodes: {
-            title: window.EditorManager.getContent('episodes-title') || document.getElementById('episodes-title').value,
-            description: window.EditorManager.getContent('episodes-description') || document.getElementById('episodes-description').value
-        },
-        stones: {
-            title: window.EditorManager.getContent('stones-title') || document.getElementById('stones-title').value,
-            description: window.EditorManager.getContent('stones-description') || document.getElementById('stones-description').value
-        },
-        london: {
-            title: window.EditorManager.getContent('london-title') || document.getElementById('london-title').value,
-            description: window.EditorManager.getContent('london-description') || document.getElementById('london-description').value
-        },
-        about: {
-            content: window.EditorManager.getContent('about-content') || document.getElementById('about-content').value
-        },
-        footer: {
-            tagline: window.EditorManager.getContent('footer-tagline') || document.getElementById('footer-tagline').value
-        },
-        updated_at: Date.now()
-    };
-    
-    // Save to localStorage
-    localStorage.setItem(STORAGE_KEYS.mainpage, JSON.stringify(content));
-    
-    console.log('✅ Main page content saved:', content);
-    
-    // Update the main site
-    updateMainJsData();
-    
-    // Show success message
-    showSuccess('Main page content saved successfully! Your homepage has been updated.');
+    try {
+        // Collect content from all editors and fallback to textareas
+        const content = {
+            hero: {
+                title: window.EditorManager.getContent('hero-title') || document.getElementById('hero-title').value,
+                subtitle: window.EditorManager.getContent('hero-subtitle') || document.getElementById('hero-subtitle').value
+            },
+            episodes: {
+                title: window.EditorManager.getContent('episodes-title') || document.getElementById('episodes-title').value,
+                description: window.EditorManager.getContent('episodes-description') || document.getElementById('episodes-description').value
+            },
+            stones: {
+                title: window.EditorManager.getContent('stones-title') || document.getElementById('stones-title').value,
+                description: window.EditorManager.getContent('stones-description') || document.getElementById('stones-description').value
+            },
+            london: {
+                title: window.EditorManager.getContent('london-title') || document.getElementById('london-title').value,
+                description: window.EditorManager.getContent('london-description') || document.getElementById('london-description').value
+            },
+            about: {
+                content: window.EditorManager.getContent('about-content') || document.getElementById('about-content').value
+            },
+            footer: {
+                tagline: window.EditorManager.getContent('footer-tagline') || document.getElementById('footer-tagline').value
+            },
+            updated_at: Date.now()
+        };
+        
+        // Save to API
+        await window.contentAPI.updateMainPageContent(content);
+        
+        console.log('✅ Main page content saved');
+        
+        // Show success message
+        showSuccess('Main page content saved successfully! Your homepage has been updated.');
+        
+    } catch (error) {
+        console.error('❌ Failed to save main page content:', error);
+        alert('Failed to save main page content: ' + error.message);
+    }
 }
 
-function loadMainPageContent() {
+async function loadMainPageContent() {
     console.log('📖 Loading main page content...');
     
-    const stored = localStorage.getItem(STORAGE_KEYS.mainpage);
-    let content;
-    
-    if (stored) {
-        content = JSON.parse(stored);
-        console.log('📚 Loaded stored content');
-    } else {
-        content = getDefaultMainPageContent();
-        console.log('📋 Using default content (existing homepage content)');
-    }
-    
-    // Check if main page tab is currently visible before populating
-    const mainPageTab = document.getElementById('mainpage-tab');
-    if (mainPageTab && !mainPageTab.classList.contains('hidden')) {
-        // Populate form fields with multiple attempts to ensure editors are ready
-        setTimeout(() => {
-            populateMainPageForm(content);
-        }, 300);
+    try {
+        let content = await window.contentAPI.getMainPageContent();
         
-        // Backup attempt in case first one fails
-        setTimeout(() => {
-            populateMainPageForm(content);
-        }, 1000);
-    } else {
-        console.log('ℹ️ Main page tab not visible, content will load when tab is shown');
+        // If no content found, use defaults
+        if (!content || Object.keys(content).length === 0) {
+            content = getDefaultMainPageContent();
+            console.log('📋 Using default content');
+        } else {
+            console.log('📚 Loaded content from cloud database');
+        }
+        
+        // Check if main page tab is currently visible before populating
+        const mainPageTab = document.getElementById('mainpage-tab');
+        if (mainPageTab && !mainPageTab.classList.contains('hidden')) {
+            // Populate form fields with multiple attempts to ensure editors are ready
+            setTimeout(() => {
+                populateMainPageForm(content);
+            }, 300);
+            
+            // Backup attempt in case first one fails
+            setTimeout(() => {
+                populateMainPageForm(content);
+            }, 1000);
+        } else {
+            console.log('ℹ️ Main page tab not visible, content will load when tab is shown');
+        }
+        
+    } catch (error) {
+        console.error('❌ Failed to load main page content:', error);
+        // Fallback to defaults on error
+        const content = getDefaultMainPageContent();
+        populateMainPageForm(content);
     }
 }
 
@@ -1869,28 +1890,37 @@ function getDefaultMainPageContent() {
     };
 }
 
-function resetMainPageContent() {
+async function resetMainPageContent() {
     if (confirm('Are you sure you want to reset all main page content to defaults? This will overwrite your current content.')) {
-        // Clear localStorage
-        localStorage.removeItem(STORAGE_KEYS.mainpage);
-        
-        // Reload default content
-        loadMainPageContent();
-        
-        // Show message
-        showSuccess('Main page content reset to defaults!');
-        
-        console.log('🔄 Main page content reset');
+        try {
+            // Get default content and save it to API
+            const defaultContent = getDefaultMainPageContent();
+            await window.contentAPI.updateMainPageContent(defaultContent);
+            
+            // Reload content in UI
+            await loadMainPageContent();
+            
+            // Show message
+            showSuccess('Main page content reset to defaults!');
+            
+            console.log('🔄 Main page content reset');
+            
+        } catch (error) {
+            console.error('❌ Failed to reset main page content:', error);
+            alert('Failed to reset content: ' + error.message);
+        }
     }
 }
 
 // Export main page content for the main site to use
-function getMainPageContentForSite() {
-    const stored = localStorage.getItem(STORAGE_KEYS.mainpage);
-    if (stored) {
-        return JSON.parse(stored);
+async function getMainPageContentForSite() {
+    try {
+        const content = await window.contentAPI.getMainPageContent();
+        return content && Object.keys(content).length > 0 ? content : getDefaultMainPageContent();
+    } catch (error) {
+        console.error('❌ Failed to get main page content for site:', error);
+        return getDefaultMainPageContent();
     }
-    return getDefaultMainPageContent();
 }
 
 // Debug function to help troubleshoot content loading
