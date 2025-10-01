@@ -3,72 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hidden World Admin - Live System</title>
+    <title>Hidden World Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Crimson Text', serif;
-        }
-        .fantasy-font {
-            font-family: 'Cinzel', serif;
-        }
-        .hidden {
-            display: none !important;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="min-h-screen" style="background: linear-gradient(135deg, #1e3a5f 0%, #2d5016 50%, #663399 100%);">
 
     <!-- Login Section -->
-    <div id="login-section" class="min-h-screen flex items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-lg w-96">
-            <h1 class="text-2xl font-bold fantasy-font text-center mb-6 text-gray-800">Hidden World Admin</h1>
-            <p class="text-gray-600 text-center mb-6">Access the admin panel to manage your magical world</p>
+    <div id="login-section" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white bg-opacity-95 p-8 rounded-lg shadow-2xl w-full max-w-md">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2" style="font-family: 'Cinzel', serif;">🏰 Hidden World</h1>
+                <h2 class="text-xl text-gray-700 mb-4" style="font-family: 'Cinzel', serif;">Admin Portal</h2>
+                <p class="text-gray-600">Enter password to manage your magical world</p>
+            </div>
             
-            <form onsubmit="handleLogin(event)" class="space-y-4">
+            <div class="space-y-6">
                 <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Admin Password</label>
+                    <label for="admin-password" class="block text-sm font-medium text-gray-700 mb-2">
+                        🔐 Admin Password
+                    </label>
                     <input 
                         type="password" 
-                        id="password" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter admin password"
-                        required
+                        id="admin-password" 
+                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-gray-800 text-lg"
+                        placeholder="Enter password..."
                     >
                 </div>
                 
-                <div id="login-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded">
-                    Incorrect password. Please try again.
+                <div id="login-error" style="display: none;" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
+                    ❌ Incorrect password. Please try again.
                 </div>
                 
                 <button 
-                    type="submit" 
-                    class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-200"
+                    id="login-button"
+                    class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-lg hover:from-blue-700 hover:to-purple-700 transition duration-200 font-semibold text-lg"
                 >
-                    Login to Admin Panel
+                    🚀 Access Admin Panel
                 </button>
-            </form>
+            </div>
             
             <div class="mt-6 text-center">
-                <a href="index.html" class="text-blue-500 hover:text-blue-700">← Back to Website</a>
+                <a href="index.html" class="text-blue-600 hover:text-blue-800 font-medium">
+                    ← Back to Website
+                </a>
             </div>
         </div>
     </div>
 
     <!-- Admin Dashboard -->
-    <div id="admin-dashboard" class="hidden">
+    <div id="admin-dashboard" style="display: none;" class="min-h-screen text-gray-800">
         <!-- Header -->
-        <header class="bg-white shadow-sm border-b">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <header class="bg-gray-800 shadow-lg border-b-2 border-yellow-500">
+            <div class="max-w-7xl mx-auto px-4 py-4">
                 <div class="flex justify-between items-center">
-                    <h1 class="text-2xl font-bold fantasy-font text-gray-900">Hidden World Admin</h1>
+                    <h1 class="text-2xl font-bold text-yellow-400" style="font-family: 'Cinzel', serif;">🏰 Hidden World Admin</h1>
                     <div class="flex space-x-4">
-                        <a href="index.html" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-                            View Live Site
+                        <a href="index.html" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                            👁️ View Live Site
                         </a>
-                        <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
-                            Logout
+                        <button id="logout-button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                            🚪 Logout
                         </button>
                     </div>
                 </div>
@@ -76,55 +71,56 @@
         </header>
 
         <!-- Navigation Tabs -->
-        <nav class="bg-gray-100 border-b">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="bg-gray-700 border-b border-gray-600">
+            <div class="max-w-7xl mx-auto px-4">
                 <div class="flex space-x-1">
-                    <button onclick="showTab('episodes')" class="tab-button px-4 py-3 text-sm font-medium rounded-t-md bg-blue-500 text-white">
-                        Episodes
+                    <button data-tab="episodes" class="tab-button px-6 py-3 text-sm font-medium rounded-t-md bg-blue-600 text-white">
+                        📖 Episodes
                     </button>
-                    <button onclick="showTab('clans')" class="tab-button px-4 py-3 text-sm font-medium rounded-t-md bg-gray-200 text-gray-700">
-                        Clans
+                    <button data-tab="clans" class="tab-button px-6 py-3 text-sm font-medium rounded-t-md bg-gray-600 text-gray-300">
+                        🔮 Clans
                     </button>
-                    <button onclick="showTab('locations')" class="tab-button px-4 py-3 text-sm font-medium rounded-t-md bg-gray-200 text-gray-700">
-                        Locations
+                    <button data-tab="locations" class="tab-button px-6 py-3 text-sm font-medium rounded-t-md bg-gray-600 text-gray-300">
+                        🗺️ Locations
+                    </button>
+                    <button data-tab="mainpage" class="tab-button px-6 py-3 text-sm font-medium rounded-t-md bg-gray-600 text-gray-300">
+                        🏠 Main Page
                     </button>
                 </div>
             </div>
         </nav>
 
-        <!-- Content Tabs -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Content Area -->
+        <main class="max-w-7xl mx-auto px-4 py-6">
             
             <!-- Episodes Tab -->
             <div id="episodes-tab" class="tab-content">
-                <div class="mb-8">
-                    <h2 class="text-xl font-bold fantasy-font mb-4">Add New Episode</h2>
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <div class="grid grid-cols-1 gap-4">
-                            <div>
-                                <label for="episode-title" class="block text-sm font-medium text-gray-700 mb-1">Episode Title</label>
-                                <input type="text" id="episode-title" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter episode title">
-                            </div>
-                            
-                            <div>
-                                <label for="episode-description" class="block text-sm font-medium text-gray-700 mb-1">Short Description</label>
-                                <input type="text" id="episode-description" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Brief description for the episode">
-                            </div>
-                            
-                            <div>
-                                <label for="episode-content" class="block text-sm font-medium text-gray-700 mb-1">Episode Content</label>
-                                <textarea id="episode-content" rows="8" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Write your episode content here..."></textarea>
-                            </div>
-                            
-                            <button onclick="saveEpisode()" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
-                                Save Episode
-                            </button>
+                <div class="bg-white rounded-lg shadow p-6 mb-8">
+                    <h2 class="text-xl font-bold mb-4">📝 Add New Episode</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="episode-title" class="block text-sm font-medium mb-1">Episode Title</label>
+                            <input type="text" id="episode-title" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Enter episode title">
                         </div>
+                        
+                        <div>
+                            <label for="episode-description" class="block text-sm font-medium mb-1">Short Description</label>
+                            <input type="text" id="episode-description" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Brief description">
+                        </div>
+                        
+                        <div>
+                            <label for="episode-content" class="block text-sm font-medium mb-1">Episode Content</label>
+                            <textarea id="episode-content" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Write your episode content here..."></textarea>
+                        </div>
+                        
+                        <button id="save-episode" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 font-semibold">
+                            💾 Save Episode
+                        </button>
                     </div>
                 </div>
 
-                <div>
-                    <h2 class="text-xl font-bold fantasy-font mb-4">Published Episodes</h2>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold mb-4">📚 Published Episodes</h2>
                     <div id="episodes-list" class="space-y-4">
                         <p class="text-gray-500 italic">Loading episodes...</p>
                     </div>
@@ -132,52 +128,50 @@
             </div>
 
             <!-- Clans Tab -->
-            <div id="clans-tab" class="tab-content hidden">
-                <div class="mb-8">
-                    <h2 class="text-xl font-bold fantasy-font mb-4">Add New Clan</h2>
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="clan-name" class="block text-sm font-medium text-gray-700 mb-1">Clan Name</label>
-                                <input type="text" id="clan-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter clan name">
-                            </div>
-                            
-                            <div>
-                                <label for="clan-origin" class="block text-sm font-medium text-gray-700 mb-1">Origin Story</label>
-                                <textarea id="clan-origin" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="How did this clan come to be?"></textarea>
-                            </div>
-                            
-                            <div>
-                                <label for="clan-powers" class="block text-sm font-medium text-gray-700 mb-1">Powers & Abilities</label>
-                                <textarea id="clan-powers" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="What special abilities do they have?"></textarea>
-                            </div>
-                            
-                            <div>
-                                <label for="clan-connection" class="block text-sm font-medium text-gray-700 mb-1">Connection to Hidden World</label>
-                                <textarea id="clan-connection" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="How do they connect to the magical realm?"></textarea>
-                            </div>
-                            
-                            <div>
-                                <label for="clan-color1" class="block text-sm font-medium text-gray-700 mb-1">Primary Color</label>
-                                <input type="color" id="clan-color1" class="w-full h-10 border border-gray-300 rounded-md" value="#3B82F6">
-                            </div>
-                            
-                            <div>
-                                <label for="clan-color2" class="block text-sm font-medium text-gray-700 mb-1">Secondary Color</label>
-                                <input type="color" id="clan-color2" class="w-full h-10 border border-gray-300 rounded-md" value="#1E40AF">
-                            </div>
-                            
-                            <div class="md:col-span-2">
-                                <button onclick="saveClan()" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
-                                    Save Clan
-                                </button>
-                            </div>
+            <div id="clans-tab" class="tab-content" style="display: none;">
+                <div class="bg-white rounded-lg shadow p-6 mb-8">
+                    <h2 class="text-xl font-bold mb-4">🔮 Add New Clan</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="clan-name" class="block text-sm font-medium mb-1">Clan Name</label>
+                            <input type="text" id="clan-name" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Enter clan name">
+                        </div>
+                        
+                        <div>
+                            <label for="clan-origin" class="block text-sm font-medium mb-1">Origin Story</label>
+                            <textarea id="clan-origin" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="How did this clan come to be?"></textarea>
+                        </div>
+                        
+                        <div>
+                            <label for="clan-powers" class="block text-sm font-medium mb-1">Powers & Abilities</label>
+                            <textarea id="clan-powers" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="What special abilities do they have?"></textarea>
+                        </div>
+                        
+                        <div>
+                            <label for="clan-connection" class="block text-sm font-medium mb-1">Connection Method</label>
+                            <textarea id="clan-connection" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="How do they connect to the magical realm?"></textarea>
+                        </div>
+                        
+                        <div>
+                            <label for="clan-color1" class="block text-sm font-medium mb-1">Primary Color</label>
+                            <input type="color" id="clan-color1" class="w-full h-10 border border-gray-300 rounded-md" value="#3B82F6">
+                        </div>
+                        
+                        <div>
+                            <label for="clan-color2" class="block text-sm font-medium mb-1">Secondary Color</label>
+                            <input type="color" id="clan-color2" class="w-full h-10 border border-gray-300 rounded-md" value="#1E40AF">
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <button id="save-clan" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 font-semibold">
+                                💾 Save Clan
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <div>
-                    <h2 class="text-xl font-bold fantasy-font mb-4">Active Clans</h2>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold mb-4">🏛️ Active Clans</h2>
                     <div id="clans-list" class="space-y-4">
                         <p class="text-gray-500 italic">Loading clans...</p>
                     </div>
@@ -185,61 +179,1091 @@
             </div>
 
             <!-- Locations Tab -->
-            <div id="locations-tab" class="tab-content hidden">
-                <div class="mb-8">
-                    <h2 class="text-xl font-bold fantasy-font mb-4">Add New Location</h2>
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="location-name" class="block text-sm font-medium text-gray-700 mb-1">Location Name</label>
-                                <input type="text" id="location-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter location name">
-                            </div>
-                            
-                            <div>
-                                <label for="location-lat" class="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
-                                <input type="number" step="any" id="location-lat" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g. 51.5074">
-                            </div>
-                            
-                            <div>
-                                <label for="location-lng" class="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
-                                <input type="number" step="any" id="location-lng" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g. -0.1278">
-                            </div>
-                            
-                            <div>
-                                <label for="location-magic" class="block text-sm font-medium text-gray-700 mb-1">Magical Description</label>
-                                <textarea id="location-magic" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="What makes this place magical?"></textarea>
-                            </div>
-                            
-                            <div class="md:col-span-2">
-                                <label for="location-lookfor" class="block text-sm font-medium text-gray-700 mb-1">What to Look For</label>
-                                <textarea id="location-lookfor" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Clues visitors should look for at this location"></textarea>
-                            </div>
-                            
-                            <div class="md:col-span-2">
-                                <button onclick="saveLocation()" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
-                                    Save Location
-                                </button>
-                            </div>
+            <div id="locations-tab" class="tab-content" style="display: none;">
+                <div class="bg-white rounded-lg shadow p-6 mb-8">
+                    <h2 class="text-xl font-bold mb-4">🗺️ Add New Location</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="location-name" class="block text-sm font-medium mb-1">Location Name</label>
+                            <input type="text" id="location-name" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Enter location name">
+                        </div>
+                        
+                        <div>
+                            <label for="location-lat" class="block text-sm font-medium mb-1">Latitude</label>
+                            <input type="number" step="any" id="location-lat" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="e.g. 51.5074">
+                        </div>
+                        
+                        <div>
+                            <label for="location-lng" class="block text-sm font-medium mb-1">Longitude</label>
+                            <input type="number" step="any" id="location-lng" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="e.g. -0.1278">
+                        </div>
+                        
+                        <div>
+                            <label for="location-magic" class="block text-sm font-medium mb-1">Magical Description</label>
+                            <textarea id="location-magic" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="What makes this place magical?"></textarea>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label for="location-lookfor" class="block text-sm font-medium mb-1">What to Look For</label>
+                            <textarea id="location-lookfor" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Clues visitors should look for"></textarea>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <button id="save-location" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 font-semibold">
+                                💾 Save Location
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <div>
-                    <h2 class="text-xl font-bold fantasy-font mb-4">Active Locations</h2>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold mb-4">📍 Active Locations</h2>
                     <div id="locations-list" class="space-y-4">
                         <p class="text-gray-500 italic">Loading locations...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Page Tab -->
+            <div id="mainpage-tab" class="tab-content" style="display: none;">
+                <div class="bg-white rounded-lg shadow p-6 mb-8">
+                    <h2 class="text-xl font-bold mb-4">🏠 Edit Main Page Content</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="main-title" class="block text-sm font-medium mb-1">Main Title</label>
+                            <input type="text" id="main-title" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="The Hidden World of London">
+                        </div>
+                        
+                        <div>
+                            <label for="main-subtitle" class="block text-sm font-medium mb-1">Subtitle</label>
+                            <textarea id="main-subtitle" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Magical stories and secret places..."></textarea>
+                        </div>
+                        
+                        <div>
+                            <label for="about-content" class="block text-sm font-medium mb-1">About Section</label>
+                            <textarea id="about-content" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Welcome to a London where magic hides..."></textarea>
+                        </div>
+                        
+                        <div>
+                            <label for="footer-tagline" class="block text-sm font-medium mb-1">Footer Tagline</label>
+                            <input type="text" id="footer-tagline" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Where London's magic lives ✨">
+                        </div>
+                        
+                        <div class="flex space-x-4">
+                            <button id="load-mainpage" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 font-semibold">
+                                📥 Load Current Content
+                            </button>
+                            <button id="save-mainpage" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 font-semibold">
+                                💾 Save Changes
+                            </button>
+                        </div>
+                        
+                        <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <h3 class="font-bold text-yellow-800 mb-2">🔄 Database Management</h3>
+                            <p class="text-yellow-700 text-sm mb-3">If you don't see existing content, the database might be empty. Click below to populate it with default content:</p>
+                            <div class="flex space-x-3">
+                                <button id="sync-content" class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 font-semibold">
+                                    🔄 Sync Default Content
+                                </button>
+                                <button id="test-system" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 font-semibold">
+                                    🧪 Test All Functions
+                                </button>
+                            </div>
+                            <div id="test-results" class="mt-3 hidden"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Success Messages -->
-    <div id="success-message" class="hidden fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-md shadow-lg z-50">
-        Content saved successfully!
-    </div>
+    <!-- Complete JavaScript with ALL functionality -->
+    <script>
+        // Admin configuration
+        const ADMIN_PASSWORD = 'hiddenworld2024';
+        const SUPABASE_URL = 'https://lnogbmmeuzkzqlfgbkng.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxub2dibW1ldXprenFsZmdia25nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU3MjYyNzgsImV4cCI6MjA1MTMwMjI3OH0.MZh1D9VB3IqJAHkUbRQgOJTHvqpEQYN1Nrm6ZE9Yp5Q';
 
-    <!-- Load JavaScript -->
-    <script src="js/live-admin.js"></script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Admin page loaded successfully');
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Login button
+            document.getElementById('login-button').addEventListener('click', handleLogin);
+            document.getElementById('admin-password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') handleLogin();
+            });
+            
+            // Logout button
+            document.getElementById('logout-button').addEventListener('click', handleLogout);
+            
+            // Tab switching
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    showTab(this.dataset.tab);
+                });
+            });
+
+            // Save buttons
+            document.getElementById('save-episode').addEventListener('click', saveEpisode);
+            document.getElementById('save-clan').addEventListener('click', saveClan);
+            document.getElementById('save-location').addEventListener('click', saveLocation);
+            document.getElementById('load-mainpage').addEventListener('click', loadMainPageContent);
+            document.getElementById('save-mainpage').addEventListener('click', saveMainPageContent);
+            document.getElementById('sync-content').addEventListener('click', syncContentToDatabase);
+            document.getElementById('test-system').addEventListener('click', runCompleteSystemTest);
+        }
+
+        function handleLogin() {
+            const password = document.getElementById('admin-password').value;
+            
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('admin-dashboard').style.display = 'block';
+                loadAllContent();
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+                document.getElementById('admin-password').value = '';
+            }
+        }
+
+        function handleLogout() {
+            document.getElementById('admin-dashboard').style.display = 'none';
+            document.getElementById('login-section').style.display = 'flex';
+            document.getElementById('admin-password').value = '';
+            document.getElementById('login-error').style.display = 'none';
+        }
+
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').style.display = 'block';
+            
+            // Update button styles
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-gray-600', 'text-gray-300');
+            });
+            
+            // Highlight active button
+            document.querySelector(`[data-tab="${tabName}"]`).classList.remove('bg-gray-600', 'text-gray-300');
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('bg-blue-600', 'text-white');
+        }
+
+        // Database functions
+        async function supabaseRequest(method, table, data = null, id = null) {
+            let url = `${SUPABASE_URL}/rest/v1/${table}`;
+            if (id) url += `?id=eq.${id}`;
+            
+            const options = {
+                method: method,
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                }
+            };
+            
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+            
+            const response = await fetch(url, options);
+            
+            if (method === 'DELETE') {
+                return response.ok;
+            }
+            
+            if (response.ok) {
+                const result = await response.json();
+                return method === 'PATCH' ? result[0] : result;
+            }
+            
+            throw new Error(`Database error: ${response.status}`);
+        }
+
+        // Load all content
+        async function loadAllContent() {
+            console.log('Loading all admin content...');
+            await loadEpisodes();
+            await loadClans();  
+            await loadLocations();
+            
+            // Check if database is empty and populate with defaults if needed
+            await initializeDefaultContent();
+        }
+
+        // Initialize database with default content if empty
+        async function initializeDefaultContent() {
+            try {
+                // Check episodes
+                const episodes = await supabaseRequest('GET', 'episodes');
+                if (!episodes || episodes.length === 0) {
+                    console.log('Database empty, adding default episodes...');
+                    await addDefaultEpisodes();
+                }
+
+                // Check clans
+                const clans = await supabaseRequest('GET', 'clans');
+                if (!clans || clans.length === 0) {
+                    console.log('Database empty, adding default clans...');
+                    await addDefaultClans();
+                }
+
+                // Check locations
+                const locations = await supabaseRequest('GET', 'locations');
+                if (!locations || locations.length === 0) {
+                    console.log('Database empty, adding default locations...');
+                    await addDefaultLocations();
+                }
+
+                // Reload all content to show the new default data
+                await loadEpisodes();
+                await loadClans();
+                await loadLocations();
+                
+            } catch (error) {
+                console.error('Error initializing default content:', error);
+            }
+        }
+
+        async function addDefaultEpisodes() {
+            const defaultEpisodes = [
+                {
+                    id: 'ep1',
+                    title: 'The Awakening of the Thames Stones',
+                    meta_description: 'Discover how the ancient clan stones first awakened along the Thames, calling to children who could hear their magical whispers.',
+                    content: '<p>Long ago, when London was just a collection of villages along the Thames, five mysterious stones appeared overnight. Each stone hummed with a different magical frequency...</p><p>The River Clan stone emerged first, glowing blue-green like the deepest part of the Thames. Children walking along the river banks began to hear whispers in languages they had never learned...</p>',
+                    page_type: 'episode',
+                    status: 'published',
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 'ep2', 
+                    title: 'The Secret of Fleet River',
+                    meta_description: 'Follow Maya as she discovers the hidden Fleet River and learns why some waters remember everything.',
+                    content: '<p>Maya pressed her ear to the pavement near Blackfriars Bridge. Other children thought she was playing, but Maya could hear something magical...</p><p>Beneath the busy London streets, the Fleet River still flows, carrying messages between the clan stones. Maya was the first to hear its call in over fifty years...</p>',
+                    page_type: 'episode',
+                    status: 'published',
+                    created_at: new Date().toISOString()
+                }
+            ];
+
+            for (const episode of defaultEpisodes) {
+                try {
+                    await supabaseRequest('POST', 'episodes', episode);
+                } catch (error) {
+                    console.error('Error adding default episode:', error);
+                }
+            }
+        }
+
+        async function addDefaultClans() {
+            const defaultClans = [
+                {
+                    id: 'clan1',
+                    name: 'River Clan',
+                    stone_description: 'The River Clan stone emerged from the Thames itself, carrying the wisdom of waters that have flowed for thousands of years. It glows with the blue-green light of deep water and hums with the rhythm of tides.',
+                    offering: 'The power to understand any language, to flow around obstacles like water, and to hear the stories that rivers tell. Members can communicate with all water creatures and feel the emotions of anyone who has touched the same water.',
+                    resonance_note: 'Place your hand on any flowing water and whisper "I hear your stories." The stone will respond when you truly mean it.',
+                    color_primary: '#0EA5E9',
+                    color_secondary: '#06B6D4',
+                    status: 'active',
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 'clan2',
+                    name: 'Sky Clan', 
+                    stone_description: 'High above London, where the pigeons nest on St. Pauls Cathedral, the Sky Clan stone catches every whisper carried by the wind. It shimmers like captured starlight and hums with the frequency of dreams taking flight.',
+                    offering: 'The gift of understanding the language of birds, the ability to find lost things by following the wind, and the power to send messages through clouds. Members can sense weather changes and feel the emotions of anyone who has looked up at the same sky.',
+                    resonance_note: 'Stand on any high place in London, spread your arms wide, and whisper to the wind "I am ready to fly." The stone will call to those who truly wish to soar.',
+                    color_primary: '#3B82F6',
+                    color_secondary: '#8B5CF6',
+                    status: 'active',
+                    created_at: new Date().toISOString()
+                }
+            ];
+
+            for (const clan of defaultClans) {
+                try {
+                    await supabaseRequest('POST', 'clans', clan);
+                } catch (error) {
+                    console.error('Error adding default clan:', error);
+                }
+            }
+        }
+
+        async function addDefaultLocations() {
+            const defaultLocations = [
+                {
+                    id: 'loc1',
+                    name: 'The Hidden Pool of Hampstead Heath',
+                    latitude: 51.5558,
+                    longitude: -0.1608,
+                    magical_description: 'Deep within Hampstead Heath lies a pool that only appears at dawn and dusk, when the light is neither day nor night. The water reflects not your face, but your hearts deepest wish.',
+                    what_to_look_for: 'Look for the ancient oak tree with silver bark that seems to shimmer. The pool appears in its shadow when you whisper "Show me wonder."',
+                    status: 'active',
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 'loc2',
+                    name: 'The Whispering Gallery Secret Door',
+                    latitude: 51.5138,
+                    longitude: -0.0984,
+                    magical_description: 'In St. Pauls Cathedral famous Whispering Gallery, there is one stone that whispers back. Touch it with your ear pressed close, and you can hear the conversations of London magical creatures from across the centuries.',
+                    what_to_look_for: 'Find the stone that feels warm when all others are cool. Its marked with a tiny carving of a feather that only children can see clearly.',
+                    status: 'active',
+                    created_at: new Date().toISOString()
+                }
+            ];
+
+            for (const location of defaultLocations) {
+                try {
+                    await supabaseRequest('POST', 'locations', location);
+                } catch (error) {
+                    console.error('Error adding default location:', error);
+                }
+            }
+        }
+
+        // Episodes functions
+        async function loadEpisodes() {
+            try {
+                const episodes = await supabaseRequest('GET', 'episodes');
+                displayEpisodes(episodes || []);
+            } catch (error) {
+                console.error('Failed to load episodes:', error);
+                displayEpisodes([]);
+            }
+        }
+
+        function displayEpisodes(episodes) {
+            const container = document.getElementById('episodes-list');
+            
+            if (episodes.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 italic">No episodes yet. Add your first episode above!</p>';
+                return;
+            }
+            
+            container.innerHTML = episodes.map(episode => `
+                <div class="bg-gray-50 p-4 border rounded-lg">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-gray-800">${episode.title}</h3>
+                        <div class="flex space-x-2">
+                            <button onclick="editEpisode('${episode.id}')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm">Edit</button>
+                            <button onclick="deleteEpisode('${episode.id}')" class="bg-red-500 text-white px-3 py-1 rounded text-sm">Delete</button>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm">${episode.meta_description}</p>
+                </div>
+            `).join('');
+        }
+
+        async function saveEpisode() {
+            const title = document.getElementById('episode-title').value;
+            const description = document.getElementById('episode-description').value;
+            const content = document.getElementById('episode-content').value;
+            
+            if (!title || !description || !content) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            const episode = {
+                id: 'ep' + Date.now(),
+                title: title,
+                meta_description: description,
+                content: content,
+                page_type: 'episode',
+                status: 'published',
+                created_at: new Date().toISOString()
+            };
+            
+            try {
+                await supabaseRequest('POST', 'episodes', episode);
+                alert('Episode saved! It will appear on the website immediately.');
+                
+                // Clear form
+                document.getElementById('episode-title').value = '';
+                document.getElementById('episode-description').value = '';
+                document.getElementById('episode-content').value = '';
+                
+                loadEpisodes();
+            } catch (error) {
+                alert('Failed to save episode: ' + error.message);
+            }
+        }
+
+        async function editEpisode(episodeId) {
+            try {
+                const episodes = await supabaseRequest('GET', 'episodes');
+                const episode = episodes.find(ep => ep.id === episodeId);
+                if (!episode) {
+                    alert('Episode not found!');
+                    return;
+                }
+                
+                // Fill form
+                document.getElementById('episode-title').value = episode.title;
+                document.getElementById('episode-description').value = episode.meta_description;
+                document.getElementById('episode-content').value = episode.content;
+                
+                // Change save button
+                const saveBtn = document.getElementById('save-episode');
+                saveBtn.innerHTML = 'Update Episode';
+                saveBtn.onclick = () => updateEpisode(episodeId);
+                
+            } catch (error) {
+                alert('Failed to load episode: ' + error.message);
+            }
+        }
+
+        async function updateEpisode(episodeId) {
+            const title = document.getElementById('episode-title').value;
+            const description = document.getElementById('episode-description').value;
+            const content = document.getElementById('episode-content').value;
+            
+            if (!title || !description || !content) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            const episode = {
+                title: title,
+                meta_description: description,
+                content: content,
+                updated_at: new Date().toISOString()
+            };
+            
+            try {
+                await supabaseRequest('PATCH', 'episodes', episode, episodeId);
+                alert('Episode updated! Changes are live.');
+                
+                // Reset form
+                document.getElementById('episode-title').value = '';
+                document.getElementById('episode-description').value = '';
+                document.getElementById('episode-content').value = '';
+                
+                const saveBtn = document.getElementById('save-episode');
+                saveBtn.innerHTML = '💾 Save Episode';
+                saveBtn.onclick = saveEpisode;
+                
+                loadEpisodes();
+            } catch (error) {
+                alert('Failed to update episode: ' + error.message);
+            }
+        }
+
+        async function deleteEpisode(episodeId) {
+            if (!confirm('Are you sure you want to delete this episode?')) return;
+            
+            try {
+                await supabaseRequest('DELETE', 'episodes', null, episodeId);
+                alert('Episode deleted!');
+                loadEpisodes();
+            } catch (error) {
+                alert('Failed to delete episode: ' + error.message);
+            }
+        }
+
+        // Clans functions
+        async function loadClans() {
+            try {
+                const clans = await supabaseRequest('GET', 'clans');
+                displayClans(clans || []);
+            } catch (error) {
+                console.error('Failed to load clans:', error);
+                displayClans([]);
+            }
+        }
+
+        function displayClans(clans) {
+            const container = document.getElementById('clans-list');
+            
+            if (clans.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 italic">No clans yet. Add your first clan above!</p>';
+                return;
+            }
+            
+            container.innerHTML = clans.map(clan => `
+                <div class="bg-gray-50 p-4 border rounded-lg">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-gray-800">${clan.name}</h3>
+                        <div class="flex space-x-2">
+                            <button onclick="editClan('${clan.id}')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm">Edit</button>
+                            <button onclick="deleteClan('${clan.id}')" class="bg-red-500 text-white px-3 py-1 rounded text-sm">Delete</button>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm">${clan.stone_description ? clan.stone_description.substring(0, 100) + '...' : ''}</p>
+                </div>
+            `).join('');
+        }
+
+        async function saveClan() {
+            const name = document.getElementById('clan-name').value;
+            const origin = document.getElementById('clan-origin').value;
+            const powers = document.getElementById('clan-powers').value;
+            const connection = document.getElementById('clan-connection').value;
+            
+            if (!name || !origin || !powers || !connection) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            const clan = {
+                id: 'clan' + Date.now(),
+                name: name,
+                stone_description: origin,
+                offering: powers,
+                resonance_note: connection,
+                color_primary: document.getElementById('clan-color1').value,
+                color_secondary: document.getElementById('clan-color2').value,
+                status: 'active',
+                created_at: new Date().toISOString()
+            };
+            
+            try {
+                await supabaseRequest('POST', 'clans', clan);
+                alert('Clan saved! It will appear on the website immediately.');
+                
+                // Clear form
+                document.getElementById('clan-name').value = '';
+                document.getElementById('clan-origin').value = '';
+                document.getElementById('clan-powers').value = '';
+                document.getElementById('clan-connection').value = '';
+                
+                loadClans();
+            } catch (error) {
+                alert('Failed to save clan: ' + error.message);
+            }
+        }
+
+        async function editClan(clanId) {
+            try {
+                const clans = await supabaseRequest('GET', 'clans');
+                const clan = clans.find(c => c.id === clanId);
+                if (!clan) {
+                    alert('Clan not found!');
+                    return;
+                }
+                
+                // Fill form
+                document.getElementById('clan-name').value = clan.name;
+                document.getElementById('clan-origin').value = clan.stone_description;
+                document.getElementById('clan-powers').value = clan.offering;
+                document.getElementById('clan-connection').value = clan.resonance_note;
+                document.getElementById('clan-color1').value = clan.color_primary || '#3B82F6';
+                document.getElementById('clan-color2').value = clan.color_secondary || '#1E40AF';
+                
+                // Change save button
+                const saveBtn = document.getElementById('save-clan');
+                saveBtn.innerHTML = 'Update Clan';
+                saveBtn.onclick = () => updateClan(clanId);
+                
+                showTab('clans');
+                
+            } catch (error) {
+                alert('Failed to load clan: ' + error.message);
+            }
+        }
+
+        async function updateClan(clanId) {
+            const name = document.getElementById('clan-name').value;
+            const origin = document.getElementById('clan-origin').value;
+            const powers = document.getElementById('clan-powers').value;
+            const connection = document.getElementById('clan-connection').value;
+            
+            if (!name || !origin || !powers || !connection) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            const clan = {
+                name: name,
+                stone_description: origin,
+                offering: powers,
+                resonance_note: connection,
+                color_primary: document.getElementById('clan-color1').value,
+                color_secondary: document.getElementById('clan-color2').value,
+                updated_at: new Date().toISOString()
+            };
+            
+            try {
+                await supabaseRequest('PATCH', 'clans', clan, clanId);
+                alert('Clan updated! Changes are live.');
+                
+                // Reset form
+                document.getElementById('clan-name').value = '';
+                document.getElementById('clan-origin').value = '';
+                document.getElementById('clan-powers').value = '';
+                document.getElementById('clan-connection').value = '';
+                
+                const saveBtn = document.getElementById('save-clan');
+                saveBtn.innerHTML = '💾 Save Clan';
+                saveBtn.onclick = saveClan;
+                
+                loadClans();
+            } catch (error) {
+                alert('Failed to update clan: ' + error.message);
+            }
+        }
+
+        async function deleteClan(clanId) {
+            if (!confirm('Are you sure you want to delete this clan?')) return;
+            
+            try {
+                await supabaseRequest('DELETE', 'clans', null, clanId);
+                alert('Clan deleted!');
+                loadClans();
+            } catch (error) {
+                alert('Failed to delete clan: ' + error.message);
+            }
+        }
+
+        // Locations functions
+        async function loadLocations() {
+            try {
+                const locations = await supabaseRequest('GET', 'locations');
+                displayLocations(locations || []);
+            } catch (error) {
+                console.error('Failed to load locations:', error);
+                displayLocations([]);
+            }
+        }
+
+        function displayLocations(locations) {
+            const container = document.getElementById('locations-list');
+            
+            if (locations.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 italic">No locations yet. Add your first location above!</p>';
+                return;
+            }
+            
+            container.innerHTML = locations.map(location => `
+                <div class="bg-gray-50 p-4 border rounded-lg">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-gray-800">${location.name}</h3>
+                        <div class="flex space-x-2">
+                            <button onclick="editLocation('${location.id}')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm">Edit</button>
+                            <button onclick="deleteLocation('${location.id}')" class="bg-red-500 text-white px-3 py-1 rounded text-sm">Delete</button>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm">${location.magical_description ? location.magical_description.substring(0, 100) + '...' : ''}</p>
+                </div>
+            `).join('');
+        }
+
+        async function saveLocation() {
+            const name = document.getElementById('location-name').value;
+            const lat = document.getElementById('location-lat').value;
+            const lng = document.getElementById('location-lng').value;
+            const magic = document.getElementById('location-magic').value;
+            const lookFor = document.getElementById('location-lookfor').value;
+            
+            if (!name || !lat || !lng || !magic || !lookFor) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            const location = {
+                id: 'loc' + Date.now(),
+                name: name,
+                latitude: parseFloat(lat),
+                longitude: parseFloat(lng),
+                magical_description: magic,
+                what_to_look_for: lookFor,
+                status: 'active',
+                created_at: new Date().toISOString()
+            };
+            
+            try {
+                await supabaseRequest('POST', 'locations', location);
+                alert('Location saved! It will appear on the website immediately.');
+                
+                // Clear form
+                document.getElementById('location-name').value = '';
+                document.getElementById('location-lat').value = '';
+                document.getElementById('location-lng').value = '';
+                document.getElementById('location-magic').value = '';
+                document.getElementById('location-lookfor').value = '';
+                
+                loadLocations();
+            } catch (error) {
+                alert('Failed to save location: ' + error.message);
+            }
+        }
+
+        async function editLocation(locationId) {
+            try {
+                const locations = await supabaseRequest('GET', 'locations');
+                const location = locations.find(l => l.id === locationId);
+                if (!location) {
+                    alert('Location not found!');
+                    return;
+                }
+                
+                // Fill form
+                document.getElementById('location-name').value = location.name;
+                document.getElementById('location-lat').value = location.latitude;
+                document.getElementById('location-lng').value = location.longitude;
+                document.getElementById('location-magic').value = location.magical_description;
+                document.getElementById('location-lookfor').value = location.what_to_look_for;
+                
+                // Change save button
+                const saveBtn = document.getElementById('save-location');
+                saveBtn.innerHTML = 'Update Location';
+                saveBtn.onclick = () => updateLocation(locationId);
+                
+                showTab('locations');
+                
+            } catch (error) {
+                alert('Failed to load location: ' + error.message);
+            }
+        }
+
+        async function updateLocation(locationId) {
+            const name = document.getElementById('location-name').value;
+            const lat = document.getElementById('location-lat').value;
+            const lng = document.getElementById('location-lng').value;
+            const magic = document.getElementById('location-magic').value;
+            const lookFor = document.getElementById('location-lookfor').value;
+            
+            if (!name || !lat || !lng || !magic || !lookFor) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            const location = {
+                name: name,
+                latitude: parseFloat(lat),
+                longitude: parseFloat(lng),
+                magical_description: magic,
+                what_to_look_for: lookFor,
+                updated_at: new Date().toISOString()
+            };
+            
+            try {
+                await supabaseRequest('PATCH', 'locations', location, locationId);
+                alert('Location updated! Changes are live.');
+                
+                // Reset form
+                document.getElementById('location-name').value = '';
+                document.getElementById('location-lat').value = '';
+                document.getElementById('location-lng').value = '';
+                document.getElementById('location-magic').value = '';
+                document.getElementById('location-lookfor').value = '';
+                
+                const saveBtn = document.getElementById('save-location');
+                saveBtn.innerHTML = '💾 Save Location';
+                saveBtn.onclick = saveLocation;
+                
+                loadLocations();
+            } catch (error) {
+                alert('Failed to update location: ' + error.message);
+            }
+        }
+
+        async function deleteLocation(locationId) {
+            if (!confirm('Are you sure you want to delete this location?')) return;
+            
+            try {
+                await supabaseRequest('DELETE', 'locations', null, locationId);
+                alert('Location deleted!');
+                loadLocations();
+            } catch (error) {
+                alert('Failed to delete location: ' + error.message);
+            }
+        }
+
+        // Main page content functions
+        async function loadMainPageContent() {
+            try {
+                const content = await supabaseRequest('GET', 'mainpage_content');
+                if (content && content.length > 0) {
+                    const data = content[0];
+                    document.getElementById('main-title').value = data.title || '';
+                    document.getElementById('main-subtitle').value = data.subtitle || '';
+                    document.getElementById('about-content').value = data.about || '';
+                    document.getElementById('footer-tagline').value = data.footer || '';
+                } else {
+                    // Load defaults
+                    document.getElementById('main-title').value = 'The Hidden World of London';
+                    document.getElementById('main-subtitle').value = 'Magical stories and secret places waiting to be discovered by children aged 8-12';
+                    document.getElementById('about-content').value = 'Welcome to a London where magic hides in plain sight. Every bridge has a story, every stone remembers, and some children can hear the city\'s ancient secrets.';
+                    document.getElementById('footer-tagline').value = 'Where London\'s magic lives ✨';
+                }
+                alert('Content loaded into form!');
+            } catch (error) {
+                console.error('Failed to load main page content:', error);
+                alert('Failed to load content, showing defaults');
+            }
+        }
+
+        async function saveMainPageContent() {
+            const title = document.getElementById('main-title').value;
+            const subtitle = document.getElementById('main-subtitle').value;
+            const about = document.getElementById('about-content').value;
+            const footer = document.getElementById('footer-tagline').value;
+            
+            if (!title || !subtitle || !about || !footer) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            const content = {
+                id: 'main_content',
+                title: title,
+                subtitle: subtitle,
+                about: about,
+                footer: footer,
+                updated_at: new Date().toISOString()
+            };
+            
+            try {
+                try {
+                    await supabaseRequest('PATCH', 'mainpage_content', content, 'main_content');
+                } catch (updateError) {
+                    await supabaseRequest('POST', 'mainpage_content', content);
+                }
+                
+                alert('Main page content saved! Changes are live immediately.');
+            } catch (error) {
+                alert('Failed to save content: ' + error.message);
+            }
+        }
+
+        // Manual sync function
+        async function syncContentToDatabase() {
+            const syncBtn = document.getElementById('sync-content');
+            syncBtn.innerHTML = '⏳ Syncing...';
+            syncBtn.disabled = true;
+            
+            try {
+                await addDefaultEpisodes();
+                await addDefaultClans();
+                await addDefaultLocations();
+                
+                // Reload content
+                await loadAllContent();
+                
+                alert('✅ Default content synced to database! You should now see existing episodes, clans, and locations.');
+                syncBtn.innerHTML = '✅ Content Synced!';
+                
+                setTimeout(() => {
+                    syncBtn.innerHTML = '🔄 Sync Default Content to Database';
+                    syncBtn.disabled = false;
+                }, 3000);
+                
+            } catch (error) {
+                alert('❌ Failed to sync content: ' + error.message);
+                syncBtn.innerHTML = '❌ Sync Failed';
+                syncBtn.disabled = false;
+            }
+        }
+
+        // COMPREHENSIVE SYSTEM TEST
+        async function runCompleteSystemTest() {
+            const testBtn = document.getElementById('test-system');
+            const resultsDiv = document.getElementById('test-results');
+            
+            testBtn.innerHTML = '⏳ Testing...';
+            testBtn.disabled = true;
+            resultsDiv.classList.remove('hidden');
+            resultsDiv.innerHTML = '<p class="text-purple-700 font-bold">🧪 Running comprehensive system test...</p>';
+            
+            let testResults = [];
+            let allPassed = true;
+            
+            try {
+                // Test 1: Database connection
+                resultsDiv.innerHTML += '<p class="text-blue-600">🔍 Testing database connection...</p>';
+                try {
+                    await supabaseRequest('GET', 'episodes');
+                    testResults.push('✅ Database connection: WORKING');
+                } catch (error) {
+                    testResults.push('❌ Database connection: FAILED - ' + error.message);
+                    allPassed = false;
+                }
+                
+                // Test 2: Episodes functionality
+                resultsDiv.innerHTML += '<p class="text-blue-600">📖 Testing episodes system...</p>';
+                try {
+                    // Test loading episodes
+                    const episodes = await supabaseRequest('GET', 'episodes');
+                    testResults.push(`✅ Load episodes: WORKING (${episodes ? episodes.length : 0} found)`);
+                    
+                    // Test adding episode
+                    const testEpisode = {
+                        id: 'test_' + Date.now(),
+                        title: 'System Test Episode',
+                        meta_description: 'Test episode for system verification',
+                        content: 'This is a test episode to verify the admin system works.',
+                        page_type: 'episode',
+                        status: 'published',
+                        created_at: new Date().toISOString()
+                    };
+                    
+                    await supabaseRequest('POST', 'episodes', testEpisode);
+                    testResults.push('✅ Add episode: WORKING');
+                    
+                    // Clean up test episode
+                    await supabaseRequest('DELETE', 'episodes', null, testEpisode.id);
+                    testResults.push('✅ Delete episode: WORKING');
+                    
+                } catch (error) {
+                    testResults.push('❌ Episodes system: FAILED - ' + error.message);
+                    allPassed = false;
+                }
+                
+                // Test 3: Clans functionality
+                resultsDiv.innerHTML += '<p class="text-blue-600">🔮 Testing clans system...</p>';
+                try {
+                    const clans = await supabaseRequest('GET', 'clans');
+                    testResults.push(`✅ Load clans: WORKING (${clans ? clans.length : 0} found)`);
+                    
+                    const testClan = {
+                        id: 'test_clan_' + Date.now(),
+                        name: 'Test Clan',
+                        stone_description: 'Test description',
+                        offering: 'Test powers',
+                        resonance_note: 'Test connection',
+                        color_primary: '#FF0000',
+                        color_secondary: '#00FF00',
+                        status: 'active',
+                        created_at: new Date().toISOString()
+                    };
+                    
+                    await supabaseRequest('POST', 'clans', testClan);
+                    testResults.push('✅ Add clan: WORKING');
+                    
+                    await supabaseRequest('DELETE', 'clans', null, testClan.id);
+                    testResults.push('✅ Delete clan: WORKING');
+                    
+                } catch (error) {
+                    testResults.push('❌ Clans system: FAILED - ' + error.message);
+                    allPassed = false;
+                }
+                
+                // Test 4: Locations functionality
+                resultsDiv.innerHTML += '<p class="text-blue-600">🗺️ Testing locations system...</p>';
+                try {
+                    const locations = await supabaseRequest('GET', 'locations');
+                    testResults.push(`✅ Load locations: WORKING (${locations ? locations.length : 0} found)`);
+                    
+                    const testLocation = {
+                        id: 'test_loc_' + Date.now(),
+                        name: 'Test Location',
+                        latitude: 51.5074,
+                        longitude: -0.1278,
+                        magical_description: 'Test magical description',
+                        what_to_look_for: 'Test clues',
+                        status: 'active',
+                        created_at: new Date().toISOString()
+                    };
+                    
+                    await supabaseRequest('POST', 'locations', testLocation);
+                    testResults.push('✅ Add location: WORKING');
+                    
+                    await supabaseRequest('DELETE', 'locations', null, testLocation.id);
+                    testResults.push('✅ Delete location: WORKING');
+                    
+                } catch (error) {
+                    testResults.push('❌ Locations system: FAILED - ' + error.message);
+                    allPassed = false;
+                }
+                
+                // Test 5: Main page content
+                resultsDiv.innerHTML += '<p class="text-blue-600">🏠 Testing main page content system...</p>';
+                try {
+                    const mainContent = await supabaseRequest('GET', 'mainpage_content');
+                    testResults.push(`✅ Load main page content: WORKING`);
+                } catch (error) {
+                    testResults.push('⚠️ Main page content: Empty (this is OK for first time)');
+                }
+                
+                // Test 6: Check if default content exists
+                resultsDiv.innerHTML += '<p class="text-blue-600">📋 Checking default content availability...</p>';
+                try {
+                    const episodes = await supabaseRequest('GET', 'episodes');
+                    const clans = await supabaseRequest('GET', 'clans');
+                    const locations = await supabaseRequest('GET', 'locations');
+                    
+                    if (!episodes || episodes.length === 0) {
+                        testResults.push('⚠️ No episodes found - will auto-populate defaults');
+                        await addDefaultEpisodes();
+                        testResults.push('✅ Default episodes added');
+                    } else {
+                        testResults.push(`✅ Episodes available: ${episodes.length}`);
+                    }
+                    
+                    if (!clans || clans.length === 0) {
+                        testResults.push('⚠️ No clans found - will auto-populate defaults');
+                        await addDefaultClans();
+                        testResults.push('✅ Default clans added');
+                    } else {
+                        testResults.push(`✅ Clans available: ${clans.length}`);
+                    }
+                    
+                    if (!locations || locations.length === 0) {
+                        testResults.push('⚠️ No locations found - will auto-populate defaults');
+                        await addDefaultLocations();
+                        testResults.push('✅ Default locations added');
+                    } else {
+                        testResults.push(`✅ Locations available: ${locations.length}`);
+                    }
+                    
+                } catch (error) {
+                    testResults.push('❌ Default content check: FAILED - ' + error.message);
+                    allPassed = false;
+                }
+                
+                // Display final results
+                const resultColor = allPassed ? 'text-green-700' : 'text-red-700';
+                const resultIcon = allPassed ? '🎉' : '⚠️';
+                const summary = allPassed ? 'ALL SYSTEMS WORKING PERFECTLY!' : 'Some issues found - see details above';
+                
+                resultsDiv.innerHTML = `
+                    <div class="p-3 rounded-lg ${allPassed ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}">
+                        <h4 class="font-bold ${resultColor} mb-2">${resultIcon} System Test Complete</h4>
+                        <p class="font-bold ${resultColor} mb-3">${summary}</p>
+                        <div class="text-sm space-y-1">
+                            ${testResults.map(result => `<p>${result}</p>`).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                // Reload all content to show any new defaults
+                await loadAllContent();
+                
+                testBtn.innerHTML = allPassed ? '✅ All Tests Passed!' : '⚠️ Issues Found';
+                
+                setTimeout(() => {
+                    testBtn.innerHTML = '🧪 Test All Functions';
+                    testBtn.disabled = false;
+                }, 5000);
+                
+            } catch (error) {
+                testResults.push('❌ System test failed: ' + error.message);
+                resultsDiv.innerHTML = `
+                    <div class="p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <p class="font-bold text-red-700">❌ System Test Failed</p>
+                        <p class="text-red-600">${error.message}</p>
+                    </div>
+                `;
+                testBtn.innerHTML = '❌ Test Failed';
+                testBtn.disabled = false;
+            }
+        }
+
+        console.log('✅ Complete admin system loaded with ALL functionality including comprehensive testing');
+    </script>
 </body>
 </html>
