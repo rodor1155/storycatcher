@@ -1,316 +1,252 @@
-// Website Data Bridge for The Hidden World of London
-// This file connects your admin panel to your main website
+/**
+ * Website Data Bridge
+ * This file bridges the admin panel data with the main website
+ * Now uses DataManager for cross-device compatibility
+ */
 
-class HiddenWorldDataLoader {
-    constructor() {
-        this.data = null;
-        this.initialized = false;
-    }
-
-    // Load data from localStorage or defaults
-    loadData() {
-        try {
-            // First, try to get updated data from admin panel
-            const websiteData = localStorage.getItem('hiddenworld_website_data');
-            
-            if (websiteData) {
-                this.data = JSON.parse(websiteData);
-                console.log('✅ Loaded updated content from admin panel');
-                console.log(`📊 Episodes: ${this.data.episodes?.length || 0}, Clans: ${this.data.clans?.length || 0}, Locations: ${this.data.locations?.length || 0}`);
-            } else {
-                // Fallback to individual localStorage keys
-                this.data = {
-                    episodes: this.getStoredData('hiddenworld_episodes') || this.getDefaultEpisodes(),
-                    clans: this.getStoredData('hiddenworld_clans') || this.getDefaultClans(),
-                    locations: this.getStoredData('hiddenworld_locations') || this.getDefaultLocations(),
-                    mainpage: this.getStoredData('hiddenworld_mainpage_content') || this.getDefaultMainPage(),
-                    last_updated: Date.now()
-                };
-                console.log('📋 Using default content - add content via admin panel to see it here');
-            }
-            
-            this.initialized = true;
-            return this.data;
-            
-        } catch (error) {
-            console.error('❌ Failed to load content:', error);
-            return this.getDefaultData();
-        }
-    }
-
-    // Get stored data from localStorage
-    getStoredData(key) {
-        try {
-            const stored = localStorage.getItem(key);
-            return stored ? JSON.parse(stored) : null;
-        } catch (error) {
-            console.warn('Warning: Could not parse stored data for', key);
-            return null;
-        }
-    }
-
-    // Get all data
-    getData() {
-        if (!this.initialized) {
-            this.loadData();
-        }
-        return this.data;
-    }
-
-    // Get episodes for display on website
-    getEpisodes() {
-        const data = this.getData();
-        return data.episodes || [];
-    }
-
-    // Get clans for display on website
-    getClans() {
-        const data = this.getData();
-        return data.clans || [];
-    }
-
-    // Get locations for display on website
-    getLocations() {
-        const data = this.getData();
-        return data.locations || [];
-    }
-
-    // Get main page content
-    getMainPageContent() {
-        const data = this.getData();
-        return data.mainpage || this.getDefaultMainPage();
-    }
-
-    // Listen for updates from admin panel
-    setupUpdateListener() {
-        // Listen for postMessage from admin panel
-        window.addEventListener('message', (event) => {
-            if (event.data && event.data.type === 'hiddenworld_update') {
-                console.log('📨 Received content update from admin panel');
-                this.data = event.data.data;
-                
-                // Trigger update event for your website to listen to
-                const updateEvent = new CustomEvent('hiddenWorldContentUpdated', {
-                    detail: this.data
-                });
-                document.dispatchEvent(updateEvent);
-                
-                console.log('✅ Content updated! Website can refresh display now.');
-            }
-        });
-
-        // Also listen for localStorage changes (when admin panel updates)
-        window.addEventListener('storage', (event) => {
-            if (event.key === 'hiddenworld_website_data') {
-                console.log('📱 Content updated via localStorage');
-                this.loadData();
-                
-                // Trigger update event
-                const updateEvent = new CustomEvent('hiddenWorldContentUpdated', {
-                    detail: this.data
-                });
-                document.dispatchEvent(updateEvent);
-            }
-        });
-    }
-
-    // Default content (same as admin panel)
-    getDefaultEpisodes() {
-        return [
-            {
-                id: 'ep1',
-                title: 'The Awakening of the Thames Stones',
-                meta_description: 'Discover how the ancient clan stones first awakened along the Thames, calling to children who could hear their magical whispers.',
-                content: '<p>Long ago, when London was just a collection of villages along the Thames, five mysterious stones appeared overnight. Each stone hummed with a different magical frequency...</p><p>The River Clan stone emerged first, glowing blue-green like the deepest part of the Thames. Children walking along the river banks began to hear whispers in languages they had never learned...</p>',
-                created_at: Date.now() - 86400000,
-                image_url: null,
-                page_type: 'episode',
-                status: 'published'
-            },
-            {
-                id: 'ep2',
-                title: 'The Secret of Fleet River',
-                meta_description: 'Follow Maya as she discovers the hidden Fleet River and learns why some waters remember everything.',
-                content: '<p>Maya pressed her ear to the pavement near Blackfriars Bridge. Other children thought she was playing, but Maya could hear something magical...</p><p>Beneath the busy London streets, the Fleet River still flows, carrying messages between the clan stones. Maya was the first to hear its call in over fifty years...</p>',
-                created_at: Date.now() - 172800000,
-                image_url: null,
-                page_type: 'episode',
-                status: 'published'
-            },
-            {
-                id: 'ep3',
-                title: 'The Crystal Garden of Covent Garden',
-                meta_description: 'Explore the hidden crystal garden where the Earth Clan stone teaches children to speak with growing things.',
-                content: '<p>Behind the market stalls of Covent Garden, there is a garden that only appears to children who truly believe in magic...</p><p>Tommy discovered it when he was looking for his lost marble. But what he found instead was a garden where flowers sang and trees offered advice in rustling whispers...</p>',
-                created_at: Date.now() - 259200000,
-                image_url: null,
-                page_type: 'episode',
-                status: 'published'
-            }
-        ];
-    }
-
-    getDefaultClans() {
-        return [
-            {
-                id: 'clan1',
-                name: 'River Clan',
-                stone_description: 'The River Clan stone emerged from the Thames itself, carrying the wisdom of waters that have flowed for thousands of years. It glows with the blue-green light of deep water and hums with the rhythm of tides.',
-                offering: 'The power to understand any language, to flow around obstacles like water, and to hear the stories that rivers tell. Members can communicate with all water creatures and feel the emotions of anyone who has touched the same water.',
-                resonance_note: 'Place your hand on any flowing water and whisper "I hear your stories." The stone will respond when you truly mean it.',
-                color_primary: '#0EA5E9',
-                color_secondary: '#06B6D4',
-                emblem_url: null,
-                status: 'active'
-            },
-            {
-                id: 'clan2',
-                name: 'Earth Clan',
-                stone_description: 'Born from the deep clay beneath London, this stone contains the memories of every tree that ever grew in the city. It glows with warm brown and green light, and smells like fresh soil after rain.',
-                offering: 'The ability to make plants grow, to speak with animals, and to sense the health of the earth. Members can find lost things by asking the ground to remember, and they always know which direction leads home.',
-                resonance_note: 'Plant something with your own hands and whisper "I help you grow." Care for it daily, and the stone will notice your dedication.',
-                color_primary: '#16A34A',
-                color_secondary: '#84CC16',
-                emblem_url: null,
-                status: 'active'
-            },
-            {
-                id: 'clan3',
-                name: 'Sky Clan',
-                stone_description: 'This stone fell from the London sky on a night when all the stars seemed especially bright. It floats slightly above the ground and changes color like the sky throughout the day and night.',
-                offering: 'The gift of flying in dreams that feel completely real, the ability to predict weather by feeling it in your bones, and the power to send messages on the wind. Members can breathe comfortably at any height.',
-                resonance_note: 'On a windy day, spread your arms wide and say "I am ready to soar." If the wind lifts your hair and fills your heart with lightness, the stone has heard you.',
-                color_primary: '#3B82F6',
-                color_secondary: '#8B5CF6',
-                emblem_url: null,
-                status: 'active'
-            },
-            {
-                id: 'clan4',
-                name: 'Fire Clan',
-                stone_description: 'Forged in the great fire of London and cooled in Thames water, this stone burns without consuming and lights without blinding. It pulses with warmth and casts dancing shadows that tell stories.',
-                offering: 'The power to bring warmth to cold hearts, to light any darkness (including the darkness of sadness), and to forge unbreakable friendships. Members can create beautiful things from raw materials and their presence makes others feel brave.',
-                resonance_note: 'Light a candle and speak your deepest wish to the flame. If the fire dances in response and fills you with courage, you have the Fire Clan\'s attention.',
-                color_primary: '#EF4444',
-                color_secondary: '#F59E0B',
-                emblem_url: null,
-                status: 'active'
-            },
-            {
-                id: 'clan5',
-                name: 'Shadow Clan',
-                stone_description: 'The most mysterious stone, it appears as black as midnight but reflects all colors when moonlight touches it. It emerged during London\'s darkest hour and teaches that shadows are not evil, but necessary for light to have meaning.',
-                offering: 'The ability to move unseen when needed, to understand hidden emotions, and to help others face their fears. Members can step into shadows to travel quickly across the city and they see clearly in complete darkness.',
-                resonance_note: 'Stand alone in a shadow and say "I am not afraid of the dark within me or around me." If you feel peaceful rather than frightened, the Shadow Clan recognizes your wisdom.',
-                color_primary: '#6366F1',
-                color_secondary: '#8B5CF6',
-                emblem_url: null,
-                status: 'active'
-            }
-        ];
-    }
-
-    getDefaultLocations() {
-        return [
-            {
-                id: 'loc1',
-                name: "Cleopatra's Needle",
-                latitude: 51.5081,
-                longitude: -0.1195,
-                magical_description: "Here, where Cleopatra's Needle pierces the London sky, the ancient Egyptian magic still hums in the stone. The Thames whispers secrets of empires past, and children who touch the bronze sphinxes at sunset can hear hieroglyphs telling their stories.",
-                what_to_look_for: "Look for the bronze sphinxes at the base - they have tiny scratches that form letters in ancient languages. Notice how the light changes around the obelisk at different times of day, and listen for the sound of ancient chanting on windy afternoons.",
-                image_url: null,
-                status: 'active'
-            },
-            {
-                id: 'loc2',
-                name: "Fleet River",
-                latitude: 51.5134,
-                longitude: -0.1044,
-                magical_description: "The Fleet River still flows beneath your feet, carrying messages between the clan stones. Listen carefully to the stones—they remember when this was a rushing waterway that powered London's first mills and carried away the city's secrets.",
-                what_to_look_for: "Find the Fleet River marker near the bridge, and notice the subtle sound of water that shouldn't be there. Place your ear to the ground near the marker - children with clan stone connections can hear the river's whispered messages.",
-                image_url: null,
-                status: 'active'
-            },
-            {
-                id: 'loc3',
-                name: "Blackfriars Bridge",
-                latitude: 51.511,
-                longitude: -0.103,
-                magical_description: "Where the ancient bridge crosses the Fleet of memory, two worlds meet. The stones here have witnessed a thousand years of London's secrets, from Roman roads to medieval monasteries to the magical awakening of the clan stones.",
-                what_to_look_for: "Stand on the bridge and feel for the vibration beneath—the old river's pulse still beats strong. Look for the small carved symbols on the bridge stones that only appear when the light is just right, usually just after rain.",
-                image_url: null,
-                status: 'active'
-            }
-        ];
-    }
-
-    getDefaultMainPage() {
-        return {
-            hero: {
-                title: 'There is a <span class="magical-text sparkle-effect">✨ hidden world ✨</span><br>beneath London...',
-                subtitle: '🏰 Where ancient stones hold memories, 🌊 forgotten rivers whisper secrets, and the city\'s ✨ magical heart ✨ beats beneath the cobblestones. 🗝️'
-            },
-            episodes: {
-                title: '📚 Recent Episodes',
-                description: 'Follow the unfolding story through glimpses and fragments from the hidden world'
-            },
-            stones: {
-                title: '🔮 The Clan Stones',
-                description: 'Each clan stone carries the essence of London\'s hidden elements. Choose your path and discover what the stones may offer you.'
-            },
-            london: {
-                title: '🗺️ Hidden London',
-                description: 'Discover the magical locations scattered across London where the veil between worlds grows thin'
-            },
-            about: {
-                content: '<div class="text-lg text-slate-300 space-y-6 leading-relaxed"><p>The Hidden World of London is a magical journey of discovery, designed to spark curiosity and wonder in children and adults alike. Through painted stones, hidden locations, and mythical storytelling, we invite you to see London through new eyes.</p><p>Our project celebrates the rich history and mythology of London while creating new stories for the next generation. Every stone is painted with non-toxic materials, every location is safe to explore, and every story is crafted with kindness and imagination.</p><p class="text-london-gold font-semibold">This is London as you\'ve never seen it before—magical, mysterious, and waiting for you to discover its secrets.</p></div><div class="mt-12"><h3 class="text-xl font-cinzel font-semibold mb-4">For Parents & Guardians</h3><p class="text-slate-300">All activities are designed with safety in mind. Stones are painted with child-safe, non-toxic materials. Location clues encourage observation and imagination without requiring dangerous exploration. This is a project about wonder, discovery, and the magic that surrounds us in everyday London.</p></div>'
-            },
-            footer: {
-                tagline: 'Where magic meets the everyday, and London reveals its deepest secrets'
-            }
-        };
-    }
-
-    getDefaultData() {
-        return {
-            episodes: this.getDefaultEpisodes(),
-            clans: this.getDefaultClans(),
-            locations: this.getDefaultLocations(),
-            mainpage: this.getDefaultMainPage(),
-            last_updated: Date.now()
-        };
-    }
+// Import DataManager if not already loaded
+if (typeof window.dataManager === 'undefined') {
+    console.error('❌ DataManager not loaded! Please include data-manager.js first');
 }
 
-// Create global instance
-window.hiddenWorldLoader = new HiddenWorldDataLoader();
-
-// Auto-initialize and setup listeners
-document.addEventListener('DOMContentLoaded', function() {
-    window.hiddenWorldLoader.setupUpdateListener();
-    console.log('🌐 Hidden World data loader ready');
-});
-
-// Export for easy use
-window.getHiddenWorldData = function() {
-    return window.hiddenWorldLoader.getData();
+// Storage keys for localStorage fallback
+const STORAGE_KEYS = {
+    episodes: 'hiddenworld_episodes',
+    clans: 'hiddenworld_clans', 
+    locations: 'hiddenworld_locations',
+    mainpage: 'hiddenworld_mainpage_content'
 };
 
-window.getEpisodes = function() {
-    return window.hiddenWorldLoader.getEpisodes();
-};
+// Get episodes for display on main website
+async function getEpisodes() {
+    try {
+        if (window.dataManager) {
+            const episodes = await window.dataManager.getEpisodes();
+            // Sort by creation date, newest first
+            return episodes.sort((a, b) => b.created_at - a.created_at);
+        }
+    } catch (error) {
+        console.warn('⚠️ Using localStorage fallback for episodes:', error);
+    }
+    
+    // Fallback to localStorage
+    const stored = localStorage.getItem(STORAGE_KEYS.episodes);
+    if (stored) {
+        const episodes = JSON.parse(stored);
+        return episodes.sort((a, b) => b.created_at - a.created_at);
+    }
+    
+    // Default episodes if none stored
+    return getDefaultEpisodes();
+}
 
-window.getClans = function() {
-    return window.hiddenWorldLoader.getClans();
-};
+// Get clans for display on main website
+async function getClans() {
+    try {
+        if (window.dataManager) {
+            return await window.dataManager.getClans();
+        }
+    } catch (error) {
+        console.warn('⚠️ Using localStorage fallback for clans:', error);
+    }
+    
+    // Fallback to localStorage
+    const stored = localStorage.getItem(STORAGE_KEYS.clans);
+    if (stored) {
+        return JSON.parse(stored);
+    }
+    
+    return getDefaultClans();
+}
 
-window.getLocations = function() {
-    return window.hiddenWorldLoader.getLocations();
-};
+// Get locations for display on main website
+async function getLocations() {
+    try {
+        if (window.dataManager) {
+            return await window.dataManager.getLocations();
+        }
+    } catch (error) {
+        console.warn('⚠️ Using localStorage fallback for locations:', error);
+    }
+    
+    // Fallback to localStorage
+    const stored = localStorage.getItem(STORAGE_KEYS.locations);
+    if (stored) {
+        return JSON.parse(stored);
+    }
+    
+    return getDefaultLocations();
+}
 
-window.getMainPageContent = function() {
-    return window.hiddenWorldLoader.getMainPageContent();
-};
+// Get main page content
+function getMainPageContent() {
+    const stored = localStorage.getItem(STORAGE_KEYS.mainpage);
+    if (stored) {
+        return JSON.parse(stored);
+    }
+    
+    // Default main page content
+    return {
+        hero_title: 'The Hidden World of London',
+        hero_subtitle: 'Magical stories and secret places waiting to be discovered by children aged 8-12',
+        episodes_heading: 'Magical Episodes',
+        stones_heading: 'Discover Your Clan Stone', 
+        london_heading: 'Secret Places in London',
+        about_content: 'Welcome to a London where magic hides in plain sight. Every bridge has a story, every stone remembers, and some children can hear the city\'s ancient secrets. Explore episodes filled with wonder, discover which clan stone calls to you, and learn about the magical places scattered throughout our amazing city.',
+        footer_tagline: 'Where London\'s magic lives ✨'
+    };
+}
 
-console.log('✨ Hidden World Website Data Bridge loaded');
+// === DEFAULT DATA FUNCTIONS ===
+
+function getDefaultEpisodes() {
+    return [
+        {
+            id: 'ep1',
+            title: 'The Awakening of the Thames Stones',
+            meta_description: 'Discover how the ancient clan stones first awakened along the Thames, calling to children who could hear their magical whispers.',
+            content: '<p>Long ago, when London was just a collection of villages along the Thames, five mysterious stones appeared overnight. Each stone hummed with a different magical frequency...</p><p>The River Clan stone emerged first, glowing blue-green like the deepest part of the Thames. Children walking along the river banks began to hear whispers in languages they had never learned...</p>',
+            created_at: Date.now() - 86400000,
+            image_url: null,
+            page_type: 'episode',
+            status: 'published'
+        },
+        {
+            id: 'ep2', 
+            title: 'The Secret of Fleet River',
+            meta_description: 'Follow Maya as she discovers the hidden Fleet River and learns why some waters remember everything.',
+            content: '<p>Maya pressed her ear to the pavement near Blackfriars Bridge. Other children thought she was playing, but Maya could hear something magical...</p><p>Beneath the busy London streets, the Fleet River still flows, carrying messages between the clan stones. Maya was the first to hear its call in over fifty years...</p>',
+            created_at: Date.now() - 172800000,
+            image_url: null,
+            page_type: 'episode',
+            status: 'published'
+        },
+        {
+            id: 'ep3',
+            title: 'The Crystal Garden of Covent Garden', 
+            meta_description: 'Explore the hidden crystal garden where the Earth Clan stone teaches children to speak with growing things.',
+            content: '<p>Behind the market stalls of Covent Garden, there is a garden that only appears to children who truly believe in magic...</p><p>Tommy discovered it when he was looking for his lost marble. But what he found instead was a garden where flowers sang and trees offered advice in rustling whispers...</p>',
+            created_at: Date.now() - 259200000,
+            image_url: null,
+            page_type: 'episode',
+            status: 'published'
+        }
+    ];
+}
+
+function getDefaultClans() {
+    return [
+        {
+            id: 'clan1',
+            name: 'River Clan',
+            stone_description: 'The River Clan stone emerged from the Thames itself, carrying the wisdom of waters that have flowed for thousands of years. It glows with the blue-green light of deep water and hums with the rhythm of tides.',
+            offering: 'The power to understand any language, to flow around obstacles like water, and to hear the stories that rivers tell. Members can communicate with all water creatures and feel the emotions of anyone who has touched the same water.',
+            resonance_note: 'Place your hand on any flowing water and whisper "I hear your stories." The stone will respond when you truly mean it.',
+            color_primary: '#0EA5E9',
+            color_secondary: '#06B6D4',
+            emblem_url: null,
+            status: 'active'
+        },
+        {
+            id: 'clan2',
+            name: 'Sky Clan',
+            stone_description: 'High above London, where the pigeons nest on St. Paul\'s Cathedral, the Sky Clan stone catches every whisper carried by the wind. It shimmers like captured starlight and hums with the frequency of dreams taking flight.',
+            offering: 'The gift of understanding the language of birds, the ability to find lost things by following the wind, and the power to send messages through clouds. Members can sense weather changes and feel the emotions of anyone who has looked up at the same sky.',
+            resonance_note: 'Stand on any high place in London, spread your arms wide, and whisper to the wind "I am ready to fly." The stone will call to those who truly wish to soar.',
+            color_primary: '#3B82F6',
+            color_secondary: '#8B5CF6',
+            emblem_url: null,
+            status: 'active'
+        },
+        {
+            id: 'clan3',
+            name: 'Earth Clan',
+            stone_description: 'Deep beneath the streets of London, where the old Roman foundations still stand, the Earth Clan stone pulses with the heartbeat of the city itself. It appears as rough granite but glows with inner warmth like embers in a fireplace.',
+            offering: 'The ability to speak with growing things, to find hidden passages and secret doors, and to sense the history held in stones and soil. Members can make plants grow faster and understand the stories that buildings tell.',
+            resonance_note: 'Place both hands on bare earth (even in a small garden or park) and whisper "I hear the deep songs." The stone responds to those who listen to what has been growing for centuries.',
+            color_primary: '#059669',
+            color_secondary: '#D97706',
+            emblem_url: null,
+            status: 'active'
+        },
+        {
+            id: 'clan4',
+            name: 'Fire Clan',
+            stone_description: 'Born from the Great Fire of London in 1666, the Fire Clan stone holds the memory of transformation and renewal. It appears as smooth obsidian but warm to the touch, with flames that dance just beneath its surface.',
+            offering: 'The power to kindle warmth in cold hearts, to see through illusions and lies, and to light the way in dark places. Members can sense danger before it arrives and inspire courage in others during difficult times.',
+            resonance_note: 'Light a single candle and stare into the flame while whispering "I carry light in darkness." The stone calls to those who are willing to be a beacon for others.',
+            color_primary: '#DC2626',
+            color_secondary: '#F59E0B',
+            emblem_url: null,
+            status: 'active'
+        },
+        {
+            id: 'clan5',
+            name: 'Shadow Clan',
+            stone_description: 'The Shadow Clan stone hides in the spaces between light and dark, in the quiet corners where secrets gather. It appears different to each person who sees it, but always seems to absorb light rather than reflect it.',
+            offering: 'The gift of moving unseen when needed, of hearing secrets whispered in shadows, and of understanding the thoughts of creatures that prefer darkness. Members can find lost things and help others discover hidden truths about themselves.',
+            resonance_note: 'Stand in your own shadow at midday and whisper "I embrace what is hidden." The stone reveals itself to those who are not afraid of mysteries.',
+            color_primary: '#6B7280',
+            color_secondary: '#4C1D95',
+            emblem_url: null,
+            status: 'active'
+        }
+    ];
+}
+
+function getDefaultLocations() {
+    return [
+        {
+            id: 'loc1',
+            name: 'The Hidden Pool of Hampstead Heath',
+            latitude: 51.5558,
+            longitude: -0.1608,
+            magical_description: 'Deep within Hampstead Heath lies a pool that only appears at dawn and dusk, when the light is neither day nor night. The water reflects not your face, but your heart\'s deepest wish.',
+            what_to_look_for: 'Look for the ancient oak tree with silver bark that seems to shimmer. The pool appears in its shadow when you whisper "Show me wonder."',
+            image_url: null,
+            status: 'active'
+        },
+        {
+            id: 'loc2', 
+            name: 'The Whispering Gallery\'s Secret Door',
+            latitude: 51.5138,
+            longitude: -0.0984,
+            magical_description: 'In St. Paul\'s Cathedral\'s famous Whispering Gallery, there is one stone that whispers back. Touch it with your ear pressed close, and you can hear the conversations of London\'s magical creatures from across the centuries.',
+            what_to_look_for: 'Find the stone that feels warm when all others are cool. It\'s marked with a tiny carving of a feather that only children can see clearly.',
+            image_url: null,
+            status: 'active'
+        },
+        {
+            id: 'loc3',
+            name: 'The Time Garden of Greenwich',
+            latitude: 51.4769,
+            longitude: -0.0005,
+            magical_description: 'Where the Prime Meridian crosses through Greenwich Park, there grows a garden where each flower blooms in a different season. Here, time moves differently, and you might glimpse London as it was, or as it will be.',
+            what_to_look_for: 'Stand exactly on the meridian line at sunset. Look for flowers that shouldn\'t be blooming in the current season - they mark the entrance to the Time Garden.',
+            image_url: null,
+            status: 'active'
+        },
+        {
+            id: 'loc4',
+            name: 'The Underground Library of King\'s Cross',
+            latitude: 51.5308,
+            longitude: -0.1238,
+            magical_description: 'Beneath the bustling King\'s Cross Station lies a library where books write themselves, recording the stories of every journey that begins or ends above. The librarian is a very old mouse who wears tiny spectacles.',
+            what_to_look_for: 'Listen for the sound of pages turning beneath the noise of trains. Find the platform tile that sounds hollow when tapped, and whisper "I seek the stories that travel."',
+            image_url: null,
+            status: 'active'
+        },
+        {
+            id: 'loc5',
+            name: 'The Floating Market of Regent\'s Canal',
+            latitude: 51.5407,
+            longitude: -0.1337,
+            magical_description: 'On misty mornings, a market appears on the waters of Regent\'s Canal, selling memories, dreams, and bottled laughter. The vendors are children who learned the secret of walking on water by believing it was possible.',
+            what_to_look_for: 'Wake early on foggy days and look for reflections in the water that don\'t match what\'s above. The market only appears for those who truly believe in impossible things.',
+            image_url: null,
+            status: 'active'
+        }
+    ];
+}
+
+console.log('🌐 Website data bridge loaded with database support');

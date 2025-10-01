@@ -1,5 +1,57 @@
 // Simple Admin System for The Hidden World of London - RESET VERSION
-// Back to localStorage but with proper website integration
+// Back to localStorage but with proper website integration + Database sync
+
+// Database Integration Functions
+async function syncToDatabase(type, data) {
+    try {
+        if (window.dataManager) {
+            if (type === 'episodes') {
+                await window.dataManager.saveEpisode(data);
+            } else if (type === 'clans') {
+                await window.dataManager.saveClan(data);
+            } else if (type === 'locations') {
+                await window.dataManager.saveLocation(data);
+            }
+            console.log('✅ Synced to database:', type, data.id);
+        }
+    } catch (error) {
+        console.warn('⚠️ Database sync failed (content saved locally):', error);
+    }
+}
+
+async function deleteFromDatabase(type, id) {
+    try {
+        if (window.dataManager) {
+            if (type === 'episodes') {
+                await window.dataManager.deleteEpisode(id);
+            } else if (type === 'clans') {
+                await window.dataManager.deleteClan(id);
+            } else if (type === 'locations') {
+                await window.dataManager.deleteLocation(id);
+            }
+            console.log('🗑️ Deleted from database:', type, id);
+        }
+    } catch (error) {
+        console.warn('⚠️ Database delete failed:', error);
+    }
+}
+
+async function loadFromDatabase(type) {
+    try {
+        if (window.dataManager) {
+            if (type === 'episodes') {
+                return await window.dataManager.getEpisodes();
+            } else if (type === 'clans') {
+                return await window.dataManager.getClans();
+            } else if (type === 'locations') {
+                return await window.dataManager.getLocations();
+            }
+        }
+    } catch (error) {
+        console.warn('⚠️ Database load failed, using localStorage:', error);
+    }
+    return null;
+}
 
 // Configuration
 const ADMIN_PASSWORD = 'hiddenworld2024';
@@ -374,6 +426,13 @@ function addEpisode(event) {
     // Save to localStorage
     localStorage.setItem(STORAGE_KEYS.episodes, JSON.stringify(episodes));
     
+    // Sync to database
+    if (isEditing) {
+        syncToDatabase('episodes', episodes[episodeIndex]);
+    } else {
+        syncToDatabase('episodes', episode);
+    }
+    
     // Update the website's data file
     updateWebsiteData();
     
@@ -646,6 +705,10 @@ function deleteEpisode(episodeId) {
         const episodes = getStoredData('episodes');
         const filtered = episodes.filter(ep => ep.id !== episodeId);
         localStorage.setItem(STORAGE_KEYS.episodes, JSON.stringify(filtered));
+        
+        // Delete from database
+        deleteFromDatabase('episodes', episodeId);
+        
         updateWebsiteData();
         loadEpisodes();
         showSuccess('Episode deleted successfully!');
@@ -730,6 +793,14 @@ function addClan(event) {
         }
         
         localStorage.setItem(STORAGE_KEYS.clans, JSON.stringify(clans));
+        
+        // Sync to database
+        if (isEditing) {
+            syncToDatabase('clans', clans[clanIndex]);
+        } else {
+            syncToDatabase('clans', clan);
+        }
+        
         updateWebsiteData();
         
         // Reset form to create mode
@@ -938,6 +1009,10 @@ function deleteClan(clanId) {
         const clans = getStoredData('clans');
         const filtered = clans.filter(clan => clan.id !== clanId);
         localStorage.setItem(STORAGE_KEYS.clans, JSON.stringify(filtered));
+        
+        // Delete from database
+        deleteFromDatabase('clans', clanId);
+        
         updateWebsiteData();
         loadClans();
         showSuccess('Clan stone deleted successfully!');
@@ -1021,6 +1096,14 @@ function addLocation(event) {
         }
         
         localStorage.setItem(STORAGE_KEYS.locations, JSON.stringify(locations));
+        
+        // Sync to database
+        if (isEditing) {
+            syncToDatabase('locations', locations[locationIndex]);
+        } else {
+            syncToDatabase('locations', location);
+        }
+        
         updateWebsiteData();
         
         // Reset form to create mode
@@ -1216,6 +1299,10 @@ function deleteLocation(locationId) {
         const locations = getStoredData('locations');
         const filtered = locations.filter(loc => loc.id !== locationId);
         localStorage.setItem(STORAGE_KEYS.locations, JSON.stringify(filtered));
+        
+        // Delete from database
+        deleteFromDatabase('locations', locationId);
+        
         updateWebsiteData();
         loadLocations();
         showSuccess('Location deleted successfully!');
