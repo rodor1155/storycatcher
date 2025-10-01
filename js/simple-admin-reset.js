@@ -654,11 +654,16 @@ function deleteEpisode(episodeId) {
 
 // Clan Management
 function addClan(event) {
-    console.log('🔮 Add Clan function called');
+    console.log('🔮 Add/Update Clan function called');
     event.preventDefault();
     
     try {
-        // Get content from editors with debugging
+        // Check if we're editing an existing clan
+        const form = document.getElementById('clan-form');
+        const editingId = form.querySelector('#editing-clan-id');
+        const isEditing = editingId && editingId.value;
+        
+        // Get content from editors
         const clanName = document.getElementById('clan-name').value;
         const originContent = window.EditorManager.getContent('clan-origin') || document.getElementById('clan-origin').value;
         const powersContent = window.EditorManager.getContent('clan-powers') || document.getElementById('clan-powers').value;
@@ -685,37 +690,57 @@ function addClan(event) {
             return;
         }
         
-        const clan = {
-            id: 'clan' + Date.now(),
-            name: clanName,
-            stone_description: originContent,
-            offering: powersContent,
-            resonance_note: connectionContent,
-            color_primary: document.getElementById('clan-color1').value,
-            color_secondary: document.getElementById('clan-color2').value,
-            emblem_url: null,
-            status: 'active'
-        };
-        
         const clans = getStoredData('clans');
-        clans.push(clan);
+        
+        if (isEditing) {
+            // UPDATE existing clan
+            const clanIndex = clans.findIndex(c => c.id === editingId.value);
+            if (clanIndex !== -1) {
+                clans[clanIndex] = {
+                    ...clans[clanIndex], // Keep existing data like id
+                    name: clanName,
+                    stone_description: originContent,
+                    offering: powersContent,
+                    resonance_note: connectionContent,
+                    color_primary: document.getElementById('clan-color1').value,
+                    color_secondary: document.getElementById('clan-color2').value,
+                    updated_at: Date.now()
+                };
+                
+                console.log('📝 Updated clan:', editingId.value);
+                showSuccess('Clan stone updated successfully!');
+            }
+        } else {
+            // CREATE new clan
+            const clan = {
+                id: 'clan' + Date.now(),
+                name: clanName,
+                stone_description: originContent,
+                offering: powersContent,
+                resonance_note: connectionContent,
+                color_primary: document.getElementById('clan-color1').value,
+                color_secondary: document.getElementById('clan-color2').value,
+                emblem_url: null,
+                status: 'active'
+            };
+            
+            clans.push(clan);
+            console.log('➕ Created new clan');
+            showSuccess('Clan stone added successfully with rich formatting!');
+        }
         
         localStorage.setItem(STORAGE_KEYS.clans, JSON.stringify(clans));
         updateWebsiteData();
         
-        // Clear form including editors
-        document.getElementById('clan-form').reset();
-        window.EditorManager.clear('clan-origin');
-        window.EditorManager.clear('clan-powers');
-        window.EditorManager.clear('clan-connection');
+        // Reset form to create mode
+        cancelClanEdit();
         
         loadClans();
-        showSuccess('Clan stone added successfully with rich formatting!');
-        console.log('✅ Clan added successfully');
+        console.log('✅ Clan operation completed');
         
     } catch (error) {
-        console.error('❌ Error adding clan:', error);
-        alert('Error adding clan: ' + error.message);
+        console.error('❌ Error with clan:', error);
+        alert('Error with clan: ' + error.message);
     }
 }
 
@@ -732,9 +757,14 @@ function loadClans() {
         <div class="content-item">
             <div class="flex justify-between items-start mb-2">
                 <h3 class="font-bold text-gray-800">${clan.name}</h3>
-                <button onclick="deleteClan('${clan.id}')" class="btn-danger text-sm">
-                    <i class="fas fa-trash"></i>
-                </button>
+                <div class="flex space-x-2">
+                    <button onclick="editClan('${clan.id}')" class="btn-success text-sm" title="Edit this clan">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteClan('${clan.id}')" class="btn-danger text-sm" title="Delete this clan">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
             </div>
             <div class="flex items-center mb-2">
                 <div class="w-4 h-4 rounded-full mr-2" style="background: linear-gradient(45deg, ${clan.color_primary}, ${clan.color_secondary})"></div>
@@ -742,6 +772,165 @@ function loadClans() {
             </div>
         </div>
     `).join('');
+}
+
+// Clan editing functionality
+function editClan(clanId) {
+    console.log('🔮 Editing clan:', clanId);
+    
+    // Find the clan
+    const clans = getStoredData('clans');
+    const clan = clans.find(c => c.id === clanId);
+    
+    if (!clan) {
+        alert('Clan not found!');
+        return;
+    }
+    
+    // Switch to clans tab if not already there
+    showTab('clans');
+    
+    // Scroll to the form
+    setTimeout(() => {
+        const form = document.getElementById('clan-form');
+        if (form) {
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // Populate the form
+        populateClanForm(clan);
+        
+        // Show editing indicator
+        showClanEditingMessage(clan.name);
+        
+    }, 100);
+}
+
+// Populate clan form with existing data
+function populateClanForm(clan) {
+    console.log('🔮 Populating clan form with data');
+    
+    // Fill basic fields
+    document.getElementById('clan-name').value = clan.name;
+    document.getElementById('clan-color1').value = clan.color_primary;
+    document.getElementById('clan-color2').value = clan.color_secondary;
+    
+    // Fill rich text editor content
+    setTimeout(() => {
+        const originEditor = window.EditorManager.editors['clan-origin'];
+        const powersEditor = window.EditorManager.editors['clan-powers'];
+        const connectionEditor = window.EditorManager.editors['clan-connection'];
+        
+        if (originEditor) {
+            originEditor.root.innerHTML = clan.stone_description;
+        } else {
+            document.getElementById('clan-origin').value = clan.stone_description;
+        }
+        
+        if (powersEditor) {
+            powersEditor.root.innerHTML = clan.offering;
+        } else {
+            document.getElementById('clan-powers').value = clan.offering;
+        }
+        
+        if (connectionEditor) {
+            connectionEditor.root.innerHTML = clan.resonance_note;
+        } else {
+            document.getElementById('clan-connection').value = clan.resonance_note;
+        }
+        
+        console.log('✅ Populated clan form');
+    }, 200);
+    
+    // Change form to update mode
+    setClanFormToUpdateMode(clan.id);
+}
+
+// Set clan form to update mode
+function setClanFormToUpdateMode(clanId) {
+    const form = document.getElementById('clan-form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    // Change submit button
+    submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Update Clan Stone';
+    submitBtn.classList.remove('btn-primary');
+    submitBtn.classList.add('bg-orange-500', 'hover:bg-orange-600');
+    
+    // Add hidden field for clan ID
+    let hiddenId = form.querySelector('#editing-clan-id');
+    if (!hiddenId) {
+        hiddenId = document.createElement('input');
+        hiddenId.type = 'hidden';
+        hiddenId.id = 'editing-clan-id';
+        form.appendChild(hiddenId);
+    }
+    hiddenId.value = clanId;
+    
+    // Add cancel button
+    let cancelBtn = form.querySelector('#cancel-clan-edit-btn');
+    if (!cancelBtn) {
+        cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.id = 'cancel-clan-edit-btn';
+        cancelBtn.className = 'ml-4 bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-2 rounded-lg';
+        cancelBtn.innerHTML = '<i class="fas fa-times mr-2"></i>Cancel';
+        cancelBtn.onclick = cancelClanEdit;
+        submitBtn.parentNode.appendChild(cancelBtn);
+    }
+    
+    console.log('🔄 Clan form switched to update mode');
+}
+
+// Cancel clan editing
+function cancelClanEdit() {
+    const form = document.getElementById('clan-form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const hiddenId = form.querySelector('#editing-clan-id');
+    const cancelBtn = form.querySelector('#cancel-clan-edit-btn');
+    
+    // Reset form
+    form.reset();
+    window.EditorManager.clear('clan-origin');
+    window.EditorManager.clear('clan-powers');
+    window.EditorManager.clear('clan-connection');
+    
+    // Reset submit button
+    submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Add Clan Stone';
+    submitBtn.classList.add('btn-primary');
+    submitBtn.classList.remove('bg-orange-500', 'hover:bg-orange-600');
+    
+    // Remove hidden ID and cancel button
+    if (hiddenId) hiddenId.remove();
+    if (cancelBtn) cancelBtn.remove();
+    
+    hideClanEditingMessage();
+    console.log('❌ Clan edit cancelled');
+}
+
+// Show clan editing message
+function showClanEditingMessage(clanName) {
+    const container = document.querySelector('#clans-tab .admin-card');
+    let msg = container.querySelector('#clan-editing-message');
+    
+    if (!msg) {
+        msg = document.createElement('div');
+        msg.id = 'clan-editing-message';
+        msg.className = 'mb-4 p-3 bg-orange-100 border border-orange-300 rounded text-orange-800';
+        container.insertBefore(msg, container.firstChild);
+    }
+    
+    msg.innerHTML = `
+        <i class="fas fa-edit mr-2"></i>
+        <strong>Editing Clan:</strong> "${clanName}"
+    `;
+}
+
+// Hide clan editing message
+function hideClanEditingMessage() {
+    const msg = document.querySelector('#clan-editing-message');
+    if (msg) {
+        msg.remove();
+    }
 }
 
 function deleteClan(clanId) {
@@ -757,32 +946,91 @@ function deleteClan(clanId) {
 
 // Location Management
 function addLocation(event) {
+    console.log('🗺️ Add/Update Location function called');
     event.preventDefault();
     
-    const location = {
-        id: 'loc' + Date.now(),
-        name: document.getElementById('location-name').value,
-        latitude: parseFloat(document.getElementById('location-lat').value),
-        longitude: parseFloat(document.getElementById('location-lng').value),
-        magical_description: window.EditorManager.getContent('location-magic') || document.getElementById('location-magic').value,
-        what_to_look_for: window.EditorManager.getContent('location-lookfor') || document.getElementById('location-lookfor').value,
-        image_url: null,
-        status: 'active'
-    };
-    
-    const locations = getStoredData('locations');
-    locations.push(location);
-    
-    localStorage.setItem(STORAGE_KEYS.locations, JSON.stringify(locations));
-    updateWebsiteData();
-    
-    // Clear form including editors
-    document.getElementById('location-form').reset();
-    window.EditorManager.clear('location-magic');
-    window.EditorManager.clear('location-lookfor');
-    
-    loadLocations();
-    showSuccess('Location added successfully with rich formatting!');
+    try {
+        // Check if we're editing an existing location
+        const form = document.getElementById('location-form');
+        const editingId = form.querySelector('#editing-location-id');
+        const isEditing = editingId && editingId.value;
+        
+        // Get content from editors and form fields
+        const locationName = document.getElementById('location-name').value;
+        const latitude = parseFloat(document.getElementById('location-lat').value);
+        const longitude = parseFloat(document.getElementById('location-lng').value);
+        const magicDescription = window.EditorManager.getContent('location-magic') || document.getElementById('location-magic').value;
+        const lookForContent = window.EditorManager.getContent('location-lookfor') || document.getElementById('location-lookfor').value;
+        
+        // Validate required fields
+        if (!locationName || locationName.trim() === '') {
+            alert('Please enter a location name!');
+            return;
+        }
+        
+        if (isNaN(latitude) || isNaN(longitude)) {
+            alert('Please enter valid latitude and longitude!');
+            return;
+        }
+        
+        if (!magicDescription || magicDescription.trim() === '') {
+            alert('Please enter the magical description!');
+            return;
+        }
+        
+        if (!lookForContent || lookForContent.trim() === '') {
+            alert('Please enter what to look for!');
+            return;
+        }
+        
+        const locations = getStoredData('locations');
+        
+        if (isEditing) {
+            // UPDATE existing location
+            const locationIndex = locations.findIndex(l => l.id === editingId.value);
+            if (locationIndex !== -1) {
+                locations[locationIndex] = {
+                    ...locations[locationIndex], // Keep existing data like id
+                    name: locationName,
+                    latitude: latitude,
+                    longitude: longitude,
+                    magical_description: magicDescription,
+                    what_to_look_for: lookForContent,
+                    updated_at: Date.now()
+                };
+                
+                console.log('📝 Updated location:', editingId.value);
+                showSuccess('Location updated successfully!');
+            }
+        } else {
+            // CREATE new location
+            const location = {
+                id: 'loc' + Date.now(),
+                name: locationName,
+                latitude: latitude,
+                longitude: longitude,
+                magical_description: magicDescription,
+                what_to_look_for: lookForContent,
+                image_url: null,
+                status: 'active'
+            };
+            
+            locations.push(location);
+            console.log('➕ Created new location');
+            showSuccess('Location added successfully with rich formatting!');
+        }
+        
+        localStorage.setItem(STORAGE_KEYS.locations, JSON.stringify(locations));
+        updateWebsiteData();
+        
+        // Reset form to create mode
+        cancelLocationEdit();
+        loadLocations();
+        
+    } catch (error) {
+        console.error('❌ Error in addLocation:', error);
+        alert('Error saving location: ' + error.message);
+    }
 }
 
 function loadLocations() {
@@ -798,14 +1046,169 @@ function loadLocations() {
         <div class="content-item">
             <div class="flex justify-between items-start mb-2">
                 <h3 class="font-bold text-gray-800">${location.name}</h3>
-                <button onclick="deleteLocation('${location.id}')" class="btn-danger text-sm">
-                    <i class="fas fa-trash"></i>
-                </button>
+                <div class="flex space-x-2">
+                    <button onclick="editLocation('${location.id}')" class="btn-success text-sm" title="Edit this location">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteLocation('${location.id}')" class="btn-danger text-sm" title="Delete this location">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
             </div>
             <p class="text-gray-600 text-sm mb-1">${stripHtmlForDisplay(location.magical_description, 100)}</p>
             <p class="text-xs text-gray-400">📍 ${location.latitude}, ${location.longitude}</p>
         </div>
     `).join('');
+}
+
+function editLocation(locationId) {
+    console.log('🗺️ Editing location:', locationId);
+    
+    // Find the location
+    const locations = getStoredData('locations');
+    const location = locations.find(l => l.id === locationId);
+    
+    if (!location) {
+        alert('Location not found!');
+        return;
+    }
+    
+    // Switch to locations tab if not already there
+    showTab('locations');
+    
+    // Scroll to the form
+    setTimeout(() => {
+        const form = document.getElementById('location-form');
+        if (form) {
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // Populate the form
+        populateLocationForm(location);
+        
+        // Show editing indicator
+        showLocationEditingMessage(location.name);
+        
+    }, 100);
+}
+
+// Populate location form with existing data
+function populateLocationForm(location) {
+    console.log('🗺️ Populating location form with data');
+    
+    // Fill basic fields
+    document.getElementById('location-name').value = location.name;
+    document.getElementById('location-lat').value = location.latitude;
+    document.getElementById('location-lng').value = location.longitude;
+    
+    // Fill rich text editor content
+    setTimeout(() => {
+        const magicEditor = window.EditorManager.editors['location-magic'];
+        const lookforEditor = window.EditorManager.editors['location-lookfor'];
+        
+        if (magicEditor) {
+            magicEditor.root.innerHTML = location.magical_description;
+        } else {
+            document.getElementById('location-magic').value = location.magical_description;
+        }
+        
+        if (lookforEditor) {
+            lookforEditor.root.innerHTML = location.what_to_look_for;
+        } else {
+            document.getElementById('location-lookfor').value = location.what_to_look_for;
+        }
+        
+        console.log('✅ Populated location form');
+    }, 200);
+    
+    // Change form to update mode
+    setLocationFormToUpdateMode(location.id);
+}
+
+// Set location form to update mode
+function setLocationFormToUpdateMode(locationId) {
+    const form = document.getElementById('location-form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    // Change submit button
+    submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Update Location';
+    submitBtn.classList.remove('btn-primary');
+    submitBtn.classList.add('bg-orange-500', 'hover:bg-orange-600');
+    
+    // Add hidden field for location ID
+    let hiddenId = form.querySelector('#editing-location-id');
+    if (!hiddenId) {
+        hiddenId = document.createElement('input');
+        hiddenId.type = 'hidden';
+        hiddenId.id = 'editing-location-id';
+        form.appendChild(hiddenId);
+    }
+    hiddenId.value = locationId;
+    
+    // Add cancel button
+    let cancelBtn = form.querySelector('#cancel-location-edit-btn');
+    if (!cancelBtn) {
+        cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.id = 'cancel-location-edit-btn';
+        cancelBtn.className = 'ml-4 bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-2 rounded-lg';
+        cancelBtn.innerHTML = '<i class="fas fa-times mr-2"></i>Cancel';
+        cancelBtn.onclick = cancelLocationEdit;
+        submitBtn.parentNode.appendChild(cancelBtn);
+    }
+    
+    console.log('🔄 Location form switched to update mode');
+}
+
+// Cancel location editing
+function cancelLocationEdit() {
+    const form = document.getElementById('location-form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const hiddenId = form.querySelector('#editing-location-id');
+    const cancelBtn = form.querySelector('#cancel-location-edit-btn');
+    
+    // Reset form
+    form.reset();
+    window.EditorManager.clear('location-magic');
+    window.EditorManager.clear('location-lookfor');
+    
+    // Reset submit button
+    submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Add Location';
+    submitBtn.classList.add('btn-primary');
+    submitBtn.classList.remove('bg-orange-500', 'hover:bg-orange-600');
+    
+    // Remove hidden ID and cancel button
+    if (hiddenId) hiddenId.remove();
+    if (cancelBtn) cancelBtn.remove();
+    
+    hideLocationEditingMessage();
+    console.log('❌ Location edit cancelled');
+}
+
+// Show location editing message
+function showLocationEditingMessage(locationName) {
+    const container = document.querySelector('#locations-tab .admin-card');
+    let msg = container.querySelector('#location-editing-message');
+    
+    if (!msg) {
+        msg = document.createElement('div');
+        msg.id = 'location-editing-message';
+        msg.className = 'mb-4 p-3 bg-orange-100 border border-orange-300 rounded text-orange-800';
+        container.insertBefore(msg, container.firstChild);
+    }
+    
+    msg.innerHTML = `
+        <i class="fas fa-edit mr-2"></i>
+        <strong>Editing Location:</strong> "${locationName}"
+    `;
+}
+
+// Hide location editing message
+function hideLocationEditingMessage() {
+    const msg = document.querySelector('#location-editing-message');
+    if (msg) {
+        msg.remove();
+    }
 }
 
 function deleteLocation(locationId) {
