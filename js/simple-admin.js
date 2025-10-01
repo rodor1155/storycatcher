@@ -1003,7 +1003,12 @@ function initializeDragAndDrop() {
 // Content Management Functions
 async function loadAllContent() {
     try {
-        // Check for migration first
+        // Initialize database first (creates tables if needed)
+        if (window.databaseInit) {
+            await window.databaseInit.initialize();
+        }
+        
+        // Check for migration from localStorage
         await checkForLocalStorageMigration();
         
         // Load all content from API
@@ -1017,7 +1022,27 @@ async function loadAllContent() {
         
     } catch (error) {
         console.error('❌ Failed to load content:', error);
-        alert('Failed to load content: ' + error.message);
+        
+        // Show user-friendly error message
+        const errorMsg = error.message.includes('404') 
+            ? 'Setting up database for first use... Please refresh the page in a moment.'
+            : `Failed to load content: ${error.message}`;
+            
+        alert(errorMsg);
+        
+        // If it's a 404, try to initialize again after a short delay
+        if (error.message.includes('404')) {
+            setTimeout(async () => {
+                try {
+                    if (window.databaseInit) {
+                        await window.databaseInit.initialize();
+                        location.reload(); // Refresh page after initialization
+                    }
+                } catch (retryError) {
+                    console.error('❌ Database initialization retry failed:', retryError);
+                }
+            }, 2000);
+        }
     }
 }
 
