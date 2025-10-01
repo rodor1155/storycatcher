@@ -1,60 +1,120 @@
 // Simple Admin System for The Hidden World of London - RESET VERSION
 // Back to localStorage but with proper website integration + Database sync
 
+// Cross-Device Sync Functions
+async function syncToServer(type) {
+    try {
+        const data = getStoredData(type);
+        
+        const response = await fetch('api/update-content.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: type,
+                content: data
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Synced to server:', result.message);
+            showSuccess(`Content synced to all devices! ${result.count} ${type} saved.`);
+            return true;
+        } else {
+            throw new Error('Server sync failed');
+        }
+    } catch (error) {
+        console.warn('⚠️ Server sync failed, content saved locally only:', error.message);
+        showWarning('Content saved locally. May not appear on other devices until sync is restored.');
+        return false;
+    }
+}
+
 // Database Integration Functions
 async function syncToDatabase(type, data) {
     try {
-        if (window.dataManager && window.dataManager.databaseAvailable) {
-            if (type === 'episodes') {
-                await window.dataManager.saveEpisode(data);
-            } else if (type === 'clans') {
-                await window.dataManager.saveClan(data);
-            } else if (type === 'locations') {
-                await window.dataManager.saveLocation(data);
+        // Direct database calls for reliable cross-device sync
+        let response;
+        
+        if (type === 'episodes') {
+            // Try to update existing, then create if not found
+            response = await fetch(`tables/episodes/${data.id}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            if (!response.ok) {
+                // If update failed, try create
+                response = await fetch('tables/episodes', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
             }
-            console.log('✅ Synced to database:', type, data.id);
-        } else {
-            console.log('ℹ️ Database not available, content saved locally only');
+        } else if (type === 'clans') {
+            response = await fetch(`tables/clans/${data.id}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            if (!response.ok) {
+                response = await fetch('tables/clans', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+            }
+        } else if (type === 'locations') {
+            response = await fetch(`tables/locations/${data.id}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            if (!response.ok) {
+                response = await fetch('tables/locations', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+            }
         }
+        
+        if (response && response.ok) {
+            console.log('✅ Synced to database:', type, data.id);
+            return true;
+        } else {
+            console.warn('⚠️ Database sync failed, status:', response?.status);
+            return false;
+        }
+        
     } catch (error) {
-        console.warn('⚠️ Database sync failed (content saved locally):', error.message);
+        console.warn('⚠️ Database sync failed:', error.message);
+        return false;
     }
 }
 
 async function deleteFromDatabase(type, id) {
     try {
-        if (window.dataManager && window.dataManager.databaseAvailable) {
-            if (type === 'episodes') {
-                await window.dataManager.deleteEpisode(id);
-            } else if (type === 'clans') {
-                await window.dataManager.deleteClan(id);
-            } else if (type === 'locations') {
-                await window.dataManager.deleteLocation(id);
-            }
-            console.log('🗑️ Deleted from database:', type, id);
+        const response = await fetch(`tables/${type}/${id}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            console.log('✅ Deleted from database:', type, id);
+            return true;
         } else {
-            console.log('ℹ️ Database not available, deleted locally only');
+            console.warn('⚠️ Database delete failed, status:', response.status);
+            return false;
         }
     } catch (error) {
         console.warn('⚠️ Database delete failed:', error.message);
+        return false;
     }
-}
-
-async function loadFromDatabase(type) {
-    try {
-        if (window.dataManager) {
-            if (type === 'episodes') {
-                return await window.dataManager.getEpisodes();
-            } else if (type === 'clans') {
-                return await window.dataManager.getClans();
-            } else if (type === 'locations') {
-                return await window.dataManager.getLocations();
-            }
-        }
-    } catch (error) {
-        console.warn('⚠️ Database load failed, using localStorage:', error);
-    }
-    return null;
 }
 
 // Configuration
@@ -427,18 +487,22 @@ function addEpisode(event) {
         showSuccess('Episode added successfully as Episode ' + episodes.length + '!');
     }
     
-    // Save to localStorage
-    localStorage.setItem(STORAGE_KEYS.episodes, JSON.stringify(episodes));
-    
-    // Sync to database
+    // Save to database - elderly user just hits save!
+    let success = false;
     if (isEditing) {
-        syncToDatabase('episodes', episodes[episodeIndex]);
+        success = await saveEpisodeToDatabase(episodes[episodeIndex]);
     } else {
-        syncToDatabase('episodes', episode);
+        success = await saveEpisodeToDatabase(episode);
     }
     
-    // Update the website's data file
-    updateWebsiteData();
+    if (success) {
+        // Also save to localStorage as backup
+        localStorage.setItem(STORAGE_KEYS.episodes, JSON.stringify(episodes));
+        showSuccess('Episode saved! It will appear on the website immediately.');
+    } else {
+        showError('Failed to save episode. Please try again.');
+        return;
+    }
     
     // Reset form to create mode
     cancelEpisodeEdit();
@@ -704,18 +768,20 @@ function hideEditingMessage() {
     }
 }
 
-function deleteEpisode(episodeId) {
+async function deleteEpisode(episodeId) {
     if (confirm('Are you sure you want to delete this episode?')) {
         const episodes = getStoredData('episodes');
         const filtered = episodes.filter(ep => ep.id !== episodeId);
-        localStorage.setItem(STORAGE_KEYS.episodes, JSON.stringify(filtered));
+        // Delete from database - elderly user just clicks delete!
+        const success = await deleteFromDatabase('episodes', episodeId);
         
-        // Delete from database
-        deleteFromDatabase('episodes', episodeId);
-        
-        updateWebsiteData();
-        loadEpisodes();
-        showSuccess('Episode deleted successfully!');
+        if (success) {
+            localStorage.setItem(STORAGE_KEYS.episodes, JSON.stringify(filtered));
+            loadEpisodes();
+            showSuccess('Episode deleted! Changes appear on website immediately.');
+        } else {
+            showError('Failed to delete episode. Please try again.');
+        }
     }
 }
 
@@ -796,16 +862,21 @@ function addClan(event) {
             showSuccess('Clan stone added successfully with rich formatting!');
         }
         
-        localStorage.setItem(STORAGE_KEYS.clans, JSON.stringify(clans));
-        
-        // Sync to database
+        // Save to database - elderly user just hits save!
+        let success = false;
         if (isEditing) {
-            syncToDatabase('clans', clans[clanIndex]);
+            success = await saveClanToDatabase(clans[clanIndex]);
         } else {
-            syncToDatabase('clans', clan);
+            success = await saveClanToDatabase(clan);
         }
         
-        updateWebsiteData();
+        if (success) {
+            localStorage.setItem(STORAGE_KEYS.clans, JSON.stringify(clans));
+            showSuccess('Clan saved! It will appear on the website immediately.');
+        } else {
+            showError('Failed to save clan. Please try again.');
+            return;
+        }
         
         // Reset form to create mode
         cancelClanEdit();
@@ -1008,14 +1079,13 @@ function hideClanEditingMessage() {
     }
 }
 
-function deleteClan(clanId) {
+async function deleteClan(clanId) {
     if (confirm('Are you sure you want to delete this clan stone?')) {
         const clans = getStoredData('clans');
         const filtered = clans.filter(clan => clan.id !== clanId);
         localStorage.setItem(STORAGE_KEYS.clans, JSON.stringify(filtered));
         
-        // Delete from database
-        deleteFromDatabase('clans', clanId);
+
         
         updateWebsiteData();
         loadClans();
@@ -1099,16 +1169,21 @@ function addLocation(event) {
             showSuccess('Location added successfully with rich formatting!');
         }
         
-        localStorage.setItem(STORAGE_KEYS.locations, JSON.stringify(locations));
-        
-        // Sync to database
+        // Save to database - elderly user just hits save!
+        let success = false;
         if (isEditing) {
-            syncToDatabase('locations', locations[locationIndex]);
+            success = await saveLocationToDatabase(locations[locationIndex]);
         } else {
-            syncToDatabase('locations', location);
+            success = await saveLocationToDatabase(location);
         }
         
-        updateWebsiteData();
+        if (success) {
+            localStorage.setItem(STORAGE_KEYS.locations, JSON.stringify(locations));
+            showSuccess('Location saved! It will appear on the website immediately.');
+        } else {
+            showError('Failed to save location. Please try again.');
+            return;
+        }
         
         // Reset form to create mode
         cancelLocationEdit();
@@ -1298,14 +1373,13 @@ function hideLocationEditingMessage() {
     }
 }
 
-function deleteLocation(locationId) {
+async function deleteLocation(locationId) {
     if (confirm('Are you sure you want to delete this location?')) {
         const locations = getStoredData('locations');
         const filtered = locations.filter(loc => loc.id !== locationId);
         localStorage.setItem(STORAGE_KEYS.locations, JSON.stringify(filtered));
         
-        // Delete from database
-        deleteFromDatabase('locations', locationId);
+
         
         updateWebsiteData();
         loadLocations();
@@ -1462,35 +1536,20 @@ function stripHtmlForDisplay(html, maxLength = 100) {
 
 // IMPORTANT: Update website data files when content changes
 function updateWebsiteData() {
-    console.log('📤 Content updated! Website will show new content immediately.');
+    console.log('📤 Content updated!');
     
-    // Create a data file that your main website can read
-    const websiteData = {
+    // Trigger JSON file generation notification
+    if (window.jsonGenerator) {
+        window.jsonGenerator.updateJSONFiles();
+    }
+    
+    // Also save to localStorage for immediate preview
+    localStorage.setItem('hiddenworld_website_data', JSON.stringify({
         episodes: getStoredData('episodes'),
         clans: getStoredData('clans'),
         locations: getStoredData('locations'),
-        mainpage: JSON.parse(localStorage.getItem(STORAGE_KEYS.mainpage) || '{}'),
         last_updated: Date.now()
-    };
-    
-    // Save to localStorage with a special key for the website
-    localStorage.setItem('hiddenworld_website_data', JSON.stringify(websiteData));
-    
-    // Also create a global variable for immediate access
-    window.hiddenWorldData = websiteData;
-    
-    // Dispatch event for main website to listen for
-    if (window.opener || window.parent !== window) {
-        try {
-            if (window.opener) {
-                window.opener.postMessage({
-                    type: 'hiddenworld_update',
-                    data: websiteData
-                }, '*');
-            }
-        } catch (e) {
-            console.log('Could not notify parent window:', e);
-        }
+    }));
     }
     
     console.log('✅ Website data updated and ready for visitors!');
@@ -1500,10 +1559,14 @@ function showSuccess(message) {
     document.getElementById('success-text').textContent = message;
     document.getElementById('success-message').classList.remove('hidden');
     
-    // Hide after 3 seconds
+    // Hide after 5 seconds
     setTimeout(() => {
         document.getElementById('success-message').classList.add('hidden');
-    }, 3000);
+    }, 5000);
+}
+
+function showError(message) {
+    alert('❌ ' + message);
 }
 
 // Main Page Content Management

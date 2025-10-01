@@ -155,7 +155,7 @@ async function loadAllData() {
     try {
         console.log('🌐 Starting data load...');
         
-        // Load data using the new DataManager (with database support)
+        // Load data from JSON files with fallbacks
         allEpisodes = await getEpisodes() || [];
         allClans = await getClans() || [];
         allLocations = await getLocations() || [];
@@ -163,23 +163,14 @@ async function loadAllData() {
         console.log('✅ Data loaded successfully');
         console.log(`📊 Episodes: ${allEpisodes.length}, Clans: ${allClans.length}, Locations: ${allLocations.length}`);
         
-        // Ensure we have some data to display
-        if (allEpisodes.length === 0 && allClans.length === 0 && allLocations.length === 0) {
-            console.log('⚠️ No data found, loading defaults...');
-            // Force load defaults if everything is empty
-            allEpisodes = getDefaultEpisodes();
-            allClans = getDefaultClans(); 
-            allLocations = getDefaultLocations();
-        }
-        
     } catch (error) {
-        console.error('❌ Error loading data, using defaults:', error.message);
-        // Fallback to default data to prevent crashes
-        allEpisodes = getDefaultEpisodes() || [];
-        allClans = getDefaultClans() || [];
-        allLocations = getDefaultLocations() || [];
+        console.error('❌ Error loading data:', error.message);
+        // Fallback to hardcoded defaults
+        allEpisodes = getDefaultEpisodes();
+        allClans = getDefaultClans();
+        allLocations = getDefaultLocations();
         
-        console.log('📊 Using default data - Episodes:', allEpisodes.length, 'Clans:', allClans.length, 'Locations:', allLocations.length);
+        console.log('📊 Using fallback data - Episodes:', allEpisodes.length, 'Clans:', allClans.length, 'Locations:', allLocations.length);
     }
 }
 
