@@ -87,13 +87,31 @@ async function getLocations() {
     return getDefaultLocations();
 }
 
-// Get main page content (still from localStorage for now)
-function getMainPageContent() {
-    const stored = localStorage.getItem('hiddenworld_mainpage_content');
-    if (stored) {
-        return JSON.parse(stored);
+// Get main page content from database
+async function getMainPageContent() {
+    try {
+        console.log('🏠 Loading main page content from database...');
+        const content = await supabaseRequest('mainpage_content');
+        
+        if (content && content.length > 0) {
+            console.log('✅ Loaded main page content from database');
+            const data = content[0];
+            return {
+                hero_title: data.title,
+                hero_subtitle: data.subtitle,
+                episodes_heading: 'Magical Episodes',
+                stones_heading: 'Discover Your Clan Stone', 
+                london_heading: 'Secret Places in London',
+                about_content: data.about,
+                footer_tagline: data.footer
+            };
+        }
+    } catch (error) {
+        console.warn('⚠️ Database failed for main page content, using fallback:', error.message);
     }
     
+    // Fallback to defaults
+    console.log('🏠 Using default main page content');
     return {
         hero_title: 'The Hidden World of London',
         hero_subtitle: 'Magical stories and secret places waiting to be discovered by children aged 8-12',

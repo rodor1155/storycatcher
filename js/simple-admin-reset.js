@@ -434,7 +434,7 @@ function showTab(tabName) {
 }
 
 // Episode Management (handles both create and update)
-function addEpisode(event) {
+async function addEpisode(event) {
     event.preventDefault();
     
     // Check if we're editing an existing episode
@@ -786,7 +786,7 @@ async function deleteEpisode(episodeId) {
 }
 
 // Clan Management
-function addClan(event) {
+async function addClan(event) {
     console.log('🔮 Add/Update Clan function called');
     event.preventDefault();
     
@@ -1094,7 +1094,7 @@ async function deleteClan(clanId) {
 }
 
 // Location Management
-function addLocation(event) {
+async function addLocation(event) {
     console.log('🗺️ Add/Update Location function called');
     event.preventDefault();
     

@@ -77,7 +77,7 @@ async function refreshContent() {
         renderClans();
         renderLocations();
         updatePublicMapMarkers();
-        loadMainPageContentFromAdmin(); // Refresh main page content too
+        await loadMainPageContentFromAdmin(); // Refresh main page content too
         console.log('Content refreshed from admin updates');
     } catch (error) {
         console.error('Error refreshing content:', error);
@@ -105,7 +105,7 @@ async function initializeApp() {
         setupInteractivity();
         
         // Load main page content and make elements editable
-        loadMainPageContentFromAdmin();
+        await loadMainPageContentFromAdmin();
         loadSavedContent();
         makeContentEditable();
         
@@ -1063,23 +1063,33 @@ function playMagicalSound(type = 'sparkle') {
     }
 }
 
-// Load main page content from admin system
-function loadMainPageContentFromAdmin() {
-    console.log('📖 Loading main page content from admin...');
+// Load main page content from admin system (database)
+async function loadMainPageContentFromAdmin() {
+    console.log('📖 Loading main page content from database...');
     
-    // Check if there's content saved by admin
-    const storedContent = localStorage.getItem('hiddenworld_mainpage_content');
-    
-    if (storedContent) {
-        try {
-            const content = JSON.parse(storedContent);
-            updateMainPageContent(content);
-            console.log('✅ Main page content loaded from admin system');
-        } catch (error) {
-            console.error('❌ Error parsing main page content:', error);
-        }
-    } else {
-        console.log('ℹ️ No custom content found, using defaults');
+    try {
+        // Use the same function as live-website-data.js
+        const mainPageContent = await getMainPageContent();
+        
+        // Convert to the format expected by updateMainPageContent
+        const content = {
+            hero: {
+                title: mainPageContent.hero_title,
+                subtitle: mainPageContent.hero_subtitle
+            },
+            about: {
+                content: `<p class="text-lg text-slate-300 leading-relaxed">${mainPageContent.about_content}</p>`
+            },
+            footer: {
+                tagline: mainPageContent.footer_tagline
+            }
+        };
+        
+        updateMainPageContent(content);
+        console.log('✅ Main page content loaded from database');
+    } catch (error) {
+        console.error('❌ Error loading main page content from database:', error);
+        console.log('ℹ️ Using default content');
     }
 }
 
