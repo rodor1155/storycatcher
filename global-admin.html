@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hidden World Admin - GLOBAL SYSTEM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="min-h-screen" style="background: linear-gradient(135deg, #1e3a5f 0%, #2d5016 50%, #663399 100%);">
+
+    <!-- Login Section -->
+    <div id="login-section" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white bg-opacity-95 p-8 rounded-lg shadow-2xl w-full max-w-md">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2" style="font-family: 'Cinzel', serif;">🏰 Hidden World</h1>
+                <h2 class="text-xl text-gray-700 mb-4" style="font-family: 'Cinzel', serif;">GLOBAL Admin Portal</h2>
+                <p class="text-gray-600">Enter password to manage your magical world</p>
+                <p class="text-green-700 font-semibold mt-2">✅ Updates visible to ALL visitors globally!</p>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label for="admin-password" class="block text-sm font-medium text-gray-700 mb-2">
+                        🔐 Admin Password
+                    </label>
+                    <input 
+                        type="password" 
+                        id="admin-password" 
+                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-gray-800 text-lg"
+                        placeholder="Enter password..."
+                    >
+                </div>
+                
+                <div id="login-error" style="display: none;" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
+                    ❌ Incorrect password. Please try again.
+                </div>
+                
+                <button 
+                    id="login-button"
+                    class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-lg hover:from-blue-700 hover:to-purple-700 transition duration-200 font-semibold text-lg"
+                >
+                    🚀 Access Global Admin Panel
+                </button>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <a href="index.html" class="text-blue-600 hover:text-blue-800 font-medium">
+                    ← Back to Website
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" style="display: none;" class="min-h-screen text-gray-800">
+        <!-- Header -->
+        <header class="bg-gray-800 shadow-lg border-b-2 border-yellow-500">
+            <div class="max-w-7xl mx-auto px-4 py-4">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-yellow-400" style="font-family: 'Cinzel', serif;">🏰 Hidden World Admin - GLOBAL</h1>
+                    <div class="flex space-x-4">
+                        <a href="index.html" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                            👁️ View Live Site
+                        </a>
+                        <button id="logout-button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                            🚪 Logout
+                        </button>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <p class="text-green-400 font-semibold">✅ All changes are visible to EVERY visitor on ANY device immediately!</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="bg-gray-700 border-b border-gray-600">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex space-x-1">
+                    <button data-tab="episodes" class="tab-button px-6 py-3 text-sm font-medium rounded-t-md bg-blue-600 text-white">
+                        📖 Episodes
+                    </button>
+                    <button data-tab="clans" class="tab-button px-6 py-3 text-sm font-medium rounded-t-md bg-gray-600 text-gray-300">
+                        🔮 Clans
+                    </button>
+                    <button data-tab="locations" class="tab-button px-6 py-3 text-sm font-medium rounded-t-md bg-gray-600 text-gray-300">
+                        🗺️ Locations
+                    </button>
+                    <button data-tab="main-page" class="tab-button px-6 py-3 text-sm font-medium rounded-t-md bg-gray-600 text-gray-300">
+                        🏠 Main Page
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Success Message -->
+        <div id="success-message" style="display: none;" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 text-center">
+            ✅ Success! Your changes are now live on the website FOR ALL VISITORS.
+        </div>
+
+        <!-- Loading Message -->
+        <div id="loading-message" style="display: none;" class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 text-center">
+            ⏳ Saving changes to global database...
+        </div>
+
+        <!-- Content Area -->
+        <main class="max-w-7xl mx-auto px-4 py-6">
+            
+            <!-- Episodes Tab -->
+            <div id="episodes-tab" class="tab-content">
+                <div class="bg-white rounded-lg shadow p-6 mb-8">
+                    <h2 class="text-xl font-bold mb-4">📝 Add New Episode</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="episode-title" class="block text-sm font-medium mb-1">Episode Title</label>
+                            <input type="text" id="episode-title" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Enter episode title">
+                        </div>
+                        
+                        <div>
+                            <label for="episode-description" class="block text-sm font-medium mb-1">Short Description</label>
+                            <input type="text" id="episode-description" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Brief description">
+                        </div>
+                        
+                        <div>
+                            <label for="episode-content" class="block text-sm font-medium mb-1">Episode Content</label>
+                            <textarea id="episode-content" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Write your episode content here..."></textarea>
+                        </div>
+                        
+                        <button id="save-episode" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 font-semibold">
+                            💾 Save Episode (Global)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold mb-4">📚 Published Episodes</h2>
+                    <div id="episodes-list" class="space-y-4">
+                        <p class="text-gray-500 italic">Loading episodes from global database...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clans Tab -->
+            <div id="clans-tab" class="tab-content" style="display: none;">
+                <div class="bg-white rounded-lg shadow p-6 mb-8">
+                    <h2 class="text-xl font-bold mb-4">🔮 Add New Clan</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="clan-name" class="block text-sm font-medium mb-1">Clan Name</label>
+                            <input type="text" id="clan-name" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Enter clan name">
+                        </div>
+                        
+                        <div>
+                            <label for="clan-origin" class="block text-sm font-medium mb-1">Origin Story</label>
+                            <textarea id="clan-origin" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="How did this clan come to be?"></textarea>
+                        </div>
+                        
+                        <div>
+                            <label for="clan-powers" class="block text-sm font-medium mb-1">Powers & Abilities</label>
+                            <textarea id="clan-powers" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="What special abilities do they have?"></textarea>
+                        </div>
+                        
+                        <div>
+                            <label for="clan-connection" class="block text-sm font-medium mb-1">Connection Method</label>
+                            <textarea id="clan-connection" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="How do they connect to the magical realm?"></textarea>
+                        </div>
+                        
+                        <div>
+                            <label for="clan-color1" class="block text-sm font-medium mb-1">Primary Color</label>
+                            <input type="color" id="clan-color1" class="w-full h-10 border border-gray-300 rounded-md" value="#3B82F6">
+                        </div>
+                        
+                        <div>
+                            <label for="clan-color2" class="block text-sm font-medium mb-1">Secondary Color</label>
+                            <input type="color" id="clan-color2" class="w-full h-10 border border-gray-300 rounded-md" value="#1E40AF">
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <button id="save-clan" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 font-semibold">
+                                💾 Save Clan (Global)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold mb-4">🏛️ Active Clans</h2>
+                    <div id="clans-list" class="space-y-4">
+                        <p class="text-gray-500 italic">Loading clans from global database...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Locations Tab -->
+            <div id="locations-tab" class="tab-content" style="display: none;">
+                <div class="bg-white rounded-lg shadow p-6 mb-8">
+                    <h2 class="text-xl font-bold mb-4">🗺️ Add New Location</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="location-name" class="block text-sm font-medium mb-1">Location Name</label>
+                            <input type="text" id="location-name" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Enter location name">
+                        </div>
+                        
+                        <div>
+                            <label for="location-lat" class="block text-sm font-medium mb-1">Latitude</label>
+                            <input type="number" step="any" id="location-lat" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="e.g. 51.5074">
+                        </div>
+                        
+                        <div>
+                            <label for="location-lng" class="block text-sm font-medium mb-1">Longitude</label>
+                            <input type="number" step="any" id="location-lng" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="e.g. -0.1278">
+                        </div>
+                        
+                        <div>
+                            <label for="location-magic" class="block text-sm font-medium mb-1">Magical Description</label>
+                            <textarea id="location-magic" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="What makes this place magical?"></textarea>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label for="location-lookfor" class="block text-sm font-medium mb-1">What to Look For</label>
+                            <textarea id="location-lookfor" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Clues visitors should look for"></textarea>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <button id="save-location" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 font-semibold">
+                                💾 Save Location (Global)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold mb-4">📍 Active Locations</h2>
+                    <div id="locations-list" class="space-y-4">
+                        <p class="text-gray-500 italic">Loading locations from global database...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Page Tab -->
+            <div id="main-page-tab" class="tab-content" style="display: none;">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold mb-4">🏠 Edit Main Page Content</h2>
+                    <div class="space-y-6">
+                        <div>
+                            <label for="hero-title" class="block text-sm font-medium mb-1">Hero Title</label>
+                            <input type="text" id="hero-title" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Main title on homepage">
+                        </div>
+                        
+                        <div>
+                            <label for="hero-subtitle" class="block text-sm font-medium mb-1">Hero Subtitle</label>
+                            <textarea id="hero-subtitle" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Subtitle description"></textarea>
+                        </div>
+                        
+                        <div>
+                            <label for="episodes-title" class="block text-sm font-medium mb-1">Episodes Section Title</label>
+                            <input type="text" id="episodes-title" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Episodes section title">
+                        </div>
+                        
+                        <div>
+                            <label for="episodes-desc" class="block text-sm font-medium mb-1">Episodes Section Description</label>
+                            <textarea id="episodes-desc" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Episodes section description"></textarea>
+                        </div>
+                        
+                        <button id="save-main-page" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 font-semibold">
+                            💾 Save Main Page Changes (Global)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Admin System JavaScript -->
+    <script>
+        const ADMIN_PASSWORD = 'hiddenworld2024';
+        let currentEditingEpisode = null;
+        let currentEditingClan = null;
+        let currentEditingLocation = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🌐 GLOBAL Admin system initializing...');
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Login
+            document.getElementById('login-button').addEventListener('click', handleLogin);
+            document.getElementById('admin-password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') handleLogin();
+            });
+            
+            // Logout  
+            document.getElementById('logout-button').addEventListener('click', handleLogout);
+            
+            // Tabs
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    showTab(this.dataset.tab);
+                });
+            });
+
+            // Save buttons
+            document.getElementById('save-episode').addEventListener('click', saveEpisode);
+            document.getElementById('save-clan').addEventListener('click', saveClan);
+            document.getElementById('save-location').addEventListener('click', saveLocation);
+            document.getElementById('save-main-page').addEventListener('click', saveMainPage);
+        }
+
+        function handleLogin() {
+            const password = document.getElementById('admin-password').value;
+            
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('admin-dashboard').style.display = 'block';
+                loadAllContent();
+                console.log('✅ Login successful, loading global content...');
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+                document.getElementById('admin-password').value = '';
+            }
+        }
+
+        function handleLogout() {
+            document.getElementById('admin-dashboard').style.display = 'none';
+            document.getElementById('login-section').style.display = 'flex';
+            document.getElementById('admin-password').value = '';
+            document.getElementById('login-error').style.display = 'none';
+        }
+
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').style.display = 'block';
+            
+            // Update button styles
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-gray-600', 'text-gray-300');
+            });
+            
+            // Highlight active button
+            document.querySelector(`[data-tab="${tabName}"]`).classList.remove('bg-gray-600', 'text-gray-300');
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('bg-blue-600', 'text-white');
+            
+            // Load content for this tab
+            if (tabName === 'episodes') loadEpisodes();
+            else if (tabName === 'clans') loadClans();
+            else if (tabName === 'locations') loadLocations();
+            else if (tabName === 'main-page') loadMainPage();
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success-message');
+            successDiv.innerHTML = message || '✅ Success! Your changes are now live on the website FOR ALL VISITORS.';
+            successDiv.style.display = 'block';
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 4000);
+        }
+
+        function showLoading() {
+            document.getElementById('loading-message').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-message').style.display = 'none';
+        }
+
+        // Load all content
+        async function loadAllContent() {
+            console.log('📖 Loading all content from GLOBAL database...');
+            await loadEpisodes();
+            await loadClans();  
+            await loadLocations();
+            await loadMainPage();
+        }
+
+        // Episodes functions
+        async function loadEpisodes() {
+            try {
+                const response = await fetch('tables/episodes');
+                const result = await response.json();
+                console.log(`📖 Loaded ${result.data.length} episodes from global database`);
+                displayEpisodes(result.data);
+            } catch (error) {
+                console.error('Error loading episodes:', error);
+                displayEpisodes([]);
+            }
+        }
+
+        function displayEpisodes(episodes) {
+            const container = document.getElementById('episodes-list');
+            
+            if (episodes.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 italic">No episodes yet. Add your first episode above!</p>';
+                return;
+            }
+            
+            container.innerHTML = episodes.map(episode => `
+                <div class="bg-gray-50 p-4 border rounded-lg">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-gray-800">${episode.title}</h3>
+                        <div class="flex space-x-2">
+                            <button onclick="editEpisode('${episode.id}')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm">Edit</button>
+                            <button onclick="deleteEpisode('${episode.id}')" class="bg-red-500 text-white px-3 py-1 rounded text-sm">Delete</button>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm">${episode.meta_description}</p>
+                    <p class="text-gray-400 text-xs mt-1">Created: ${new Date(episode.created_at).toLocaleDateString()}</p>
+                </div>
+            `).join('');
+        }
+
+        async function saveEpisode() {
+            const title = document.getElementById('episode-title').value;
+            const description = document.getElementById('episode-description').value;
+            const content = document.getElementById('episode-content').value;
+            
+            if (!title || !description || !content) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            showLoading();
+            
+            const episode = {
+                title: title,
+                meta_description: description,
+                content: content,
+                page_type: 'episode',
+                status: 'published'
+            };
+            
+            try {
+                let response, result;
+                if (currentEditingEpisode) {
+                    // Update existing episode
+                    response = await fetch(`tables/episodes/${currentEditingEpisode}`, {
+                        method: 'PATCH',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(episode)
+                    });
+                } else {
+                    // Create new episode
+                    response = await fetch('tables/episodes', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(episode)
+                    });
+                }
+                
+                result = await response.json();
+                hideLoading();
+                
+                if (response.ok) {
+                    showSuccess(currentEditingEpisode ? 
+                        '✅ Episode updated! All visitors can see the changes immediately.' :
+                        '✅ Episode saved! All visitors can see it immediately.'
+                    );
+                    
+                    // Clear form
+                    document.getElementById('episode-title').value = '';
+                    document.getElementById('episode-description').value = '';
+                    document.getElementById('episode-content').value = '';
+                    
+                    // Reset edit mode
+                    currentEditingEpisode = null;
+                    document.getElementById('save-episode').textContent = '💾 Save Episode (Global)';
+                    
+                    loadEpisodes();
+                } else {
+                    throw new Error(result.message || 'Failed to save episode');
+                }
+            } catch (error) {
+                hideLoading();
+                alert('Failed to save episode: ' + error.message);
+            }
+        }
+
+        async function editEpisode(episodeId) {
+            try {
+                const response = await fetch(`tables/episodes/${episodeId}`);
+                const episode = await response.json();
+                
+                if (!episode) {
+                    alert('Episode not found!');
+                    return;
+                }
+                
+                // Fill form
+                document.getElementById('episode-title').value = episode.title;
+                document.getElementById('episode-description').value = episode.meta_description;
+                document.getElementById('episode-content').value = episode.content;
+                
+                // Set edit mode
+                currentEditingEpisode = episodeId;
+                document.getElementById('save-episode').textContent = '📝 Update Episode (Global)';
+                
+                // Switch to episodes tab
+                showTab('episodes');
+                
+            } catch (error) {
+                alert('Failed to load episode: ' + error.message);
+            }
+        }
+
+        async function deleteEpisode(episodeId) {
+            if (!confirm('Are you sure you want to delete this episode? This will remove it for ALL visitors.')) return;
+            
+            try {
+                showLoading();
+                const response = await fetch(`tables/episodes/${episodeId}`, {
+                    method: 'DELETE'
+                });
+                
+                hideLoading();
+                
+                if (response.ok) {
+                    showSuccess('✅ Episode deleted! Removed from website for all visitors.');
+                    loadEpisodes();
+                } else {
+                    throw new Error('Failed to delete episode');
+                }
+            } catch (error) {
+                hideLoading();
+                alert('Failed to delete episode: ' + error.message);
+            }
+        }
+
+        // Clans functions
+        async function loadClans() {
+            try {
+                const response = await fetch('tables/clans');
+                const result = await response.json();
+                console.log(`🔮 Loaded ${result.data.length} clans from global database`);
+                displayClans(result.data);
+            } catch (error) {
+                console.error('Error loading clans:', error);
+                displayClans([]);
+            }
+        }
+
+        function displayClans(clans) {
+            const container = document.getElementById('clans-list');
+            
+            if (clans.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 italic">No clans yet. Add your first clan above!</p>';
+                return;
+            }
+            
+            container.innerHTML = clans.map(clan => `
+                <div class="bg-gray-50 p-4 border rounded-lg">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-gray-800">${clan.name}</h3>
+                        <div class="flex space-x-2">
+                            <button onclick="editClan('${clan.id}')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm">Edit</button>
+                            <button onclick="deleteClan('${clan.id}')" class="bg-red-500 text-white px-3 py-1 rounded text-sm">Delete</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 mb-2">
+                        <div class="w-4 h-4 rounded-full" style="background-color: ${clan.color_primary}"></div>
+                        <div class="w-4 h-4 rounded-full" style="background-color: ${clan.color_secondary}"></div>
+                    </div>
+                    <p class="text-gray-600 text-sm">${clan.stone_description ? clan.stone_description.substring(0, 100) + '...' : ''}</p>
+                </div>
+            `).join('');
+        }
+
+        async function saveClan() {
+            const name = document.getElementById('clan-name').value;
+            const origin = document.getElementById('clan-origin').value;
+            const powers = document.getElementById('clan-powers').value;
+            const connection = document.getElementById('clan-connection').value;
+            
+            if (!name || !origin || !powers || !connection) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            showLoading();
+            
+            const clan = {
+                name: name,
+                stone_description: origin,
+                offering: powers,
+                resonance_note: connection,
+                color_primary: document.getElementById('clan-color1').value,
+                color_secondary: document.getElementById('clan-color2').value,
+                status: 'active'
+            };
+            
+            try {
+                let response;
+                if (currentEditingClan) {
+                    response = await fetch(`tables/clans/${currentEditingClan}`, {
+                        method: 'PATCH',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(clan)
+                    });
+                } else {
+                    response = await fetch('tables/clans', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(clan)
+                    });
+                }
+                
+                hideLoading();
+                
+                if (response.ok) {
+                    showSuccess(currentEditingClan ? 
+                        '✅ Clan updated! All visitors can see the changes immediately.' :
+                        '✅ Clan saved! All visitors can see it immediately.'
+                    );
+                    
+                    // Clear form
+                    document.getElementById('clan-name').value = '';
+                    document.getElementById('clan-origin').value = '';
+                    document.getElementById('clan-powers').value = '';
+                    document.getElementById('clan-connection').value = '';
+                    
+                    // Reset edit mode
+                    currentEditingClan = null;
+                    document.getElementById('save-clan').textContent = '💾 Save Clan (Global)';
+                    
+                    loadClans();
+                } else {
+                    throw new Error('Failed to save clan');
+                }
+            } catch (error) {
+                hideLoading();
+                alert('Failed to save clan: ' + error.message);
+            }
+        }
+
+        async function editClan(clanId) {
+            try {
+                const response = await fetch(`tables/clans/${clanId}`);
+                const clan = await response.json();
+                
+                if (!clan) {
+                    alert('Clan not found!');
+                    return;
+                }
+                
+                // Fill form
+                document.getElementById('clan-name').value = clan.name;
+                document.getElementById('clan-origin').value = clan.stone_description;
+                document.getElementById('clan-powers').value = clan.offering;
+                document.getElementById('clan-connection').value = clan.resonance_note;
+                document.getElementById('clan-color1').value = clan.color_primary || '#3B82F6';
+                document.getElementById('clan-color2').value = clan.color_secondary || '#1E40AF';
+                
+                // Set edit mode
+                currentEditingClan = clanId;
+                document.getElementById('save-clan').textContent = '📝 Update Clan (Global)';
+                
+                showTab('clans');
+                
+            } catch (error) {
+                alert('Failed to load clan: ' + error.message);
+            }
+        }
+
+        async function deleteClan(clanId) {
+            if (!confirm('Are you sure you want to delete this clan? This will remove it for ALL visitors.')) return;
+            
+            try {
+                showLoading();
+                const response = await fetch(`tables/clans/${clanId}`, {
+                    method: 'DELETE'
+                });
+                
+                hideLoading();
+                
+                if (response.ok) {
+                    showSuccess('✅ Clan deleted! Removed from website for all visitors.');
+                    loadClans();
+                } else {
+                    throw new Error('Failed to delete clan');
+                }
+            } catch (error) {
+                hideLoading();
+                alert('Failed to delete clan: ' + error.message);
+            }
+        }
+
+        // Locations functions
+        async function loadLocations() {
+            try {
+                const response = await fetch('tables/locations');
+                const result = await response.json();
+                console.log(`🗺️ Loaded ${result.data.length} locations from global database`);
+                displayLocations(result.data);
+            } catch (error) {
+                console.error('Error loading locations:', error);
+                displayLocations([]);
+            }
+        }
+
+        function displayLocations(locations) {
+            const container = document.getElementById('locations-list');
+            
+            if (locations.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 italic">No locations yet. Add your first location above!</p>';
+                return;
+            }
+            
+            container.innerHTML = locations.map(location => `
+                <div class="bg-gray-50 p-4 border rounded-lg">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-gray-800">${location.name}</h3>
+                        <div class="flex space-x-2">
+                            <button onclick="editLocation('${location.id}')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm">Edit</button>
+                            <button onclick="deleteLocation('${location.id}')" class="bg-red-500 text-white px-3 py-1 rounded text-sm">Delete</button>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm">${location.magical_description ? location.magical_description.substring(0, 100) + '...' : ''}</p>
+                    <p class="text-gray-400 text-xs mt-1">📍 ${location.latitude}, ${location.longitude}</p>
+                </div>
+            `).join('');
+        }
+
+        async function saveLocation() {
+            const name = document.getElementById('location-name').value;
+            const lat = document.getElementById('location-lat').value;
+            const lng = document.getElementById('location-lng').value;
+            const magic = document.getElementById('location-magic').value;
+            const lookFor = document.getElementById('location-lookfor').value;
+            
+            if (!name || !lat || !lng || !magic || !lookFor) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            showLoading();
+            
+            const location = {
+                name: name,
+                latitude: parseFloat(lat),
+                longitude: parseFloat(lng),
+                magical_description: magic,
+                what_to_look_for: lookFor,
+                status: 'active'
+            };
+            
+            try {
+                let response;
+                if (currentEditingLocation) {
+                    response = await fetch(`tables/locations/${currentEditingLocation}`, {
+                        method: 'PATCH',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(location)
+                    });
+                } else {
+                    response = await fetch('tables/locations', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(location)
+                    });
+                }
+                
+                hideLoading();
+                
+                if (response.ok) {
+                    showSuccess(currentEditingLocation ? 
+                        '✅ Location updated! All visitors can see the changes immediately.' :
+                        '✅ Location saved! All visitors can see it immediately.'
+                    );
+                    
+                    // Clear form
+                    document.getElementById('location-name').value = '';
+                    document.getElementById('location-lat').value = '';
+                    document.getElementById('location-lng').value = '';
+                    document.getElementById('location-magic').value = '';
+                    document.getElementById('location-lookfor').value = '';
+                    
+                    // Reset edit mode
+                    currentEditingLocation = null;
+                    document.getElementById('save-location').textContent = '💾 Save Location (Global)';
+                    
+                    loadLocations();
+                } else {
+                    throw new Error('Failed to save location');
+                }
+            } catch (error) {
+                hideLoading();
+                alert('Failed to save location: ' + error.message);
+            }
+        }
+
+        async function editLocation(locationId) {
+            try {
+                const response = await fetch(`tables/locations/${locationId}`);
+                const location = await response.json();
+                
+                if (!location) {
+                    alert('Location not found!');
+                    return;
+                }
+                
+                // Fill form
+                document.getElementById('location-name').value = location.name;
+                document.getElementById('location-lat').value = location.latitude;
+                document.getElementById('location-lng').value = location.longitude;
+                document.getElementById('location-magic').value = location.magical_description;
+                document.getElementById('location-lookfor').value = location.what_to_look_for;
+                
+                // Set edit mode
+                currentEditingLocation = locationId;
+                document.getElementById('save-location').textContent = '📝 Update Location (Global)';
+                
+                showTab('locations');
+                
+            } catch (error) {
+                alert('Failed to load location: ' + error.message);
+            }
+        }
+
+        async function deleteLocation(locationId) {
+            if (!confirm('Are you sure you want to delete this location? This will remove it for ALL visitors.')) return;
+            
+            try {
+                showLoading();
+                const response = await fetch(`tables/locations/${locationId}`, {
+                    method: 'DELETE'
+                });
+                
+                hideLoading();
+                
+                if (response.ok) {
+                    showSuccess('✅ Location deleted! Removed from website for all visitors.');
+                    loadLocations();
+                } else {
+                    throw new Error('Failed to delete location');
+                }
+            } catch (error) {
+                hideLoading();
+                alert('Failed to delete location: ' + error.message);
+            }
+        }
+
+        // Main page functions
+        async function loadMainPage() {
+            try {
+                const response = await fetch('tables/main_page');
+                const result = await response.json();
+                
+                // Load saved main page content into form
+                result.data.forEach(item => {
+                    if (item.section === 'hero' && item.field === 'title') {
+                        document.getElementById('hero-title').value = item.content || '';
+                    }
+                    if (item.section === 'hero' && item.field === 'subtitle') {
+                        document.getElementById('hero-subtitle').value = item.content || '';
+                    }
+                    if (item.section === 'episodes' && item.field === 'title') {
+                        document.getElementById('episodes-title').value = item.content || '';
+                    }
+                    if (item.section === 'episodes' && item.field === 'description') {
+                        document.getElementById('episodes-desc').value = item.content || '';
+                    }
+                });
+                
+                console.log('🏠 Loaded main page content');
+            } catch (error) {
+                console.error('Error loading main page:', error);
+            }
+        }
+
+        async function saveMainPage() {
+            const heroTitle = document.getElementById('hero-title').value;
+            const heroSubtitle = document.getElementById('hero-subtitle').value;
+            const episodesTitle = document.getElementById('episodes-title').value;
+            const episodesDesc = document.getElementById('episodes-desc').value;
+            
+            showLoading();
+            
+            try {
+                // Save each field separately
+                const updates = [
+                    { section: 'hero', field: 'title', content: heroTitle },
+                    { section: 'hero', field: 'subtitle', content: heroSubtitle },
+                    { section: 'episodes', field: 'title', content: episodesTitle },
+                    { section: 'episodes', field: 'description', content: episodesDesc }
+                ];
+                
+                for (const update of updates) {
+                    if (update.content) {
+                        await fetch('tables/main_page', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({
+                                ...update,
+                                status: 'active'
+                            })
+                        });
+                    }
+                }
+                
+                hideLoading();
+                showSuccess('✅ Main page updated! All visitors will see the new content immediately.');
+                
+            } catch (error) {
+                hideLoading();
+                alert('Failed to save main page: ' + error.message);
+            }
+        }
+
+        console.log('✅ GLOBAL Admin system fully loaded and ready');
+    </script>
+</body>
+</html>
