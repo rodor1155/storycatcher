@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Admin - Main Page Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: Arial, sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <h1 class="text-2xl font-bold mb-6">🧪 Testing Main Page Content Editor</h1>
+    
+    <div class="bg-white rounded-lg p-6 shadow-lg">
+        <h2 class="text-lg font-semibold mb-4">✅ What Should Happen:</h2>
+        <ol class="list-decimal list-inside space-y-2 text-sm">
+            <li>Go to <code class="bg-gray-200 px-1 rounded">simple-admin.html</code></li>
+            <li>Login with password: <strong>hiddenworld2024</strong></li>
+            <li>Click the <strong>"Main Page"</strong> tab (4th tab)</li>
+            <li>All editors should be <strong>pre-filled with current homepage content</strong></li>
+            <li>You should see existing text like "There is a ✨ hidden world ✨ beneath London..."</li>
+            <li>Edit any content and click "Save All Changes"</li>
+            <li>Changes should appear immediately on the main site</li>
+        </ol>
+        
+        <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded">
+            <h3 class="font-semibold text-blue-800 mb-2">🔧 If Editors Are Blank:</h3>
+            <p class="text-blue-700 text-sm">The content loading system has been updated to retry multiple times and should populate with the existing homepage content automatically.</p>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <a href="simple-admin.html" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg inline-block">
+                🚀 Test Admin Panel
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        console.log('🧪 Test page loaded - ready to test admin functionality');
+    </script>
+</body>
+</html>
